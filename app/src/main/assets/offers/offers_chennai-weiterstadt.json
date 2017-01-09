@@ -1,0 +1,120 @@
+{
+  "restaurantID": "chennai-weiterstadt",
+  "title": "Chennai-Buffet Healthy Food",
+  "description": "Indo-Asia Küche im Loop 5",
+  "offers": [
+    {
+      "title": "Großer Teller vom Buffet",
+      "description": "Feinste indische Gerichte, 100% HALAL",
+      "prize": 650,
+      "starts": "Jan 09 2017 11:30:00 GMT+0100",
+      "ends": "Jan 09 2017 21:00:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Kleiner Teller vom Buffet",
+      "description": "Feinste indische Gerichte, 100% HALAL",
+      "prize": 490,
+      "starts": "Jan 09 2017 11:30:00 GMT+0100",
+      "ends": "Jan 09 2017 21:00:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Großer Teller vom Buffet",
+      "description": "Feinste indische Gerichte, 100% HALAL",
+      "prize": 650,
+      "starts": "Jan 10 2017 11:30:00 GMT+0100",
+      "ends": "Jan 10 2017 21:00:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Kleiner Teller vom Buffet",
+      "description": "Feinste indische Gerichte, 100% HALAL",
+      "prize": 490,
+      "starts": "Jan 10 2017 11:30:00 GMT+0100",
+      "ends": "Jan 10 2017 21:00:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Großer Teller vom Buffet",
+      "description": "Feinste indische Gerichte, 100% HALAL",
+      "prize": 650,
+      "starts": "Jan 11 2017 11:30:00 GMT+0100",
+      "ends": "Jan 11 2017 21:00:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Kleiner Teller vom Buffet",
+      "description": "Feinste indische Gerichte, 100% HALAL",
+      "prize": 490,
+      "starts": "Jan 11 2017 11:30:00 GMT+0100",
+      "ends": "Jan 11 2017 21:00:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Großer Teller vom Buffet",
+      "description": "Feinste indische Gerichte, 100% HALAL",
+      "prize": 650,
+      "starts": "Jan 12 2017 11:30:00 GMT+0100",
+      "ends": "Jan 12 2017 21:00:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Kleiner Teller vom Buffet",
+      "description": "Feinste indische Gerichte, 100% HALAL",
+      "prize": 490,
+      "starts": "Jan 12 2017 11:30:00 GMT+0100",
+      "ends": "Jan 12 2017 21:00:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Großer Teller vom Buffet",
+      "description": "Feinste indische Gerichte, 100% HALAL",
+      "prize": 650,
+      "starts": "Jan 13 2017 11:30:00 GMT+0100",
+      "ends": "Jan 13 2017 21:00:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Kleiner Teller vom Buffet",
+      "description": "Feinste indische Gerichte, 100% HALAL",
+      "prize": 490,
+      "starts": "Jan 13 2017 11:30:00 GMT+0100",
+      "ends": "Jan 13 2017 21:00:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Großer Teller vom Buffet",
+      "description": "Feinste indische Gerichte, 100% HALAL",
+      "prize": 650,
+      "starts": "Jan 14 2017 11:30:00 GMT+0100",
+      "ends": "Jan 14 2017 21:00:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Kleiner Teller vom Buffet",
+      "description": "Feinste indische Gerichte, 100% HALAL",
+      "prize": 490,
+      "starts": "Jan 14 2017 11:30:00 GMT+0100",
+      "ends": "Jan 14 2017 21:00:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    }
+  ]
+}

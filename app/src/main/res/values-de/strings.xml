@@ -4,6 +4,11 @@
     <string name="nav_content_desc_drawer_open">Navigationsbar öffnen</string>
     <string name="nav_content_desc_drawer_close">Navigationsbar schließen</string>
 
+    <string name="breakfast_time">Frühstücken?</string>
+    <string name="lunch_time">Mittagessenszeit!</string>
+    <string name="coffee_time">Ein Kaffee geht immer</string>
+    <string name="dinner_time">Heute abend essen gehen?</string>
+
     <string name="nav_item_dashboard">Startseite</string>
     <string name="nav_item_help">Hilfe</string>
     <string name="webview_help"><![CDATA[
@@ -20,4 +25,15 @@
     Durch Deine Nutzung verzichtest Du auf jegliche Haftungsanspr&uuml;che, die durch Nutzung der App entstehen k&ouml;nnen.
     ]]>
     </string>
+    <string name="more">Mehr</string>
+    <string name="starts">Ab </string>
+    <string name="ends">Bis </string>
+    <string name="expired">Abgelaufen</string>
+    <string name="no_offers">Keine Angebote verfügbar</string>
+    <string name="excellentChoice">Hervorragende Wahl!</string>
+    <string name="no_offers_today1">Heute keine Angebote verfügbar, mein Tipp: Alles nochmal Menü passieren lassen.</string>
+    <string name="no_offers_today2">Heute keine Angebote verfügbar, mache Gebrauch von Deinem Burger-Recht, gehe wählen.</string>
+    <string name="no_offers_today3">Heute keine Angebote verfügbar, eine Küche ist kein Ponyhof.</string>
+    <string name="no_offers_today4">Heute keine Angebote verfügbar, pass auf, dass Du nicht in Teufels Küche kommst.</string>
+    <string name="no_offers_today5">Heute keine Angebote verfügbar, das Geheimnis einer sauberen Küche? Nicht kochen…</string>
 </resources>

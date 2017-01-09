@@ -1,0 +1,748 @@
+{
+  "restaurantID": "hamm-weiterstadt",
+  "title": "Hamm",
+  "description": "Feinkost Metzgerei und Bistro im Loop 5",
+  "offers": [
+    {
+      "title": "Hühnerfrikassee mit Gemüsereis",
+      "description": "",
+      "prize": 620,
+      "starts": "Jan 09 2017 11:30:00 GMT+0100",
+      "ends": "Jan 09 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Penne mit Gorgonzolasoße",
+      "description": "",
+      "prize": 580,
+      "starts": "Jan 09 2017 11:30:00 GMT+0100",
+      "ends": "Jan 09 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Jägerschnitzel und Beilage",
+      "description": "Inklusive Getränk (alkoholfrei)",
+      "prize": 650,
+      "starts": "Jan 10 2017 11:30:00 GMT+0100",
+      "ends": "Jan 10 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Wildgeschnetzeltes mit Kartoffelgratin",
+      "description": "",
+      "prize": 750,
+      "starts": "Jan 10 2017 11:30:00 GMT+0100",
+      "ends": "Jan 10 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Lachssteak mit Blattspinat und Salzkartoffeln",
+      "description": "",
+      "prize": 670,
+      "starts": "Jan 10 2017 11:30:00 GMT+0100",
+      "ends": "Jan 10 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Chili con Carne (vom Rind) mit Reis",
+      "description": "",
+      "prize": 620,
+      "starts": "Jan 11 2017 11:30:00 GMT+0100",
+      "ends": "Jan 11 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Kartoffelrösti mit Kräuterquark",
+      "description": "",
+      "prize": 580,
+      "starts": "Jan 11 2017 11:30:00 GMT+0100",
+      "ends": "Jan 11 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Kochkäsebratwurst mit Kartoffelpüree und Erbsen-Karottengemüse",
+      "description": "",
+      "prize": 580,
+      "starts": "Jan 12 2017 11:30:00 GMT+0100",
+      "ends": "Jan 12 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Gemüseeintopf mit Rosenkohl und Kürbis",
+      "description": "",
+      "prize": 580,
+      "starts": "Jan 12 2017 11:30:00 GMT+0100",
+      "ends": "Jan 12 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Grießknödel mit Vanillesauce",
+      "description": "",
+      "prize": 520,
+      "starts": "Jan 13 2017 11:30:00 GMT+0100",
+      "ends": "Jan 13 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Seelachsfilet mit Specksalat und Schnittlauchsoße",
+      "description": "",
+      "prize": 520,
+      "starts": "Jan 13 2017 11:30:00 GMT+0100",
+      "ends": "Jan 13 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Eingelegte Matjes “Hausfrauenart“ mit Kartoffeln",
+      "description": "",
+      "prize": 520,
+      "starts": "Jan 13 2017 11:30:00 GMT+0100",
+      "ends": "Jan 13 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Grüne Soße mit Salzkartoffeln und Ei",
+      "description": "",
+      "prize": 470,
+      "starts": "Jan 13 2017 11:30:00 GMT+0100",
+      "ends": "Jan 13 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+
+
+    {
+      "title": "Wildgulascheintopf mit Salzkartoffeln",
+      "description": "Inklusive Salat",
+      "prize": 850,
+      "starts": "Jan 16 2017 11:30:00 GMT+0100",
+      "ends": "Jan 16 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Brokkoli mit Rosinen und Cashewkernen, dazu Safranreis",
+      "description": "",
+      "prize": 580,
+      "starts": "Jan 16 2017 11:30:00 GMT+0100",
+      "ends": "Jan 16 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Bergkäse-Schnitzel mit Speckrosenkohl und Beilage",
+      "description": "Inklusive Getränk (alkoholfrei)",
+      "prize": 650,
+      "starts": "Jan 17 2017 11:30:00 GMT+0100",
+      "ends": "Jan 17 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Braten von Pute oder Gans mit Rotkraut und Semmelknödel",
+      "description": "",
+      "prize": 850,
+      "starts": "Jan 17 2017 11:30:00 GMT+0100",
+      "ends": "Jan 17 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Schupfnudelpfanne mit Gemüse",
+      "description": "",
+      "prize": 620,
+      "starts": "Jan 17 2017 11:30:00 GMT+0100",
+      "ends": "Jan 17 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Putensteak mit Tomatensoße, dazu Pasta und Chinakohl-Salat",
+      "description": "",
+      "prize": 620,
+      "starts": "Jan 18 2017 11:30:00 GMT+0100",
+      "ends": "Jan 18 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Gemischte Pilzpfanne mit Spätzle und Salat",
+      "description": "",
+      "prize": 580,
+      "starts": "Jan 18 2017 11:30:00 GMT+0100",
+      "ends": "Jan 18 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Rinderrouladen mit Kohlrabigemüse und gebackenen Kartoffelknödeln",
+      "description": "",
+      "prize": 670,
+      "starts": "Jan 19 2017 11:30:00 GMT+0100",
+      "ends": "Jan 19 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Rosenkohl-Möhren-Auflauf mit Kartoffeln",
+      "description": "",
+      "prize": 520,
+      "starts": "Jan 19 2017 11:30:00 GMT+0100",
+      "ends": "Jan 19 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Gebratener Lachs mit Erbsenpüree und Salzkartoffeln",
+      "description": "",
+      "prize": 670,
+      "starts": "Jan 20 2017 11:30:00 GMT+0100",
+      "ends": "Jan 20 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Seelachsfilet mit Specksalat und Schnittlauchsoße",
+      "description": "",
+      "prize": 520,
+      "starts": "Jan 20 2017 11:30:00 GMT+0100",
+      "ends": "Jan 20 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Eingelegte Matjes “Hausfrauenart“ mit Kartoffeln",
+      "description": "",
+      "prize": 520,
+      "starts": "Jan 20 2017 11:30:00 GMT+0100",
+      "ends": "Jan 20 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Grüne Soße mit Salzkartoffeln und Ei",
+      "description": "",
+      "prize": 470,
+      "starts": "Jan 20 2017 11:30:00 GMT+0100",
+      "ends": "Jan 20 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+
+
+    {
+      "title": "Wild-Lasagne mit Wirsing und Taleggiokäse",
+      "description": "",
+      "prize": 750,
+      "starts": "Jan 23 2017 11:30:00 GMT+0100",
+      "ends": "Jan 23 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Kartoffel-Wirsing-Auflauf",
+      "description": "",
+      "prize": 520,
+      "starts": "Jan 23 2017 11:30:00 GMT+0100",
+      "ends": "Jan 23 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Balkanschnitzel mit Paprikasoße und Beilage",
+      "description": "Inklusive Getränk (alkoholfrei)",
+      "prize": 650,
+      "starts": "Jan 24 2017 11:30:00 GMT+0100",
+      "ends": "Jan 24 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Gemischter Gulasch mit Nudeln und Salat",
+      "description": "",
+      "prize": 620,
+      "starts": "Jan 24 2017 11:30:00 GMT+0100",
+      "ends": "Jan 24 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Tortelloni mit Brokkolisoße",
+      "description": "",
+      "prize": 520,
+      "starts": "Jan 24 2017 11:30:00 GMT+0100",
+      "ends": "Jan 24 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Rindergeschnetzeltes mit Paprika und Sprossen, dazu Reis",
+      "description": "",
+      "prize": 620,
+      "starts": "Jan 25 2017 11:30:00 GMT+0100",
+      "ends": "Jan 25 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Blumenkohl-Curry mit Süßkartoffeln und Reis",
+      "description": "",
+      "prize": 580,
+      "starts": "Jan 25 2017 11:30:00 GMT+0100",
+      "ends": "Jan 25 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Schweinerollbraten mit Kartoffelgratin und Salat",
+      "description": "",
+      "prize": 580,
+      "starts": "Jan 26 2017 11:30:00 GMT+0100",
+      "ends": "Jan 26 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Griesheimer Lauch-Kartoffel-Kuchen mit Kräuterschmand",
+      "description": "",
+      "prize": 520,
+      "starts": "Jan 26 2017 11:30:00 GMT+0100",
+      "ends": "Jan 26 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Pikante Fischsuppe mit Brötchen",
+      "description": "",
+      "prize": 650,
+      "starts": "Jan 27 2017 11:30:00 GMT+0100",
+      "ends": "Jan 27 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Seelachsfilet mit Specksalat und Schnittlauchsoße",
+      "description": "",
+      "prize": 520,
+      "starts": "Jan 27 2017 11:30:00 GMT+0100",
+      "ends": "Jan 27 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Eingelegte Matjes “Hausfrauenart“ mit Kartoffeln",
+      "description": "",
+      "prize": 520,
+      "starts": "Jan 27 2017 11:30:00 GMT+0100",
+      "ends": "Jan 27 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Grüne Soße mit Salzkartoffeln und Ei",
+      "description": "",
+      "prize": 470,
+      "starts": "Jan 27 2017 11:30:00 GMT+0100",
+      "ends": "Jan 27 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+
+
+    {
+      "title": "3 Rostbratwürstchen mit Riesling-Sauerkraut und Stampfkartoffeln",
+      "description": "",
+      "prize": 580,
+      "starts": "Jan 30 2017 11:30:00 GMT+0100",
+      "ends": "Jan 30 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Kartoffel-Auberginen-Auflauf",
+      "description": "",
+      "prize": 520,
+      "starts": "Jan 30 2017 11:30:00 GMT+0100",
+      "ends": "Jan 30 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Hawaiischnitzel mit Ananas und Beilage",
+      "description": "Inklusive Getränk (alkoholfrei)",
+      "prize": 650,
+      "starts": "Jan 31 2017 11:30:00 GMT+0100",
+      "ends": "Jan 31 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Rinderroulade mit Steckrübengemüse und Petersilienkartoffeln",
+      "description": "",
+      "prize": 690,
+      "starts": "Jan 31 2017 11:30:00 GMT+0100",
+      "ends": "Jan 31 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Spaghetti mit Gemüseragout",
+      "description": "",
+      "prize": 520,
+      "starts": "Jan 31 2017 11:30:00 GMT+0100",
+      "ends": "Jan 31 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Hähnchenschenkel mit Paprikasoße und Rosmarinkartoffeln",
+      "description": "",
+      "prize": 620,
+      "starts": "Feb 1 2017 11:30:00 GMT+0100",
+      "ends": "Feb 1 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Gratinierte Spinatknöpfle mit Salat",
+      "description": "",
+      "prize": 520,
+      "starts": "Feb 1 2017 11:30:00 GMT+0100",
+      "ends": "Feb 1 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Gegrillter Spanferkelbraten mit Bratkartoffeln und Krautsalat",
+      "description": "",
+      "prize": 650,
+      "starts": "Feb 2 2017 11:30:00 GMT+0100",
+      "ends": "Feb 2 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Gebackener Schafskäse mit buntem Ofengemüse",
+      "description": "",
+      "prize": 580,
+      "starts": "Feb 2 2017 11:30:00 GMT+0100",
+      "ends": "Feb 2 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Kabeljau auf Steckrübengemüse und Salzkartoffeln",
+      "description": "",
+      "prize": 670,
+      "starts": "Feb 3 2017 11:30:00 GMT+0100",
+      "ends": "Feb 3 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Seelachsfilet mit Specksalat und Schnittlauchsoße",
+      "description": "",
+      "prize": 520,
+      "starts": "Feb 3 2017 11:30:00 GMT+0100",
+      "ends": "Feb 3 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Eingelegte Matjes “Hausfrauenart“ mit Kartoffeln",
+      "description": "",
+      "prize": 520,
+      "starts": "Feb 3 2017 11:30:00 GMT+0100",
+      "ends": "Feb 3 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Grüne Soße mit Salzkartoffeln und Ei",
+      "description": "",
+      "prize": 470,
+      "starts": "Feb 3 2017 11:30:00 GMT+0100",
+      "ends": "Feb 3 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+
+
+    {
+      "title": "Hack-Lauch-Auflauf",
+      "description": "Inklusive Salat",
+      "prize": 580,
+      "starts": "Feb 6 2017 11:30:00 GMT+0100",
+      "ends": "Feb 6 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Käsespätzle mit Schmelzzwiebeln",
+      "description": "Inklusive Blattsalat",
+      "prize": 520,
+      "starts": "Feb 6 2017 11:30:00 GMT+0100",
+      "ends": "Feb 6 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Zwiebelschnitzel und Beilage",
+      "description": "Inklusive Getränk (alkoholfrei)",
+      "prize": 650,
+      "starts": "Feb 7 2017 11:30:00 GMT+0100",
+      "ends": "Feb 7 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Rinderbraten mit Apfelrotkohl und Kartoffelpüree",
+      "description": "",
+      "prize": 690,
+      "starts": "Feb 7 2017 11:30:00 GMT+0100",
+      "ends": "Feb 7 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Champignon-Spinat-Risotto",
+      "description": "",
+      "prize": 580,
+      "starts": "Feb 7 2017 11:30:00 GMT+0100",
+      "ends": "Feb 7 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Truthahnbraten mit Preiselbeersoße und Salzkartoffeln",
+      "description": "",
+      "prize": 690,
+      "starts": "Feb 8 2017 11:30:00 GMT+0100",
+      "ends": "Feb 8 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Schwarzwurzelragout mit Salzkartoffeln",
+      "description": "",
+      "prize": 580,
+      "starts": "Feb 8 2017 11:30:00 GMT+0100",
+      "ends": "Feb 8 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Wildgulasch mit Rosenkohl und Salzkartoffeln",
+      "description": "",
+      "prize": 750,
+      "starts": "Feb 9 2017 11:30:00 GMT+0100",
+      "ends": "Feb 9 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Rigatoni mit Mandel-Karottensoße",
+      "description": "",
+      "prize": 580,
+      "starts": "Feb 9 2017 11:30:00 GMT+0100",
+      "ends": "Feb 9 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Rotes Kokos-Fisch-Curry dazu gemischter Reis",
+      "description": "",
+      "prize": 650,
+      "starts": "Feb 10 2017 11:30:00 GMT+0100",
+      "ends": "Feb 10 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Seelachsfilet mit Specksalat und Schnittlauchsoße",
+      "description": "",
+      "prize": 520,
+      "starts": "Feb 10 2017 11:30:00 GMT+0100",
+      "ends": "Feb 10 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Eingelegte Matjes “Hausfrauenart“ mit Kartoffeln",
+      "description": "",
+      "prize": 520,
+      "starts": "Feb 10 2017 11:30:00 GMT+0100",
+      "ends": "Feb 10 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Grüne Soße mit Salzkartoffeln und Ei",
+      "description": "",
+      "prize": 470,
+      "starts": "Feb 10 2017 11:30:00 GMT+0100",
+      "ends": "Feb 10 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+
+
+    {
+      "title": "Rippchen mit Sauerkraut und Kartoffelpüree",
+      "description": "",
+      "prize": 580,
+      "starts": "Feb 13 2017 11:30:00 GMT+0100",
+      "ends": "Feb 13 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Rigatoni mit Gorgonzolasoße und Rote Bete-Salat",
+      "description": "",
+      "prize": 580,
+      "starts": "Feb 13 2017 11:30:00 GMT+0100",
+      "ends": "Feb 13 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Schnitzel natur (S) in Apfel-Calvadosrahm und Beilage",
+      "description": "Inklusive Getränk (alkoholfrei)",
+      "prize": 650,
+      "starts": "Feb 14 2017 11:30:00 GMT+0100",
+      "ends": "Feb 14 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": ["PIG"]
+    },
+    {
+      "title": "Hackbällchen in Tomatensoße mit Reis",
+      "description": "Inklusive Salat",
+      "prize": 620,
+      "starts": "Feb 14 2017 11:30:00 GMT+0100",
+      "ends": "Feb 14 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Pilzpfanne mit Semmelknödel",
+      "description": "",
+      "prize": 580,
+      "starts": "Feb 14 2017 11:30:00 GMT+0100",
+      "ends": "Feb 14 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Gulasch vom Rind mit Eierknöpfle und Karottengemüse",
+      "description": "",
+      "prize": 650,
+      "starts": "Feb 15 2017 11:30:00 GMT+0100",
+      "ends": "Feb 15 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Kartoffelreibekuchen mit Kräuterschmand (und Lachs 5,90 €)",
+      "description": "",
+      "prize": 500,
+      "starts": "Feb 15 2017 11:30:00 GMT+0100",
+      "ends": "Feb 15 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Wildbraten mit Tagliatelle und Karottengemüse",
+      "description": "",
+      "prize": 780,
+      "starts": "Feb 16 2017 11:30:00 GMT+0100",
+      "ends": "Feb 16 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Erbsensuppe mit Wurzelgemüse",
+      "description": "",
+      "prize": 520,
+      "starts": "Feb 16 2017 11:30:00 GMT+0100",
+      "ends": "Feb 16 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Forelle gebacken, mit Riesling-Soße und Salzkartoffeln",
+      "description": "",
+      "prize": 670,
+      "starts": "Feb 17 2017 11:30:00 GMT+0100",
+      "ends": "Feb 17 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Seelachsfilet mit Specksalat und Schnittlauchsoße",
+      "description": "",
+      "prize": 520,
+      "starts": "Feb 17 2017 11:30:00 GMT+0100",
+      "ends": "Feb 17 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Eingelegte Matjes “Hausfrauenart“ mit Kartoffeln",
+      "description": "",
+      "prize": 520,
+      "starts": "Feb 17 2017 11:30:00 GMT+0100",
+      "ends": "Feb 17 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Grüne Soße mit Salzkartoffeln und Ei",
+      "description": "",
+      "prize": 470,
+      "starts": "Feb 17 2017 11:30:00 GMT+0100",
+      "ends": "Feb 17 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    }
+  ]
+}

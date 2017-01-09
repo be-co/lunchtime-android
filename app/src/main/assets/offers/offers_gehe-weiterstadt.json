@@ -1,0 +1,146 @@
+{
+  "restaurantID": "gehe-weiterstadt",
+  "title": "Casino Gehe",
+  "description": "Öffentliches Betriebsrestaurant",
+  "offers": [
+    {
+      "title": "Hähnchenbrust-Filet “Hawaii“ mit Currysoße und Reis",
+      "description": "Inklusive Salat vom Buffet oder Dessert",
+      "prize": 590,
+      "starts": "Jan 9 2017 11:30:00 GMT+0100",
+      "ends": "Jan 9 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": ["MILK"]
+    },
+    {
+      "title": "Hackfleisch-Pilz-Pfanne in Paprikasahne mit Nudeln",
+      "description": "Inklusive Salat vom Buffet oder Dessert",
+      "prize": 590,
+      "starts": "Jan 9 2017 11:30:00 GMT+0100",
+      "ends": "Jan 9 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": ["MILK"]
+    },
+    {
+      "title": "Süßkartoffel-Lauch-Pfanne",
+      "description": "Inklusive Salat vom Buffet und Dessert",
+      "prize": 520,
+      "starts": "Jan 9 2017 11:30:00 GMT+0100",
+      "ends": "Jan 9 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+
+    {
+      "title": "Schweinelende in Walpilzrahm mit Kroketten",
+      "description": "Inklusive Salat vom Buffet oder Dessert",
+      "prize": 590,
+      "starts": "Jan 10 2017 11:30:00 GMT+0100",
+      "ends": "Jan 10 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": ["GLUTEN", "MILK"]
+    },
+    {
+      "title": "Knoblauch- Hähnchen mit Rosmarinkartoffeln",
+      "description": "Inklusive Salat vom Buffet oder Dessert",
+      "prize": 590,
+      "starts": "Jan 10 2017 11:30:00 GMT+0100",
+      "ends": "Jan 10 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "Eier in Senfsoße mit Kartoffeln",
+      "description": "Inklusive Salat vom Buffet und Dessert",
+      "prize": 520,
+      "starts": "Jan 10 2017 11:30:00 GMT+0100",
+      "ends": "Jan 10 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": ["EGG", "MILK"]
+    },
+
+    {
+      "title": "Wildgulasch mit Rotkohl und Semmelknödel",
+      "description": "Inklusive Salat vom Buffet oder Dessert",
+      "prize": 590,
+      "starts": "Jan 11 2017 11:30:00 GMT+0100",
+      "ends": "Jan 11 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": ["GLUTEN", "EGG", "MILK"]
+    },
+    {
+      "title": "Königsberger Klopse mit Reis",
+      "description": "Inklusive Salat vom Buffet oder Dessert",
+      "prize": 590,
+      "starts": "Jan 11 2017 11:30:00 GMT+0100",
+      "ends": "Jan 11 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": ["GLUTEN", "EGG", "MILK"]
+    },
+    {
+      "title": "Topfen-Palatschinken mit Kirschkompott",
+      "description": "Inklusive Salat vom Buffet und Dessert",
+      "prize": 520,
+      "starts": "Jan 11 2017 11:30:00 GMT+0100",
+      "ends": "Jan 11 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": ["GLUTEN", "EGG", "MILK"]
+    },
+
+    {
+      "title": "Lachs auf Blattspinat mit Bandnudeln",
+      "description": "Inklusive Salat vom Buffet oder Dessert",
+      "prize": 590,
+      "starts": "Jan 12 2017 11:30:00 GMT+0100",
+      "ends": "Jan 12 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": ["GLUTEN", "EGG", "MILK"]
+    },
+    {
+      "title": "Hausgemachte Lasagne",
+      "description": "Inklusive Salat vom Buffet oder Dessert",
+      "prize": 590,
+      "starts": "Jan 12 2017 11:30:00 GMT+0100",
+      "ends": "Jan 12 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": ["GLUTEN", "MILK"]
+    },
+    {
+      "title": "Tortellini- Rosenkohl- Auflauf",
+      "description": "Inklusive Salat vom Buffet und Dessert",
+      "prize": 520,
+      "starts": "Jan 12 2017 11:30:00 GMT+0100",
+      "ends": "Jan 12 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": ["GLUTEN", "EGG", "MILK"]
+    },
+
+    {
+      "title": "G1",
+      "description": "Inklusive Salat vom Buffet oder Dessert",
+      "prize": 590,
+      "starts": "Jan 13 2017 11:30:00 GMT+0100",
+      "ends": "Jan 13 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "G2",
+      "description": "Inklusive Salat vom Buffet oder Dessert",
+      "prize": 590,
+      "starts": "Jan 13 2017 11:30:00 GMT+0100",
+      "ends": "Jan 13 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    },
+    {
+      "title": "G3",
+      "description": "Inklusive Salat vom Buffet und Dessert",
+      "prize": 520,
+      "starts": "Jan 13 2017 11:30:00 GMT+0100",
+      "ends": "Jan 13 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": []
+    }
+  ]
+}

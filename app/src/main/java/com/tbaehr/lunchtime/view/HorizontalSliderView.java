@@ -46,7 +46,7 @@ public class HorizontalSliderView extends LinearLayout {
 
     private static final int INGREDIENTS_PADDING_IN_PIXELS = 4;
 
-    private static final int MAX_ITEM_WIDTH = 380;
+    private static final int MAX_ITEM_WIDTH = 150;
 
     private static final double MIN_ITEM_NUMBER = 2.7;
 
@@ -153,9 +153,9 @@ public class HorizontalSliderView extends LinearLayout {
 
         DisplayMetrics displaymetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int width = (int) (displaymetrics.widthPixels/MIN_ITEM_NUMBER);
-        if (width > MAX_ITEM_WIDTH) {
-            width = MAX_ITEM_WIDTH;
+        int width = (int) (displaymetrics.widthPixels / MIN_ITEM_NUMBER * displaymetrics.density);
+        if (width > MAX_ITEM_WIDTH * displaymetrics.density) {
+            width = (int) (MAX_ITEM_WIDTH * displaymetrics.density);
         }
         itemView.setLayoutParams(new LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT));
 

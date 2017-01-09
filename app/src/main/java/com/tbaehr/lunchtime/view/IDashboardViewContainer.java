@@ -32,6 +32,8 @@ public interface IDashboardViewContainer {
 
     View getRootView();
 
+    boolean isInitialized();
+
     void addOffers(
             String sectionTitle,
             String shortDescription,

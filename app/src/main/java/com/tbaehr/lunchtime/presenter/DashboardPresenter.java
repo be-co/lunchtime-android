@@ -37,14 +37,13 @@ import java.util.Map;
  */
 public class DashboardPresenter extends BasePresenter<IDashboardViewContainer> {
 
-    private boolean initiallyStarted = true;
-
-    boolean foundOffers = false;
+    private boolean foundOffers = false;
 
     @Override
     public void bindView(IDashboardViewContainer view) {
         super.bindView(view);
         DataProvider dataProvider = new DataProvider();
+        boolean isInitialized = getView().isInitialized();
         // TODO: Insert longitue, latitude and radius (in km)
         Map<String, Date> nearbyRestaurants = dataProvider.getNearbyRestaurants(-1, -1, -1);
         for (String key : nearbyRestaurants.keySet()) {
@@ -57,7 +56,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer> {
                     Snackbar.make(view, R.string.excellentChoice, Snackbar.LENGTH_SHORT).show();
                 }
             };
-            if (nearbyOffers.isEmpty() || !initiallyStarted) {
+            if (nearbyOffers.isEmpty() || isInitialized) {
                 continue;
             }
 
@@ -89,8 +88,6 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer> {
             int randomNumber = (int) (Math.random() * 5);
             getView().enableNoOffersView(noOffersMessages[randomNumber]);
         }
-
-        initiallyStarted = false;
     }
 
     @Override

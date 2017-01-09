@@ -71,4 +71,9 @@ public class DashboardViewContainer implements IDashboardViewContainer {
     public View getRootView() {
         return rootView;
     }
+
+    @Override
+    public boolean isInitialized() {
+        return viewContainer.getChildCount() > 1;
+    }
 }

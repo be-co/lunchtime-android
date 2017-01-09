@@ -12,6 +12,16 @@ buildscript {
     }
 }
 
+ext {
+    compileSdkVersion = 25
+    buildToolsVersion = '25.0.0'
+    targetSdkVersion = 25
+    minSdkVersion = 15
+
+    supportVersion = '25.1.0'
+    butterknifeVersion = '8.4.0'
+}
+
 allprojects {
     repositories {
         jcenter()

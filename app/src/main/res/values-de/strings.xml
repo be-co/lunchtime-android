@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Lunchtime</string>
+
+    <string name="nav_content_desc_drawer_open">Navigationsbar öffnen</string>
+    <string name="nav_content_desc_drawer_close">Navigationsbar schließen</string>
+
+    <string name="nav_item_dashboard">Startseite</string>
+    <string name="nav_item_help">Hilfe</string>
+    <string name="webview_help"><![CDATA[
+    <h2>Willkommen bei Lunchtime</h2>
+    <b>Entdecke</b> wo und was Du mittags essen kannst und verabrede Dich mit anderen.<br/><br/>
+    <b>Verstecke</b> Angebote, die Dich nicht interessieren, z.B. Fleischgerichte als Vegetarier.<br/><br/>
+    <b>Helfe mit</b> durch Dein <a href=\"mailto:timo.baehr@gmail.com\">Feedback</a>, Code-Beitr&aumlge oder dem Hinzuf&uuml;gen weiterer Restaurants.
+
+    <h3>&Uuml;ber diese Version</h3>
+    Die App befindet sich noch in der Entwicklung. Daher sind noch nicht alle Features nutzbar.
+
+    <h3>Rechtliches</h3>
+    Bisher handelt es sich bei dieser App um ein Freizeitprojekt von Timo B&auml;hr.
+    Durch Deine Nutzung verzichtest Du auf jegliche Haftungsanspr&uuml;che, die durch Nutzung der App entstehen k&ouml;nnen.
+    ]]>
+    </string>
+</resources>

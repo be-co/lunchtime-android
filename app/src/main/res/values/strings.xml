@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Lunchtime</string>
+
+    <string name="nav_content_desc_drawer_open">Open navigation drawer</string>
+    <string name="nav_content_desc_drawer_close">Close navigation drawer</string>
+
+    <string name="nav_item_dashboard">Dashboard</string>
+    <string name="nav_item_help">Help</string>
+    <string name="webview_help"><![CDATA[
+    <h2>Welcome to Lunchtime</h2>
+    <b>Explore</b> where and what you can eat for lunch and who may come with you.<br/><br/>
+    <b>Hide</b> offers you are not interested in, such as meat if your are vegetarian.<br/><br/>
+    <b>Contribute</b> by giving <a href=\"mailto:timo.baehr@gmail.com\">feedback</a>, contributing code, or adding new restaurants.
+
+    <h3>About this version</h3>
+    This is under development. Hence, not all features are implemented yet.
+
+    <h3>Legal information</h3>
+    This is developed by Timo B&auml;hr inside his leisure time. By using this app you confirm not to make him liable for any damages which are caused by the app\'s usage.
+    ]]>
+    </string>
+</resources>

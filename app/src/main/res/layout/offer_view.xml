@@ -34,7 +34,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:maxLines="4"
             android:textStyle="bold"
             android:text="Title"
             android:textColor="@android:color/black" />
@@ -44,7 +43,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="4dp"
-            android:maxLines="4"
             android:text="Description"
             android:textStyle="italic"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1" />

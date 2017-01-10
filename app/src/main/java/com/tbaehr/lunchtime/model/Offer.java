@@ -52,7 +52,7 @@ public class Offer {
 
     public enum Ingredient {
         GLUTEN(R.drawable.ic_gluten),
-        MILK(R.drawable.ic_milk),
+        LACTOSE(R.drawable.ic_milk),
         EGG(R.drawable.ic_eggs),
         COW(R.drawable.ic_cow),
         PIG(R.drawable.ic_pig),

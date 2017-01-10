@@ -141,6 +141,9 @@ public class HorizontalSliderView extends LinearLayout {
 
                     TextView descriptionView = (TextView) offerView.findViewById(R.id.description);
                     descriptionView.setMinLines(descriptionMaxLines);
+                    if (descriptionMaxLines > 0) {
+                        descriptionView.setVisibility(View.VISIBLE);
+                    }
                     descriptionView.refreshDrawableState();
                 }
             }
@@ -157,7 +160,7 @@ public class HorizontalSliderView extends LinearLayout {
         if (width > MAX_ITEM_WIDTH * displaymetrics.density) {
             width = (int) (MAX_ITEM_WIDTH * displaymetrics.density);
         }
-        itemView.setLayoutParams(new LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT));
+        itemView.setLayoutParams(new LayoutParams(width, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         /*ImageView imageView = (ImageView) itemView.findViewById(R.id.imageView);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -174,6 +177,7 @@ public class HorizontalSliderView extends LinearLayout {
         if (description.length() > 0) {
             descriptionView.setText(description);
         } else {
+            descriptionView.setText("");
             descriptionView.setVisibility(View.GONE);
         }
 

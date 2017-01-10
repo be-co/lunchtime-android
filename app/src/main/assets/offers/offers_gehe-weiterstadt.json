@@ -10,7 +10,7 @@
       "starts": "Jan 9 2017 11:30:00 GMT+0100",
       "ends": "Jan 9 2017 14:30:00 GMT+0100",
       "category": "Lunch",
-      "ingredients": ["MILK"]
+      "ingredients": ["LACTOSE"]
     },
     {
       "title": "Hackfleisch-Pilz-Pfanne in Paprikasahne mit Nudeln",
@@ -19,7 +19,7 @@
       "starts": "Jan 9 2017 11:30:00 GMT+0100",
       "ends": "Jan 9 2017 14:30:00 GMT+0100",
       "category": "Lunch",
-      "ingredients": ["MILK"]
+      "ingredients": ["LACTOSE"]
     },
     {
       "title": "Süßkartoffel-Lauch-Pfanne",
@@ -38,7 +38,7 @@
       "starts": "Jan 10 2017 11:30:00 GMT+0100",
       "ends": "Jan 10 2017 14:30:00 GMT+0100",
       "category": "Lunch",
-      "ingredients": ["GLUTEN", "MILK"]
+      "ingredients": ["GLUTEN", "LACTOSE"]
     },
     {
       "title": "Knoblauch- Hähnchen mit Rosmarinkartoffeln",
@@ -56,7 +56,7 @@
       "starts": "Jan 10 2017 11:30:00 GMT+0100",
       "ends": "Jan 10 2017 14:30:00 GMT+0100",
       "category": "Lunch",
-      "ingredients": ["EGG", "MILK"]
+      "ingredients": ["EGG", "LACTOSE"]
     },
 
     {
@@ -66,7 +66,7 @@
       "starts": "Jan 11 2017 11:30:00 GMT+0100",
       "ends": "Jan 11 2017 14:30:00 GMT+0100",
       "category": "Lunch",
-      "ingredients": ["GLUTEN", "EGG", "MILK"]
+      "ingredients": ["GLUTEN", "EGG", "LACTOSE"]
     },
     {
       "title": "Königsberger Klopse mit Reis",
@@ -75,7 +75,7 @@
       "starts": "Jan 11 2017 11:30:00 GMT+0100",
       "ends": "Jan 11 2017 14:30:00 GMT+0100",
       "category": "Lunch",
-      "ingredients": ["GLUTEN", "EGG", "MILK"]
+      "ingredients": ["GLUTEN", "EGG", "LACTOSE"]
     },
     {
       "title": "Topfen-Palatschinken mit Kirschkompott",
@@ -84,7 +84,7 @@
       "starts": "Jan 11 2017 11:30:00 GMT+0100",
       "ends": "Jan 11 2017 14:30:00 GMT+0100",
       "category": "Lunch",
-      "ingredients": ["GLUTEN", "EGG", "MILK"]
+      "ingredients": ["GLUTEN", "EGG", "LACTOSE"]
     },
 
     {
@@ -94,7 +94,7 @@
       "starts": "Jan 12 2017 11:30:00 GMT+0100",
       "ends": "Jan 12 2017 14:30:00 GMT+0100",
       "category": "Lunch",
-      "ingredients": ["GLUTEN", "EGG", "MILK"]
+      "ingredients": ["GLUTEN", "EGG", "LACTOSE"]
     },
     {
       "title": "Hausgemachte Lasagne",
@@ -103,7 +103,7 @@
       "starts": "Jan 12 2017 11:30:00 GMT+0100",
       "ends": "Jan 12 2017 14:30:00 GMT+0100",
       "category": "Lunch",
-      "ingredients": ["GLUTEN", "MILK"]
+      "ingredients": ["GLUTEN", "LACTOSE"]
     },
     {
       "title": "Tortellini- Rosenkohl- Auflauf",
@@ -112,7 +112,7 @@
       "starts": "Jan 12 2017 11:30:00 GMT+0100",
       "ends": "Jan 12 2017 14:30:00 GMT+0100",
       "category": "Lunch",
-      "ingredients": ["GLUTEN", "EGG", "MILK"]
+      "ingredients": ["GLUTEN", "EGG", "LACTOSE"]
     },
 
     {

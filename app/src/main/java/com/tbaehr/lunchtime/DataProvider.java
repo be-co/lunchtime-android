@@ -209,19 +209,19 @@ public class DataProvider {
         if (contains(title, "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "wurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
             ingredientList.add(Offer.Ingredient.PIG);
         }
-        if (contains(title, "Wildgulasch", "Hack", "Rind", "Carne", "Hacksteak", "Bockwurst")) {
+        if (contains(title, "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Carne", "Hacksteak", "Bockwurst")) {
             ingredientList.add(Offer.Ingredient.COW);
         }
         if (contains(title, "Geflügel", "Hähnchen", "Huhn", "Hühner", "Coq", "Truthahn")) {
             ingredientList.add(Offer.Ingredient.CHICKEN);
         }
-        if (contains(title, "Penne", "Eierknöpfle", "Tagliatelle", "Spaghetti", "Spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
+        if (contains(title, "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
             ingredientList.add(Offer.Ingredient.GLUTEN);
         }
-        if (contains(title, "schmarrn", "Käse", "Sahne", "Rahm", "Remoulade", "schmand")) {
-            ingredientList.add(Offer.Ingredient.MILK);
+        if (contains(title, "schmarrn", "Käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand")) {
+            ingredientList.add(Offer.Ingredient.LACTOSE);
         }
-        if (contains(title, "Seelachs", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {
+        if (contains(title, "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {
             ingredientList.add(Offer.Ingredient.FISH);
         }
         if (contains(title, " Ei", "Ei ", "Eier", "eier", "Spiegelei", "Majonese", "Eierknöpfle", "Tagliatelle", "Spaghetti", "Spätzle", "Nudel", "nudel")) {

@@ -1,8 +1,12 @@
 package com.tbaehr.lunchtime;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.os.AsyncTask;
 import android.util.Log;
 
+import com.propaneapps.tomorrow.presenter.BasePresenter;
 import com.tbaehr.lunchtime.model.Constants;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Offers;
@@ -16,6 +20,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -28,19 +34,66 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * Created by timo.baehr@gmail.com on 27.12.16.
  */
 public class DataProvider {
 
+    private static final String KEY_NEARBY_OFFERS = "nearby_offers";
+
+    private static final String KEY_RESTAURANT = "restaurant_%s$1";
+
+    private static final String KEY_OFFER = "offer_%s$1";
+
+    private static final String URI_NEARBY_RESTAURANTS = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/nearby_restaurants_weiterstadt.json";
+
+    private static final String URI_RESTAURANT = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/restaurant_%s$1.json";
+
+    private static final String URI_OFFER = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/offers_%s$1.json";
+
     public Restaurant getRestaurant(String restaurantID) {
         return createRestaurant("restaurant_" + restaurantID + ".json");
+    }
+
+    private void getTextAsync(final String uri, BasePresenter callback, final String... arguments) {
+        new AsyncTask<Void, Void, Void>() {
+            String json;
+            @Override
+            protected Void doInBackground(Void... params) {
+                json = downloadTextFromServer(String.format(uri, arguments));
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                // TODO: update the UI by calling the callback (this is executed on UI thread)
+                super.onPostExecute(aVoid);
+            }
+        }.execute();
+    }
+
+    private String getText(String cacheKey, String uri, String... arguments) {
+        String json = loadFromCache(cacheKey);
+        if (json == null) {
+            json = downloadTextFromServer(String.format(uri, arguments));
+        }
+
+        return json;
     }
 
     public Map<String, Date> getNearbyRestaurants(double latitude, double longitude, int radius) {
         Map<String, Date> nearbyRestaurants = new HashMap<>();
         try {
-            String json = parseJsonFromAssets("restaurants/nearby_restaurants_weiterstadt.json");
+            // TODO: Fix network on MAIN_THREAD
+            String json = getText(KEY_NEARBY_OFFERS, URI_NEARBY_RESTAURANTS);
+            if (json == null) {
+                return nearbyRestaurants;
+            }
+            //String json = parseJsonFromAssets("restaurants/nearby_restaurants_weiterstadt.json");
+            storeToCache(KEY_NEARBY_OFFERS, json);
+
             JSONArray jsonArray = new JSONArray(json);
             for (int index = 0; index < jsonArray.length(); index++) {
                 JSONObject restaurant = jsonArray.getJSONObject(index);
@@ -108,6 +161,41 @@ public class DataProvider {
         }
 
         return nearbyOffers;
+    }
+
+    private String loadFromCache(String key) {
+        Context context = LunchtimeApplication.getContext();
+        String name = "cache";
+        SharedPreferences sharedPreferences = context.getSharedPreferences(name, MODE_PRIVATE);
+
+        return sharedPreferences.getString(key, null);
+    }
+
+    private void storeToCache(String key, String value) {
+        Context context = LunchtimeApplication.getContext();
+        String name = "cache";
+        SharedPreferences sharedPreferences = context.getSharedPreferences(name, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString(key, value).apply();
+    }
+
+    private String downloadTextFromServer(String path) {
+        try {
+            StringBuilder stringBuilder = new StringBuilder();
+            URL url = new URL(path);
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+            String line;
+            while ((line = in.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            in.close();
+            return stringBuilder.toString();
+        } catch (MalformedURLException e) {
+        } catch (IOException e) {
+        }
+        return null;
     }
 
     private int[] convertToIntArray(JSONArray array) throws JSONException {

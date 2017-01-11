@@ -47,7 +47,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer> {
         // TODO: Insert longitue, latitude and radius (in km)
         Map<String, Date> nearbyRestaurants = dataProvider.getNearbyRestaurants(-1, -1, -1);
         for (String key : nearbyRestaurants.keySet()) {
-            Offers nearbyOffers = dataProvider.getNearbyOffers(key);
+            Offers nearbyOffers = dataProvider.getOffers(key);
 
             HorizontalSliderView.OnSliderItemClickListener onSliderItemClickListener = new HorizontalSliderView.OnSliderItemClickListener() {
                 @Override

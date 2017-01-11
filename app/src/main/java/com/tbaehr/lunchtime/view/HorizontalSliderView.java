@@ -160,7 +160,7 @@ public class HorizontalSliderView extends LinearLayout {
         if (width > MAX_ITEM_WIDTH * displaymetrics.density) {
             width = (int) (MAX_ITEM_WIDTH * displaymetrics.density);
         }
-        itemView.setLayoutParams(new LayoutParams(width, ViewGroup.LayoutParams.WRAP_CONTENT));
+        itemView.setLayoutParams(new LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT));
 
         /*ImageView imageView = (ImageView) itemView.findViewById(R.id.imageView);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

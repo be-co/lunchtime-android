@@ -61,7 +61,7 @@ public class DataProvider {
         return nearbyRestaurants;
     }
 
-    public Offers getNearbyOffers(String restaurantKey) {
+    public Offers getOffers(String restaurantKey) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
 
@@ -207,7 +207,13 @@ public class DataProvider {
 
     private void autoSearchForTags(Set<Offer.Ingredient> ingredientList, String title) {
         if (contains(title, "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "wurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
-            ingredientList.add(Offer.Ingredient.PIG);
+            if (title.contains("Carne")) {
+                if (!title.contains("vom Rind")) {
+                    ingredientList.add(Offer.Ingredient.PIG);
+                }
+            } else {
+                ingredientList.add(Offer.Ingredient.PIG);
+            }
         }
         if (contains(title, "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Carne", "Hacksteak", "Bockwurst")) {
             ingredientList.add(Offer.Ingredient.COW);
@@ -218,7 +224,7 @@ public class DataProvider {
         if (contains(title, "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
             ingredientList.add(Offer.Ingredient.GLUTEN);
         }
-        if (contains(title, "schmarrn", "Käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand")) {
+        if (contains(title, "quark", "schmarrn", "Käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand")) {
             ingredientList.add(Offer.Ingredient.LACTOSE);
         }
         if (contains(title, "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {

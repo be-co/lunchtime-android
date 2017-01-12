@@ -41,7 +41,7 @@ import static android.content.Context.MODE_PRIVATE;
  */
 public class DataProvider {
 
-    private static final String KEY_NEARBY_OFFERS = "nearby_offers";
+    private static final String KEY_NEARBY_OFFERS = "nearby_offers_%s$1";
 
     private static final String KEY_RESTAURANT = "restaurant_%s$1";
 
@@ -77,22 +77,29 @@ public class DataProvider {
     private String getText(String cacheKey, String uri, String... arguments) {
         String json = loadFromCache(cacheKey);
         if (json == null) {
+            //URI_NEARBY_RESTAURANTS
             json = downloadTextFromServer(String.format(uri, arguments));
         }
 
         return json;
     }
 
+    // TODO: Callback
+    private void loadNearbyRestaurants(double latitude, double longitude, int radius) {
+        String json = parseJsonFromAssets("restaurants/nearby_restaurants_weiterstadt.json");
+        if (json != null) {
+            storeToCache(String.format(KEY_NEARBY_OFFERS, ""), json);
+        }
+    }
+
     public Map<String, Date> getNearbyRestaurants(double latitude, double longitude, int radius) {
         Map<String, Date> nearbyRestaurants = new HashMap<>();
         try {
-            // TODO: Fix network on MAIN_THREAD
-            String json = getText(KEY_NEARBY_OFFERS, URI_NEARBY_RESTAURANTS);
+            String json = parseJsonFromAssets("restaurants/nearby_restaurants_weiterstadt.json");
+            //String json = loadFromCache(KEY_NEARBY_OFFERS);
             if (json == null) {
                 return nearbyRestaurants;
             }
-            //String json = parseJsonFromAssets("restaurants/nearby_restaurants_weiterstadt.json");
-            storeToCache(KEY_NEARBY_OFFERS, json);
 
             JSONArray jsonArray = new JSONArray(json);
             for (int index = 0; index < jsonArray.length(); index++) {
@@ -294,7 +301,7 @@ public class DataProvider {
     }
 
     private void autoSearchForTags(Set<Offer.Ingredient> ingredientList, String title) {
-        if (contains(title, "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "wurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
+        if (contains(title, "Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "wurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
             if (title.contains("Carne")) {
                 if (!title.contains("vom Rind")) {
                     ingredientList.add(Offer.Ingredient.PIG);

@@ -60,7 +60,7 @@
     },
 
     {
-      "title": "Wildgulasch mit Rotkohl und Semmelknödel",
+      "title": "Schnitzel mit Jägersoße und Pommes- Frites",
       "description": "Inklusive Salat vom Buffet oder Dessert",
       "prize": 590,
       "starts": "Jan 11 2017 11:30:00 GMT+0100",
@@ -69,7 +69,7 @@
       "ingredients": ["GLUTEN", "EGG", "LACTOSE"]
     },
     {
-      "title": "Königsberger Klopse mit Reis",
+      "title": "Knoblauch- Hähnchen mit Rosmarinkartoffeln",
       "description": "Inklusive Salat vom Buffet oder Dessert",
       "prize": 590,
       "starts": "Jan 11 2017 11:30:00 GMT+0100",
@@ -78,7 +78,7 @@
       "ingredients": ["GLUTEN", "EGG", "LACTOSE"]
     },
     {
-      "title": "Topfen-Palatschinken mit Kirschkompott",
+      "title": "Eier in Senfsoße mit Kartoffeln",
       "description": "Inklusive Salat vom Buffet und Dessert",
       "prize": 520,
       "starts": "Jan 11 2017 11:30:00 GMT+0100",
@@ -88,7 +88,7 @@
     },
 
     {
-      "title": "Lachs auf Blattspinat mit Bandnudeln",
+      "title": "Wildgulasch mit Rotkohl und Semmelknödel",
       "description": "Inklusive Salat vom Buffet oder Dessert",
       "prize": 590,
       "starts": "Jan 12 2017 11:30:00 GMT+0100",
@@ -97,7 +97,7 @@
       "ingredients": ["GLUTEN", "EGG", "LACTOSE"]
     },
     {
-      "title": "Hausgemachte Lasagne",
+      "title": "Königsberger Klopse mit Reis",
       "description": "Inklusive Salat vom Buffet oder Dessert",
       "prize": 590,
       "starts": "Jan 12 2017 11:30:00 GMT+0100",
@@ -106,7 +106,7 @@
       "ingredients": ["GLUTEN", "LACTOSE"]
     },
     {
-      "title": "Tortellini- Rosenkohl- Auflauf",
+      "title": "Topfen-Palatschinken mit Kirschkompott",
       "description": "Inklusive Salat vom Buffet und Dessert",
       "prize": 520,
       "starts": "Jan 12 2017 11:30:00 GMT+0100",
@@ -116,31 +116,59 @@
     },
 
     {
-      "title": "G1",
+      "title": "Lachs auf Blattspinat mit Bandnudeln",
       "description": "Inklusive Salat vom Buffet oder Dessert",
       "prize": 590,
       "starts": "Jan 13 2017 11:30:00 GMT+0100",
       "ends": "Jan 13 2017 14:30:00 GMT+0100",
       "category": "Lunch",
-      "ingredients": []
+      "ingredients": ["GLUTEN", "EGG", "LACTOSE"]
     },
     {
-      "title": "G2",
+      "title": "Hausgemachte Lasagne",
       "description": "Inklusive Salat vom Buffet oder Dessert",
       "prize": 590,
       "starts": "Jan 13 2017 11:30:00 GMT+0100",
       "ends": "Jan 13 2017 14:30:00 GMT+0100",
       "category": "Lunch",
-      "ingredients": []
+      "ingredients": ["GLUTEN", "LACTOSE"]
     },
     {
-      "title": "G3",
+      "title": "Tortellini- Rosenkohl- Auflauf",
       "description": "Inklusive Salat vom Buffet und Dessert",
       "prize": 520,
       "starts": "Jan 13 2017 11:30:00 GMT+0100",
       "ends": "Jan 13 2017 14:30:00 GMT+0100",
       "category": "Lunch",
-      "ingredients": []
+      "ingredients": ["GLUTEN", "EGG", "LACTOSE"]
+    },
+
+    {
+      "title": "Import der Gehe-Daten erfolgt am Dienstag",
+      "description": "Inklusive Salat vom Buffet oder Dessert",
+      "prize": 590,
+      "starts": "Jan 15 2017 11:30:00 GMT+0100",
+      "ends": "Jan 15 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": ["GLUTEN", "EGG", "LACTOSE"]
+    },
+    {
+      "title": "Happy Meal",
+      "description": "Inklusive Salat vom Buffet oder Dessert",
+      "prize": 590,
+      "starts": "Jan 15 2017 11:30:00 GMT+0100",
+      "ends": "Jan 15 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": ["GLUTEN", "LACTOSE"]
+    },
+    {
+      "title": "Vegetarisches Gericht",
+      "description": "Inklusive Salat vom Buffet und Dessert",
+      "prize": 520,
+      "starts": "Jan 15 2017 11:30:00 GMT+0100",
+      "ends": "Jan 15 2017 14:30:00 GMT+0100",
+      "category": "Lunch",
+      "ingredients": ["GLUTEN", "EGG", "LACTOSE"]
     }
   ]
 }

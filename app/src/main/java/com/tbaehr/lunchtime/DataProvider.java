@@ -41,19 +41,19 @@ import static android.content.Context.MODE_PRIVATE;
  */
 public class DataProvider {
 
-    private static final String KEY_NEARBY_OFFERS = "nearby_offers_%s$1";
+    private static final String KEY_NEARBY_OFFERS = "nearby_offers_%s";
 
-    private static final String KEY_RESTAURANT = "restaurant_%s$1";
+    private static final String KEY_RESTAURANT = "restaurant_%s";
 
-    private static final String KEY_OFFER = "offer_%s$1";
+    private static final String KEY_OFFER = "offer_%s";
 
-    private static final String KEY_OFFER_UPDATED = "offer_updated_%s$1";
+    private static final String KEY_OFFER_UPDATED = "offer_updated_%s";
 
-    private static final String URI_NEARBY_RESTAURANTS = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/nearby_restaurants_%s$1.json";
+    private static final String URI_NEARBY_RESTAURANTS = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/nearby_restaurants_%s.json";
 
-    private static final String URI_RESTAURANT = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/restaurant_%s$1.json";
+    private static final String URI_RESTAURANT = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/restaurant_%s.json";
 
-    private static final String URI_OFFER = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/offers_%s$1.json";
+    private static final String URI_OFFER = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/offers_%s.json";
 
     public Restaurant getRestaurant(String restaurantID) {
         return createRestaurant("restaurant_" + restaurantID + ".json");
@@ -206,6 +206,7 @@ public class DataProvider {
 
     @Deprecated
     public Map<String, String> getNearbyRestaurants(double latitude, double longitude, int radius) {
+        syncOffers(this);
         String json = parseJsonFromAssets("restaurants/nearby_restaurants_weiterstadt.json");
         return parseNearbyRestaurantKeys(json);
     }

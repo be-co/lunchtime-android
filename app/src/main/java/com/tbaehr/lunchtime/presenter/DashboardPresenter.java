@@ -45,7 +45,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer> {
         DataProvider dataProvider = new DataProvider();
         boolean isInitialized = getView().isInitialized();
         // TODO: Insert longitue, latitude and radius (in km)
-        Map<String, Date> nearbyRestaurants = dataProvider.getNearbyRestaurants(-1, -1, -1);
+        Map<String, String> nearbyRestaurants = dataProvider.getNearbyRestaurants(-1, -1, -1);
         for (String key : nearbyRestaurants.keySet()) {
             Offers nearbyOffers = dataProvider.getOffers(key);
 

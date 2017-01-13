@@ -4,9 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.propaneapps.tomorrow.presenter.BasePresenter;
 import com.tbaehr.lunchtime.model.Constants;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Offers;
@@ -47,7 +47,9 @@ public class DataProvider {
 
     private static final String KEY_OFFER = "offer_%s$1";
 
-    private static final String URI_NEARBY_RESTAURANTS = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/nearby_restaurants_weiterstadt.json";
+    private static final String KEY_OFFER_UPDATED = "offer_updated_%s$1";
+
+    private static final String URI_NEARBY_RESTAURANTS = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/nearby_restaurants_%s$1.json";
 
     private static final String URI_RESTAURANT = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/restaurant_%s$1.json";
 
@@ -57,62 +59,84 @@ public class DataProvider {
         return createRestaurant("restaurant_" + restaurantID + ".json");
     }
 
-    private void getTextAsync(final String uri, BasePresenter callback, final String... arguments) {
+    public void syncOffers(final Object callback) {
+        final String uriSync = String.format(URI_NEARBY_RESTAURANTS, "weiterstadt");
+        final String keySync = String.format(KEY_NEARBY_OFFERS, "weiterstadt");
+
         new AsyncTask<Void, Void, Void>() {
-            String json;
+            List<Offers> offersList;
+
             @Override
             protected Void doInBackground(Void... params) {
-                json = downloadTextFromServer(String.format(uri, arguments));
+                // Try to download json from server
+                String jsonDownloaded = downloadTextFromServer(uriSync);
+
+                // Create the output list of Offers
+                offersList = new ArrayList<>();
+
+                // Save to cache
+                if (jsonDownloaded != null) {
+                    storeToCache(String.format(keySync, ""), jsonDownloaded);
+                    Map<String, String> nearbyRestaurantKeys = parseNearbyRestaurantKeys(jsonDownloaded);
+                    for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
+                        Offers offers = updateOffers(restaurantKey, nearbyRestaurantKeys.get(restaurantKey));
+                        if (offers != null) {
+                            offersList.add(offers);
+                        }
+                    }
+                }
+
                 return null;
             }
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                // TODO: update the UI by calling the callback (this is executed on UI thread)
+                // TODO: Call callback method with dataset (this is executed on UI thread)
+                callback.hashCode();
                 super.onPostExecute(aVoid);
             }
         }.execute();
     }
 
-    private String getText(String cacheKey, String uri, String... arguments) {
-        String json = loadFromCache(cacheKey);
-        if (json == null) {
-            //URI_NEARBY_RESTAURANTS
-            json = downloadTextFromServer(String.format(uri, arguments));
-        }
+    private Offers updateOffers(String restaurantKey, String dateUpdated) {
+        final String uriRestaurantOffers = String.format(URI_OFFER, restaurantKey);
+        final String keyUpdated = String.format(KEY_OFFER_UPDATED, restaurantKey);
 
-        return json;
-    }
+        Date cachedDate = createDateFromString(loadFromCache(keyUpdated));
+        Date downloadDate = createDateFromString(dateUpdated);
 
-    // TODO: Callback
-    private void loadNearbyRestaurants(double latitude, double longitude, int radius) {
-        String json = parseJsonFromAssets("restaurants/nearby_restaurants_weiterstadt.json");
-        if (json != null) {
-            storeToCache(String.format(KEY_NEARBY_OFFERS, ""), json);
-        }
-    }
-
-    public Map<String, Date> getNearbyRestaurants(double latitude, double longitude, int radius) {
-        Map<String, Date> nearbyRestaurants = new HashMap<>();
-        try {
-            String json = parseJsonFromAssets("restaurants/nearby_restaurants_weiterstadt.json");
-            //String json = loadFromCache(KEY_NEARBY_OFFERS);
-            if (json == null) {
-                return nearbyRestaurants;
+        String jsonOffers;
+        if (cachedDate == null || downloadDate.after(cachedDate)) {
+            jsonOffers = downloadTextFromServer(uriRestaurantOffers);
+            Offers offers = parseOffersFromJson(jsonOffers);
+            if (jsonOffers != null && offers != null) {
+                storeToCache(String.format(KEY_OFFER, restaurantKey), jsonOffers);
+                storeToCache(keyUpdated, dateUpdated);
+                return offers;
             }
+        }
 
+        // try to restore offers from cache
+        final String keyRestaurant = String.format(KEY_RESTAURANT, restaurantKey);
+        jsonOffers = loadFromCache(keyRestaurant);
+
+        if (jsonOffers != null) {
+            return parseOffersFromJson(jsonOffers);
+        } else {
+            return null;
+        }
+    }
+
+    private Map<String, String> parseNearbyRestaurantKeys(@NonNull String json) {
+        Map<String, String> nearbyRestaurants = new HashMap<>();
+
+        try {
             JSONArray jsonArray = new JSONArray(json);
             for (int index = 0; index < jsonArray.length(); index++) {
                 JSONObject restaurant = jsonArray.getJSONObject(index);
                 String key = restaurant.getString("key");
                 String lastUpdated = restaurant.getString("lastUpdated");
-                DateFormat dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT);
-                try {
-                    Date date = dateFormat.parse(lastUpdated);
-                    nearbyRestaurants.put(key, date);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+                nearbyRestaurants.put(key, lastUpdated);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -121,13 +145,9 @@ public class DataProvider {
         return nearbyRestaurants;
     }
 
-    public Offers getOffers(String restaurantKey) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-
-        Offers nearbyOffers = null;
+    private Offers parseOffersFromJson(@NonNull String json) {
+        Offers offersResult = null;
         try {
-            String json = parseJsonFromAssets("offers/offers_" + restaurantKey + ".json");
             JSONObject restaurantObject = new JSONObject(json);
             String restaurantTitle = restaurantObject.getString("title");
             String restaurantDescription = restaurantObject.getString("description");
@@ -162,12 +182,38 @@ public class DataProvider {
                     offers.add(offer);
                 }
             }
-            nearbyOffers = new Offers(restaurantTitle, restaurantDescription, offers);
+            offersResult = new Offers(restaurantTitle, restaurantDescription, offers);
         } catch (JSONException jsonException) {
             Log.e(this.getClass().getCanonicalName(), jsonException.getMessage());
         }
 
-        return nearbyOffers;
+        return offersResult;
+    }
+
+    private Date createDateFromString(String date) {
+        if (date == null) {
+            return null;
+        }
+
+        DateFormat dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT);
+        try {
+            return dateFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Deprecated
+    public Map<String, String> getNearbyRestaurants(double latitude, double longitude, int radius) {
+        String json = parseJsonFromAssets("restaurants/nearby_restaurants_weiterstadt.json");
+        return parseNearbyRestaurantKeys(json);
+    }
+
+    @Deprecated
+    public Offers getOffers(String restaurantKey) {
+        String json = parseJsonFromAssets("offers/offers_" + restaurantKey + ".json");
+        return parseOffersFromJson(json);
     }
 
     private String loadFromCache(String key) {
@@ -229,6 +275,7 @@ public class DataProvider {
         return listOfStrings;
     }
 
+    @Deprecated
     private String parseJsonFromAssets(String filePath) {
         BufferedReader reader = null;
         String jsonOutput = null;

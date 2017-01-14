@@ -150,6 +150,7 @@ public class DataProvider {
                         return true;
                     }
                 } catch (JSONException jsonException) {
+                    jsonException.printStackTrace();
                     String message = "Failed to download " + restaurantKey + " updated "+ dateUpdated;
                     callback.onDownloadFailed(message);
                 }

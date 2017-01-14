@@ -7,10 +7,10 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.tbaehr.lunchtime.model.Constants;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Offers;
 import com.tbaehr.lunchtime.model.Restaurant;
+import com.tbaehr.lunchtime.utils.DateUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,9 +22,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -119,17 +116,19 @@ public class DataProvider {
         final String uriRestaurantOffers = String.format(URI_OFFER, restaurantKey);
         final String keyUpdated = String.format(KEY_OFFER_UPDATED, restaurantKey);
 
-        Date cachedDate = createDateFromString(loadFromCache(keyUpdated));
-        Date downloadDate = createDateFromString(dateUpdated);
+        Date cachedDate = DateUtils.createDateFromString(loadFromCache(keyUpdated));
+        Date downloadDate = DateUtils.createDateFromString(dateUpdated);
 
         String jsonOffers;
-        if (cachedDate == null || downloadDate.after(cachedDate)) {
+        if (downloadDate != null && (cachedDate == null || downloadDate.after(cachedDate))) {
             jsonOffers = downloadTextFromServer(uriRestaurantOffers);
-            Offers offers = parseOffersFromJson(jsonOffers);
-            if (jsonOffers != null && offers != null) {
-                storeToCache(String.format(KEY_OFFER, restaurantKey), jsonOffers);
-                storeToCache(keyUpdated, dateUpdated);
-                return offers;
+            if (jsonOffers != null) {
+                Offers offers = parseOffersFromJson(jsonOffers);
+                if (offers != null) {
+                    storeToCache(String.format(KEY_OFFER, restaurantKey), jsonOffers);
+                    storeToCache(keyUpdated, dateUpdated);
+                    return offers;
+                }
             }
         }
         return null;
@@ -196,20 +195,6 @@ public class DataProvider {
         }
 
         return offersResult;
-    }
-
-    private Date createDateFromString(String date) {
-        if (date == null) {
-            return null;
-        }
-
-        DateFormat dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT);
-        try {
-            return dateFormat.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     @Deprecated

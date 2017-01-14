@@ -22,10 +22,8 @@ import android.content.Context;
 import android.support.annotation.DrawableRes;
 
 import com.tbaehr.lunchtime.R;
+import com.tbaehr.lunchtime.utils.DateUtils;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
@@ -95,13 +93,8 @@ public class Offer {
         this.description = description;
         this.prize = prize;
 
-        DateFormat dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT);
-        try {
-            startDate = dateFormat.parse(starts);
-            endDate = dateFormat.parse(ends);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        startDate = DateUtils.createDateFromString(starts);
+        endDate = DateUtils.createDateFromString(starts);
 
         this.category = category;
         this.ingredients = ingredients;

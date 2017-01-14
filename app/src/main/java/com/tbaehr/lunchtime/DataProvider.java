@@ -68,20 +68,37 @@ public class DataProvider {
 
             @Override
             protected Void doInBackground(Void... params) {
-                // Try to download json from server
+                // Try to download restaurants json from server
                 String jsonDownloaded = downloadTextFromServer(uriSync);
 
                 // Create the output list of Offers
                 offersList = new ArrayList<>();
 
-                // Save to cache
+                // Server answered with json -> save to cache and update offers
                 if (jsonDownloaded != null) {
-                    storeToCache(String.format(keySync, ""), jsonDownloaded);
+                    storeToCache(keySync, jsonDownloaded);
                     Map<String, String> nearbyRestaurantKeys = parseNearbyRestaurantKeys(jsonDownloaded);
                     for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
                         Offers offers = updateOffers(restaurantKey, nearbyRestaurantKeys.get(restaurantKey));
                         if (offers != null) {
                             offersList.add(offers);
+                        }
+                    }
+                } else {
+                    // try to restore offers from cache
+                    String jsonNearbyRestaurantsCached = loadFromCache(keySync);
+                    if (jsonNearbyRestaurantsCached != null) {
+                        Map<String, String> nearbyRestaurantKeys = parseNearbyRestaurantKeys(jsonNearbyRestaurantsCached);
+                        for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
+                            final String keyRestaurant = String.format(KEY_RESTAURANT, restaurantKey);
+                            String jsonOffers = loadFromCache(keyRestaurant);
+
+                            if (jsonOffers != null) {
+                                Offers offers = parseOffersFromJson(jsonOffers);
+                                if (offers != null) {
+                                    offersList.add(offers);
+                                }
+                            }
                         }
                     }
                 }
@@ -115,16 +132,7 @@ public class DataProvider {
                 return offers;
             }
         }
-
-        // try to restore offers from cache
-        final String keyRestaurant = String.format(KEY_RESTAURANT, restaurantKey);
-        jsonOffers = loadFromCache(keyRestaurant);
-
-        if (jsonOffers != null) {
-            return parseOffersFromJson(jsonOffers);
-        } else {
-            return null;
-        }
+        return null;
     }
 
     private Map<String, String> parseNearbyRestaurantKeys(@NonNull String json) {

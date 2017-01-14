@@ -20,10 +20,13 @@ package com.tbaehr.lunchtime.presenter;
 
 import android.support.design.widget.Snackbar;
 import android.view.View;
+import android.widget.Toast;
 
 import com.propaneapps.tomorrow.presenter.BasePresenter;
 import com.tbaehr.lunchtime.DataProvider;
+import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
+import com.tbaehr.lunchtime.controller.DashboardFragment;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Offers;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
@@ -37,13 +40,23 @@ import java.util.List;
 public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         implements DataProvider.OfferLoadJobListener {
 
-    private boolean foundOffers = false;
+    private DataProvider dataProvider;
+
+    private DashboardFragment dashboardFragment;
+
+    public DashboardPresenter(DashboardFragment fragment) {
+        this.dashboardFragment = fragment;
+    }
 
     @Override
     public void bindView(IDashboardViewContainer view) {
         super.bindView(view);
-        DataProvider dataProvider = new DataProvider();
+        dataProvider = new DataProvider();
         dataProvider.syncOffers(this);
+
+        if (!view.isInitialized()) {
+            presentOffers(dataProvider.loadOffersFromCache());
+        }
     }
 
     @Override
@@ -52,21 +65,47 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     }
 
     @Override
-    public void onStarted() {
-        getView().hideNoOffersView();
-        getView().setProgressBarVisibility(true);
+    public void onDownloadStarted() {
+        dashboardFragment.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                getView().clearOffers();
+                getView().hideNoOffersView();
+                getView().setProgressBarVisibility(true);
+            }
+        });
     }
 
     @Override
-    public void onFinished(List<Offers> offersList) {
+    public void onDownloadFailed(final String message) {
+        dashboardFragment.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                presentOffers(dataProvider.loadOffersFromCache());
+                Toast.makeText(LunchtimeApplication.getContext(), message, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    @Override
+    public void onNewOffersDownloaded(List<Offers> offersList) {
         IDashboardViewContainer view = getView();
         if (view == null) {
             return;
         }
 
         view.setProgressBarVisibility(false);
+        presentOffers(offersList);
+    }
 
-        boolean isInitialized = view.isInitialized();
+    private void presentOffers(List<Offers> offersList) {
+        IDashboardViewContainer view = getView();
+        boolean foundOffers = false;
+
+        view.setProgressBarVisibility(false);
+        view.hideNoOffersView();
+        view.clearOffers();
+
         for (Offers nearbyOffers : offersList) {
             HorizontalSliderView.OnSliderItemClickListener onSliderItemClickListener = new HorizontalSliderView.OnSliderItemClickListener() {
                 @Override
@@ -75,7 +114,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
                     Snackbar.make(view, R.string.excellentChoice, Snackbar.LENGTH_SHORT).show();
                 }
             };
-            if (nearbyOffers.isEmpty() || isInitialized) {
+            if (nearbyOffers.isEmpty()) {
                 continue;
             }
 

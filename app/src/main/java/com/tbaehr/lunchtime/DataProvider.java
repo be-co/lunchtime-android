@@ -53,9 +53,11 @@ public class DataProvider {
     private static final String URI_OFFER = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/offers_%s.json";
 
     public interface OfferLoadJobListener {
-        void onStarted();
+        void onDownloadStarted();
 
-        void onFinished(List<Offers> offersList);
+        void onDownloadFailed(String message);
+
+        void onNewOffersDownloaded(List<Offers> offersList);
     }
 
     public Restaurant getRestaurant(String restaurantID) {
@@ -66,15 +68,10 @@ public class DataProvider {
         final String uriSync = String.format(URI_NEARBY_RESTAURANTS, "weiterstadt");
         final String keySync = String.format(KEY_NEARBY_OFFERS, "weiterstadt");
 
-        callback.onStarted();
-
         new AsyncTask<Void, Void, Void>() {
-            List<Offers> offersList;
-
+            private boolean dataSetChanged = false;
             @Override
             protected Void doInBackground(Void... params) {
-                offersList = new ArrayList<>();
-
                 // Try to download restaurants json from server
                 String jsonDownloaded = downloadTextFromServer(uriSync);
 
@@ -83,19 +80,7 @@ public class DataProvider {
                     storeToCache(keySync, jsonDownloaded);
                     Map<String, String> nearbyRestaurantKeys = parseNearbyRestaurantKeys(jsonDownloaded);
                     for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
-                        Offers offers = updateOffers(restaurantKey, nearbyRestaurantKeys.get(restaurantKey));
-                        if (offers != null) {
-                            offersList.add(offers);
-                        }
-                    }
-                } else {
-                    String jsonNearbyRestaurantsCached = loadFromCache(keySync);
-                    if (jsonNearbyRestaurantsCached != null) {
-                        Map<String, String> nearbyRestaurantKeys = parseNearbyRestaurantKeys(jsonNearbyRestaurantsCached);
-                        for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
-                            Offers offers = loadOffersFromCache(restaurantKey);
-                            offersList.add(offers);
-                        }
+                        dataSetChanged = dataSetChanged || updateOffers(restaurantKey, nearbyRestaurantKeys.get(restaurantKey), callback);
                     }
                 }
 
@@ -104,10 +89,30 @@ public class DataProvider {
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                callback.onFinished(offersList);
+                if (dataSetChanged) {
+                    List<Offers> offersList = null;
+                    offersList = loadOffersFromCache();
+                    callback.onNewOffersDownloaded(offersList);
+                }
                 super.onPostExecute(aVoid);
             }
         }.execute();
+    }
+
+    public List<Offers> loadOffersFromCache() {
+        final String keySync = String.format(KEY_NEARBY_OFFERS, "weiterstadt");
+        List<Offers> offersList = new ArrayList<>();
+        String jsonNearbyRestaurantsCached = loadFromCache(keySync);
+        if (jsonNearbyRestaurantsCached != null) {
+            Map<String, String> nearbyRestaurantKeys = parseNearbyRestaurantKeys(jsonNearbyRestaurantsCached);
+            for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
+                Offers offers = loadOffersFromCache(restaurantKey);
+                if (offers != null) {
+                    offersList.add(offers);
+                }
+            }
+        }
+        return offersList;
     }
 
     private Offers loadOffersFromCache(String restaurantKey) {
@@ -115,13 +120,17 @@ public class DataProvider {
         String jsonOffers = loadFromCache(keyRestaurant);
 
         if (jsonOffers != null) {
-            return parseOffersFromJson(jsonOffers);
+            try {
+                return parseOffersFromJson(jsonOffers);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         return null;
     }
 
-    private Offers updateOffers(String restaurantKey, String dateUpdated) {
+    private boolean updateOffers(String restaurantKey, String dateUpdated, final OfferLoadJobListener callback) {
         final String uriRestaurantOffers = String.format(URI_OFFER, restaurantKey);
         final String keyUpdated = String.format(KEY_OFFER_UPDATED, restaurantKey);
 
@@ -130,22 +139,27 @@ public class DataProvider {
 
         String jsonOffers;
         if (downloadDate != null && (cachedDate == null || downloadDate.after(cachedDate))) {
+            callback.onDownloadStarted();
             jsonOffers = downloadTextFromServer(uriRestaurantOffers);
             if (jsonOffers != null) {
-                Offers offers = parseOffersFromJson(jsonOffers);
-                if (offers != null) {
-                    storeToCache(String.format(KEY_OFFER, restaurantKey), jsonOffers);
-                    storeToCache(keyUpdated, dateUpdated);
-                    return offers;
+                try {
+                    Offers offers = parseOffersFromJson(jsonOffers);
+                    if (offers != null) {
+                        storeToCache(String.format(KEY_OFFER, restaurantKey), jsonOffers);
+                        storeToCache(keyUpdated, dateUpdated);
+                        return true;
+                    }
+                } catch (JSONException jsonException) {
+                    String message = "Failed to download " + restaurantKey + " updated "+ dateUpdated;
+                    callback.onDownloadFailed(message);
                 }
             }
         }
-        return loadOffersFromCache(restaurantKey);
+        return false;
     }
 
     private Map<String, String> parseNearbyRestaurantKeys(@NonNull String json) {
         Map<String, String> nearbyRestaurants = new HashMap<>();
-
         try {
             JSONArray jsonArray = new JSONArray(json);
             for (int index = 0; index < jsonArray.length(); index++) {
@@ -154,54 +168,50 @@ public class DataProvider {
                 String lastUpdated = restaurant.getString("lastUpdated");
                 nearbyRestaurants.put(key, lastUpdated);
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (JSONException jsonException) {
+            jsonException.printStackTrace();
         }
 
         return nearbyRestaurants;
     }
 
-    private Offers parseOffersFromJson(@NonNull String json) {
+    private Offers parseOffersFromJson(@NonNull String json) throws JSONException {
         Offers offersResult = null;
-        try {
-            JSONObject restaurantObject = new JSONObject(json);
-            String restaurantTitle = restaurantObject.getString("title");
-            String restaurantDescription = restaurantObject.getString("description");
-            JSONArray restaurantOffersArray = restaurantObject.getJSONArray("offers");
-            List<Offer> offers = new ArrayList<>();
-            for (int offerIndex = 0; offerIndex < restaurantOffersArray.length(); offerIndex++) {
-                JSONObject offerObject = restaurantOffersArray.getJSONObject(offerIndex);
-                String offerTitle = offerObject.getString("title");
-                String offerDescription = offerObject.getString("description");
-                int offerPrize = offerObject.getInt("prize");
-                String starts = offerObject.getString("starts");
-                String ends = offerObject.getString("ends");
-                Offer.Category category = Offer.Category.valueOf(offerObject.getString("category").toUpperCase());
-                JSONArray ingredientsArray = offerObject.getJSONArray("ingredients");
-                Set<Offer.Ingredient> ingredients = new HashSet<>();
-                for (int ingrIndex = 0; ingrIndex < ingredientsArray.length(); ingrIndex++) {
-                    ingredients.add(Offer.Ingredient.valueOf(ingredientsArray.getString(ingrIndex)));
-                }
-
-                autoSearchForTags(ingredients, offerTitle);
-                autoSearchForTags(ingredients, offerDescription);
-                Offer offer = new Offer(
-                        offerTitle,
-                        offerDescription,
-                        offerPrize,
-                        starts, ends,
-                        category,
-                        ingredients);
-                Offer.ValidationState validationState = offer.getValidationState();
-                if (validationState.equals(Offer.ValidationState.NOW_VALID) ||
-                        validationState.equals(Offer.ValidationState.SOON_VALID)) {
-                    offers.add(offer);
-                }
+        JSONObject restaurantObject = new JSONObject(json);
+        String restaurantTitle = restaurantObject.getString("title");
+        String restaurantDescription = restaurantObject.getString("description");
+        JSONArray restaurantOffersArray = restaurantObject.getJSONArray("offers");
+        List<Offer> offers = new ArrayList<>();
+        for (int offerIndex = 0; offerIndex < restaurantOffersArray.length(); offerIndex++) {
+            JSONObject offerObject = restaurantOffersArray.getJSONObject(offerIndex);
+            String offerTitle = offerObject.getString("title");
+            String offerDescription = offerObject.getString("description");
+            int offerPrize = offerObject.getInt("prize");
+            String starts = offerObject.getString("starts");
+            String ends = offerObject.getString("ends");
+            Offer.Category category = Offer.Category.valueOf(offerObject.getString("category").toUpperCase());
+            JSONArray ingredientsArray = offerObject.getJSONArray("ingredients");
+            Set<Offer.Ingredient> ingredients = new HashSet<>();
+            for (int ingrIndex = 0; ingrIndex < ingredientsArray.length(); ingrIndex++) {
+                ingredients.add(Offer.Ingredient.valueOf(ingredientsArray.getString(ingrIndex)));
             }
-            offersResult = new Offers(restaurantTitle, restaurantDescription, offers);
-        } catch (JSONException jsonException) {
-            Log.e(this.getClass().getCanonicalName(), jsonException.getMessage());
+
+            autoSearchForTags(ingredients, offerTitle);
+            autoSearchForTags(ingredients, offerDescription);
+            Offer offer = new Offer(
+                    offerTitle,
+                    offerDescription,
+                    offerPrize,
+                    starts, ends,
+                    category,
+                    ingredients);
+            Offer.ValidationState validationState = offer.getValidationState();
+            if (validationState.equals(Offer.ValidationState.NOW_VALID) ||
+                    validationState.equals(Offer.ValidationState.SOON_VALID)) {
+                offers.add(offer);
+            }
         }
+        offersResult = new Offers(restaurantTitle, restaurantDescription, offers);
 
         return offersResult;
     }

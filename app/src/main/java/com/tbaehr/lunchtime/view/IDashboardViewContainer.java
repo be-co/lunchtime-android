@@ -47,4 +47,6 @@ public interface IDashboardViewContainer {
     void enableNoOffersView(@StringRes int message);
 
     void setProgressBarVisibility(boolean visible);
+
+    void clearOffers();
 }

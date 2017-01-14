@@ -80,13 +80,17 @@ public class DashboardViewContainer implements IDashboardViewContainer {
     }
 
     @Override
+    public void clearOffers() {
+        viewContainer.removeAllViews();
+    }
+
+    @Override
     public View getRootView() {
         return rootView;
     }
 
     @Override
     public boolean isInitialized() {
-        int childCount = viewContainer.getChildCount();
-        return childCount > 3;
+        return viewContainer.getChildCount() > 0;
     }
 }

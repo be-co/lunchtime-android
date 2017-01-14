@@ -199,7 +199,7 @@ public class DataProvider {
 
     @Deprecated
     public Map<String, String> getNearbyRestaurants(double latitude, double longitude, int radius) {
-        syncOffers(this);
+        //syncOffers(this);
         String json = parseJsonFromAssets("restaurants/nearby_restaurants_weiterstadt.json");
         return parseNearbyRestaurantKeys(json);
     }

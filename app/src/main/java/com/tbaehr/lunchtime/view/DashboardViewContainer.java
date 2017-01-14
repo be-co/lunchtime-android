@@ -49,6 +49,9 @@ public class DashboardViewContainer implements IDashboardViewContainer {
     @BindView(R.id.view_container)
     LinearLayout viewContainer;
 
+    @BindView(R.id.progress_bar_loading)
+    LinearLayout progressBarLoading;
+
     public DashboardViewContainer(Context context, LayoutInflater inflater, ViewGroup container) {
         rootView = inflater.inflate(R.layout.content_dashboard, container, false);
         ButterKnife.bind(this, rootView);
@@ -67,6 +70,10 @@ public class DashboardViewContainer implements IDashboardViewContainer {
         noOffersView.setVisibility(View.VISIBLE);
     }
 
+    public void setProgressBarVisibility(boolean visible) {
+        progressBarLoading.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
     @Override
     public View getRootView() {
         return rootView;
@@ -74,6 +81,7 @@ public class DashboardViewContainer implements IDashboardViewContainer {
 
     @Override
     public boolean isInitialized() {
-        return viewContainer.getChildCount() > 1;
+        int childCount = viewContainer.getChildCount();
+        return childCount > 3;
     }
 }

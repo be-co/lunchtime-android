@@ -36,4 +36,5 @@
     <string name="no_offers_today3">Heute keine Angebote verfügbar, eine Küche ist kein Ponyhof.</string>
     <string name="no_offers_today4">Heute keine Angebote verfügbar, pass auf, dass Du nicht in Teufels Küche kommst.</string>
     <string name="no_offers_today5">Heute keine Angebote verfügbar, das Geheimnis einer sauberen Küche? Nicht kochen…</string>
+    <string name="status_loading">Aktualisiere Angebote</string>
 </resources>

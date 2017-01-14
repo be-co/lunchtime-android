@@ -35,4 +35,5 @@
     <string name="no_offers_today3">No offers for today, make full use of your burger rights, go voting.</string>
     <string name="no_offers_today4">No offers for today, a messy kitchen is a sign of happiness.</string>
     <string name="no_offers_today5">No offers for today. The onions aren\'t making me cry, it\'s being in the kitchen in general.</string>
+    <string name="status_loading">Loading offers</string>
 </resources>

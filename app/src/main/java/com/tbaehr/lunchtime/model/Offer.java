@@ -94,7 +94,7 @@ public class Offer {
         this.prize = prize;
 
         startDate = DateUtils.createDateFromString(starts);
-        endDate = DateUtils.createDateFromString(starts);
+        endDate = DateUtils.createDateFromString(ends);
 
         this.category = category;
         this.ingredients = ingredients;

@@ -29,13 +29,13 @@ import com.tbaehr.lunchtime.model.Offers;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
-import java.util.Date;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
-public class DashboardPresenter extends BasePresenter<IDashboardViewContainer> {
+public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
+        implements DataProvider.OfferLoadJobListener {
 
     private boolean foundOffers = false;
 
@@ -43,12 +43,31 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer> {
     public void bindView(IDashboardViewContainer view) {
         super.bindView(view);
         DataProvider dataProvider = new DataProvider();
-        boolean isInitialized = getView().isInitialized();
-        // TODO: Insert longitue, latitude and radius (in km)
-        Map<String, String> nearbyRestaurants = dataProvider.getNearbyRestaurants(-1, -1, -1);
-        for (String key : nearbyRestaurants.keySet()) {
-            Offers nearbyOffers = dataProvider.getOffers(key);
+        dataProvider.syncOffers(this);
+    }
 
+    @Override
+    public void unbindView() {
+        super.unbindView();
+    }
+
+    @Override
+    public void onStarted() {
+        getView().hideNoOffersView();
+        getView().setProgressBarVisibility(true);
+    }
+
+    @Override
+    public void onFinished(List<Offers> offersList) {
+        IDashboardViewContainer view = getView();
+        if (view == null) {
+            return;
+        }
+
+        view.setProgressBarVisibility(false);
+
+        boolean isInitialized = view.isInitialized();
+        for (Offers nearbyOffers : offersList) {
             HorizontalSliderView.OnSliderItemClickListener onSliderItemClickListener = new HorizontalSliderView.OnSliderItemClickListener() {
                 @Override
                 public void onSliderItemClick(Offer offer, View view) {
@@ -68,7 +87,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer> {
                     // TODO: Add action on header clicks
                 }
             };
-            getView().addOffers(
+            view.addOffers(
                     nearbyOffers.getRestaurantName(),
                     nearbyOffers.getRestaurantDescription(),
                     nearbyOffers.getOffers(),
@@ -86,12 +105,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer> {
                     R.string.no_offers_today5
             };
             int randomNumber = (int) (Math.random() * 5);
-            getView().enableNoOffersView(noOffersMessages[randomNumber]);
+            view.enableNoOffersView(noOffersMessages[randomNumber]);
         }
-    }
-
-    @Override
-    public void unbindView() {
-        super.unbindView();
     }
 }

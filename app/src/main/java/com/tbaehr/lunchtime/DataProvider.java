@@ -52,24 +52,31 @@ public class DataProvider {
 
     private static final String URI_OFFER = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/offers_%s.json";
 
+    public interface OfferLoadJobListener {
+        void onStarted();
+
+        void onFinished(List<Offers> offersList);
+    }
+
     public Restaurant getRestaurant(String restaurantID) {
         return createRestaurant("restaurant_" + restaurantID + ".json");
     }
 
-    public void syncOffers(final Object callback) {
+    public void syncOffers(final OfferLoadJobListener callback) {
         final String uriSync = String.format(URI_NEARBY_RESTAURANTS, "weiterstadt");
         final String keySync = String.format(KEY_NEARBY_OFFERS, "weiterstadt");
+
+        callback.onStarted();
 
         new AsyncTask<Void, Void, Void>() {
             List<Offers> offersList;
 
             @Override
             protected Void doInBackground(Void... params) {
+                offersList = new ArrayList<>();
+
                 // Try to download restaurants json from server
                 String jsonDownloaded = downloadTextFromServer(uriSync);
-
-                // Create the output list of Offers
-                offersList = new ArrayList<>();
 
                 // Server answered with json -> save to cache and update offers
                 if (jsonDownloaded != null) {
@@ -82,20 +89,12 @@ public class DataProvider {
                         }
                     }
                 } else {
-                    // try to restore offers from cache
                     String jsonNearbyRestaurantsCached = loadFromCache(keySync);
                     if (jsonNearbyRestaurantsCached != null) {
                         Map<String, String> nearbyRestaurantKeys = parseNearbyRestaurantKeys(jsonNearbyRestaurantsCached);
                         for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
-                            final String keyRestaurant = String.format(KEY_RESTAURANT, restaurantKey);
-                            String jsonOffers = loadFromCache(keyRestaurant);
-
-                            if (jsonOffers != null) {
-                                Offers offers = parseOffersFromJson(jsonOffers);
-                                if (offers != null) {
-                                    offersList.add(offers);
-                                }
-                            }
+                            Offers offers = loadOffersFromCache(restaurantKey);
+                            offersList.add(offers);
                         }
                     }
                 }
@@ -105,11 +104,21 @@ public class DataProvider {
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                // TODO: Call callback method with dataset (this is executed on UI thread)
-                callback.hashCode();
+                callback.onFinished(offersList);
                 super.onPostExecute(aVoid);
             }
         }.execute();
+    }
+
+    private Offers loadOffersFromCache(String restaurantKey) {
+        final String keyRestaurant = String.format(KEY_OFFER, restaurantKey);
+        String jsonOffers = loadFromCache(keyRestaurant);
+
+        if (jsonOffers != null) {
+            return parseOffersFromJson(jsonOffers);
+        }
+
+        return null;
     }
 
     private Offers updateOffers(String restaurantKey, String dateUpdated) {
@@ -131,7 +140,7 @@ public class DataProvider {
                 }
             }
         }
-        return null;
+        return loadOffersFromCache(restaurantKey);
     }
 
     private Map<String, String> parseNearbyRestaurantKeys(@NonNull String json) {
@@ -195,19 +204,6 @@ public class DataProvider {
         }
 
         return offersResult;
-    }
-
-    @Deprecated
-    public Map<String, String> getNearbyRestaurants(double latitude, double longitude, int radius) {
-        //syncOffers(this);
-        String json = parseJsonFromAssets("restaurants/nearby_restaurants_weiterstadt.json");
-        return parseNearbyRestaurantKeys(json);
-    }
-
-    @Deprecated
-    public Offers getOffers(String restaurantKey) {
-        String json = parseJsonFromAssets("offers/offers_" + restaurantKey + ".json");
-        return parseOffersFromJson(json);
     }
 
     private String loadFromCache(String key) {
@@ -301,6 +297,7 @@ public class DataProvider {
 
     private Restaurant createRestaurant(String fileName) {
         try {
+            // TODO: Do not use parseJsonFromAssets, fetch from server instead
             JSONObject restaurant = new JSONObject(parseJsonFromAssets("restaurants/" + fileName));
             String name = restaurant.getString("title");
             String shortDescription = restaurant.getString("shortDescription");

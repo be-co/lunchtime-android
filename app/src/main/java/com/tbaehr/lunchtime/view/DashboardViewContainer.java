@@ -70,6 +70,11 @@ public class DashboardViewContainer implements IDashboardViewContainer {
         noOffersView.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    public void hideNoOffersView() {
+        noOffersView.setVisibility(View.GONE);
+    }
+
     public void setProgressBarVisibility(boolean visible) {
         progressBarLoading.setVisibility(visible ? View.VISIBLE : View.GONE);
     }

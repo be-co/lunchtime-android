@@ -46,25 +46,23 @@ public class DataProvider {
 
     private static final String KEY_OFFER_UPDATED = "offer_updated_%s";
 
+    private static final String KEY_RESTAURANT_UPDATED = "restaurant_updated_%s";
+
     private static final String URI_NEARBY_RESTAURANTS = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/nearby_restaurants_%s.json";
 
     private static final String URI_RESTAURANT = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/restaurant_%s.json";
 
     private static final String URI_OFFER = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/offers_%s.json";
 
-    public interface OfferLoadJobListener {
+    public interface LoadJobListener<T> {
         void onDownloadStarted();
 
         void onDownloadFailed(String message);
 
-        void onNewOffersDownloaded(List<Offers> offersList);
+        void onNewOffersDownloaded(T downloadedObject);
     }
 
-    public Restaurant getRestaurant(String restaurantID) {
-        return createRestaurant("restaurant_" + restaurantID + ".json");
-    }
-
-    public void syncOffers(final OfferLoadJobListener callback) {
+    public void syncOffers(final LoadJobListener callback) {
         final String uriSync = String.format(URI_NEARBY_RESTAURANTS, "weiterstadt");
         final String keySync = String.format(KEY_NEARBY_OFFERS, "weiterstadt");
 
@@ -115,7 +113,7 @@ public class DataProvider {
         return offersList;
     }
 
-    private Offers loadOffersFromCache(String restaurantKey) {
+    private Offers loadOffersFromCache(@NonNull String restaurantKey) {
         final String keyRestaurant = String.format(KEY_OFFER, restaurantKey);
         String jsonOffers = loadFromCache(keyRestaurant);
 
@@ -130,7 +128,49 @@ public class DataProvider {
         return null;
     }
 
-    private boolean updateOffers(String restaurantKey, String dateUpdated, final OfferLoadJobListener callback) {
+    private Restaurant loadRestaurantFromCache(@NonNull String keyRestaurant) {
+        try {
+            String json = loadFromCache(String.format(KEY_RESTAURANT, keyRestaurant));
+            if (json != null) {
+                return parseRestaurantFromJson(json);
+            }
+        } catch (JSONException jsonException) {
+            Log.e(this.getClass().getCanonicalName(), jsonException.getMessage());
+        }
+
+        return null;
+    }
+
+    private boolean updateRestaurant(@NonNull String restaurantKey, @NonNull String dateUpdated, final LoadJobListener callback) {
+        final String uriRestaurant = String.format(URI_RESTAURANT, restaurantKey);
+        final String keyUpdated = String.format(KEY_RESTAURANT_UPDATED, restaurantKey);
+
+        Date cachedDate = DateUtils.createDateFromString(loadFromCache(keyUpdated));
+        Date downloadDate = DateUtils.createDateFromString(dateUpdated);
+
+        String jsonRestaurant;
+        if (downloadDate != null && (cachedDate == null || downloadDate.after(cachedDate))) {
+            callback.onDownloadStarted();
+            jsonRestaurant = downloadTextFromServer(uriRestaurant);
+            if (jsonRestaurant != null) {
+                try {
+                    Restaurant restaurant = parseRestaurantFromJson(jsonRestaurant);
+                    if (restaurant != null) {
+                        storeToCache(String.format(KEY_RESTAURANT, restaurantKey), jsonRestaurant);
+                        storeToCache(keyUpdated, dateUpdated);
+                        return true;
+                    }
+                } catch (JSONException jsonException) {
+                    jsonException.printStackTrace();
+                    String message = "Failed to download " + restaurantKey + " updated "+ dateUpdated;
+                    callback.onDownloadFailed(message);
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean updateOffers(@NonNull String restaurantKey, @NonNull String dateUpdated, final LoadJobListener callback) {
         final String uriRestaurantOffers = String.format(URI_OFFER, restaurantKey);
         final String keyUpdated = String.format(KEY_OFFER_UPDATED, restaurantKey);
 
@@ -177,7 +217,6 @@ public class DataProvider {
     }
 
     private Offers parseOffersFromJson(@NonNull String json) throws JSONException {
-        Offers offersResult = null;
         JSONObject restaurantObject = new JSONObject(json);
         String restaurantTitle = restaurantObject.getString("title");
         String restaurantDescription = restaurantObject.getString("description");
@@ -212,9 +251,43 @@ public class DataProvider {
                 offers.add(offer);
             }
         }
-        offersResult = new Offers(restaurantTitle, restaurantDescription, offers);
+        return new Offers(restaurantTitle, restaurantDescription, offers);
+    }
 
-        return offersResult;
+    private Restaurant parseRestaurantFromJson(@NonNull String json) throws JSONException {
+        JSONObject restaurant = new JSONObject(json);
+        String name = restaurant.getString("title");
+        String shortDescription = restaurant.getString("shortDescription");
+        String longDescription = restaurant.getString("longDescription");
+        String address = restaurant.getString("address");
+
+        JSONObject openingTimesObject = restaurant.getJSONObject("openingTimes");
+        JSONArray mondayArray = openingTimesObject.getJSONArray("monday");
+        JSONArray tuesdayArray = openingTimesObject.getJSONArray("tuesday");
+        JSONArray wednesdayArray = openingTimesObject.getJSONArray("wednesday");
+        JSONArray thursdayArray = openingTimesObject.getJSONArray("thursday");
+        JSONArray fridayArray = openingTimesObject.getJSONArray("friday");
+        JSONArray saturdayArray = openingTimesObject.getJSONArray("saturday");
+        JSONArray sundayArray = openingTimesObject.getJSONArray("sunday");
+        Map<Integer, int[]> openingTimes = new HashMap<>();
+        openingTimes.put(Calendar.MONDAY, convertToIntArray(mondayArray));
+        openingTimes.put(Calendar.TUESDAY, convertToIntArray(tuesdayArray));
+        openingTimes.put(Calendar.WEDNESDAY, convertToIntArray(wednesdayArray));
+        openingTimes.put(Calendar.THURSDAY, convertToIntArray(thursdayArray));
+        openingTimes.put(Calendar.FRIDAY, convertToIntArray(fridayArray));
+        openingTimes.put(Calendar.SATURDAY, convertToIntArray(saturdayArray));
+        openingTimes.put(Calendar.SUNDAY, convertToIntArray(sundayArray));
+
+        String phoneNumber = restaurant.getString("phoneNumber");
+        String email = restaurant.getString("email");
+        String website = restaurant.getString("website");
+        JSONArray photoUrlsObjects = restaurant.getJSONArray("photoUrls");
+        String[] photoUrls = convertToArray(photoUrlsObjects);
+
+        Restaurant gehe = new Restaurant(name, shortDescription, longDescription, address,
+                openingTimes, phoneNumber, email, website, photoUrls);
+
+        return gehe;
     }
 
     private String loadFromCache(String key) {
@@ -304,49 +377,6 @@ public class DataProvider {
             }
             return jsonOutput;
         }
-    }
-
-    private Restaurant createRestaurant(String fileName) {
-        try {
-            // TODO: Do not use parseJsonFromAssets, fetch from server instead
-            JSONObject restaurant = new JSONObject(parseJsonFromAssets("restaurants/" + fileName));
-            String name = restaurant.getString("title");
-            String shortDescription = restaurant.getString("shortDescription");
-            String longDescription = restaurant.getString("longDescription");
-            String address = restaurant.getString("address");
-
-            JSONObject openingTimesObject = restaurant.getJSONObject("openingTimes");
-            JSONArray mondayArray = openingTimesObject.getJSONArray("monday");
-            JSONArray tuesdayArray = openingTimesObject.getJSONArray("tuesday");
-            JSONArray wednesdayArray = openingTimesObject.getJSONArray("wednesday");
-            JSONArray thursdayArray = openingTimesObject.getJSONArray("thursday");
-            JSONArray fridayArray = openingTimesObject.getJSONArray("friday");
-            JSONArray saturdayArray = openingTimesObject.getJSONArray("saturday");
-            JSONArray sundayArray = openingTimesObject.getJSONArray("sunday");
-            Map<Integer, int[]> openingTimes = new HashMap<>();
-            openingTimes.put(Calendar.MONDAY, convertToIntArray(mondayArray));
-            openingTimes.put(Calendar.TUESDAY, convertToIntArray(tuesdayArray));
-            openingTimes.put(Calendar.WEDNESDAY, convertToIntArray(wednesdayArray));
-            openingTimes.put(Calendar.THURSDAY, convertToIntArray(thursdayArray));
-            openingTimes.put(Calendar.FRIDAY, convertToIntArray(fridayArray));
-            openingTimes.put(Calendar.SATURDAY, convertToIntArray(saturdayArray));
-            openingTimes.put(Calendar.SUNDAY, convertToIntArray(sundayArray));
-
-            String phoneNumber = restaurant.getString("phoneNumber");
-            String email = restaurant.getString("email");
-            String website = restaurant.getString("website");
-            JSONArray photoUrlsObjects = restaurant.getJSONArray("photoUrls");
-            String[] photoUrls = convertToArray(photoUrlsObjects);
-
-            Restaurant gehe = new Restaurant(name, shortDescription, longDescription, address,
-                    openingTimes, phoneNumber, email, website, photoUrls);
-
-            return gehe;
-        } catch (JSONException jsonException) {
-            Log.e(this.getClass().getCanonicalName(), jsonException.getMessage());
-        }
-
-        return null;
     }
 
     private void autoSearchForTags(Set<Offer.Ingredient> ingredientList, String title) {

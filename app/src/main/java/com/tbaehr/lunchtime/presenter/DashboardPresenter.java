@@ -38,7 +38,7 @@ import java.util.List;
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
 public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
-        implements DataProvider.OfferLoadJobListener {
+        implements DataProvider.LoadJobListener<List<Offers>> {
 
     private DataProvider dataProvider;
 

@@ -380,7 +380,7 @@ public class DataProvider {
     }
 
     private void autoSearchForTags(Set<Offer.Ingredient> ingredientList, String title) {
-        if (contains(title, "Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "wurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
+        if (contains(title, "Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
             if (title.contains("Carne")) {
                 if (!title.contains("vom Rind")) {
                     ingredientList.add(Offer.Ingredient.PIG);
@@ -389,13 +389,13 @@ public class DataProvider {
                 ingredientList.add(Offer.Ingredient.PIG);
             }
         }
-        if (contains(title, "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Carne", "Hacksteak", "Bockwurst")) {
+        if (contains(title, "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Rindswurst", "Carne", "Hacksteak", "Bockwurst")) {
             ingredientList.add(Offer.Ingredient.COW);
         }
-        if (contains(title, "Geflügel", "Hähnchen", "Huhn", "Hühner", "Coq", "Truthahn")) {
+        if (contains(title, "Coq", "Gans", "Geflügel", "Hähnchen", "Huhn", "Hühner", "Pute", "Truthahn")) {
             ingredientList.add(Offer.Ingredient.CHICKEN);
         }
-        if (contains(title, "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
+        if (contains(title, "Pasta", "Futtuccine", "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
             ingredientList.add(Offer.Ingredient.GLUTEN);
         }
         if (contains(title, "quark", "schmarrn", "Käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand")) {

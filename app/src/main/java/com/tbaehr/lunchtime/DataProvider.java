@@ -79,7 +79,7 @@ public class DataProvider {
                     storeToCache(keySync, jsonDownloaded);
                     Map<String, String> nearbyRestaurantKeys = parseNearbyRestaurantKeys(jsonDownloaded);
                     for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
-                        dataSetChanged = dataSetChanged || updateOffers(restaurantKey, nearbyRestaurantKeys.get(restaurantKey), callback);
+                        dataSetChanged = updateOffers(restaurantKey, nearbyRestaurantKeys.get(restaurantKey), callback) || dataSetChanged;
                     }
                 }
 

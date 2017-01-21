@@ -42,6 +42,7 @@ public class Offer {
     }
 
     public enum ValidationState {
+        INVALID,
         NEXT_DAYS_VALID,
         SOON_VALID,
         NOW_VALID,
@@ -53,7 +54,9 @@ public class Offer {
         LACTOSE(R.drawable.ic_milk),
         EGG(R.drawable.ic_eggs),
         COW(R.drawable.ic_cow),
-        PIG(R.drawable.ic_pig),
+
+        // TODO: Rename to PORK
+        PIG(R.drawable.ic_pork),
         CHICKEN(R.drawable.ic_chicken),
         FISH(R.drawable.ic_fish);
 
@@ -179,6 +182,10 @@ public class Offer {
     }
 
     public ValidationState getValidationState() {
+        if (startDate == null || endDate == null) {
+            return ValidationState.INVALID;
+        }
+
         Date now = new Date(System.currentTimeMillis());
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(now);

@@ -68,6 +68,7 @@ public class DataProvider {
 
         new AsyncTask<Void, Void, Void>() {
             private boolean dataSetChanged = false;
+
             @Override
             protected Void doInBackground(Void... params) {
                 // Try to download restaurants json from server
@@ -162,7 +163,7 @@ public class DataProvider {
                     }
                 } catch (JSONException jsonException) {
                     jsonException.printStackTrace();
-                    String message = "Failed to download " + restaurantKey + " updated "+ dateUpdated;
+                    String message = "Failed to download " + restaurantKey + " updated " + dateUpdated;
                     callback.onDownloadFailed(message);
                 }
             }
@@ -191,7 +192,7 @@ public class DataProvider {
                     }
                 } catch (JSONException jsonException) {
                     jsonException.printStackTrace();
-                    String message = "Failed to download " + restaurantKey + " updated "+ dateUpdated;
+                    String message = "Failed to download " + restaurantKey + " updated " + dateUpdated + ". " + jsonException.getMessage();
                     callback.onDownloadFailed(message);
                 }
             }
@@ -233,7 +234,11 @@ public class DataProvider {
             JSONArray ingredientsArray = offerObject.getJSONArray("ingredients");
             Set<Offer.Ingredient> ingredients = new HashSet<>();
             for (int ingrIndex = 0; ingrIndex < ingredientsArray.length(); ingrIndex++) {
-                ingredients.add(Offer.Ingredient.valueOf(ingredientsArray.getString(ingrIndex)));
+                try {
+                    ingredients.add(Offer.Ingredient.valueOf(ingredientsArray.getString(ingrIndex)));
+                } catch (IllegalArgumentException e) {
+                    throw new JSONException("Invalid offer " + offerTitle + " for " +restaurantTitle + ": " + e.getMessage());
+                }
             }
 
             autoSearchForTags(ingredients, offerTitle);
@@ -249,6 +254,8 @@ public class DataProvider {
             if (validationState.equals(Offer.ValidationState.NOW_VALID) ||
                     validationState.equals(Offer.ValidationState.SOON_VALID)) {
                 offers.add(offer);
+            } else if (validationState.equals(Offer.ValidationState.INVALID)) {
+                throw new JSONException("Invalid offer " + offer.getTitle() + " for " + restaurantTitle + ": Check date format: " + starts + "," + ends);
             }
         }
         return new Offers(restaurantTitle, restaurantDescription, offers);
@@ -312,7 +319,9 @@ public class DataProvider {
             StringBuilder stringBuilder = new StringBuilder();
             URL url = new URL(path);
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+            InputStream stream = url.openStream();
+            InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
+            BufferedReader in = new BufferedReader(reader);
             String line;
             while ((line = in.readLine()) != null) {
                 stringBuilder.append(line);
@@ -380,7 +389,7 @@ public class DataProvider {
     }
 
     private void autoSearchForTags(Set<Offer.Ingredient> ingredientList, String title) {
-        if (contains(title, "Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
+        if (contains(title, "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
             if (title.contains("Carne")) {
                 if (!title.contains("vom Rind")) {
                     ingredientList.add(Offer.Ingredient.PIG);
@@ -389,7 +398,7 @@ public class DataProvider {
                 ingredientList.add(Offer.Ingredient.PIG);
             }
         }
-        if (contains(title, "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Rindswurst", "Carne", "Hacksteak", "Bockwurst")) {
+        if (contains(title, "Rumpsteak", "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Rindswurst", "Carne", "Hacksteak", "Bockwurst")) {
             ingredientList.add(Offer.Ingredient.COW);
         }
         if (contains(title, "Coq", "Gans", "Geflügel", "Hähnchen", "Huhn", "Hühner", "Pute", "Truthahn")) {
@@ -398,7 +407,7 @@ public class DataProvider {
         if (contains(title, "Pasta", "Futtuccine", "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
             ingredientList.add(Offer.Ingredient.GLUTEN);
         }
-        if (contains(title, "quark", "schmarrn", "Käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand")) {
+        if (contains(title, "quark", "schmarrn", "Käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand", "Frischkaese", "Kochkaese", "Frischkäse", "Kochkäs")) {
             ingredientList.add(Offer.Ingredient.LACTOSE);
         }
         if (contains(title, "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {

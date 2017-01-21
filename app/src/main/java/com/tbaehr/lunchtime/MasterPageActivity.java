@@ -31,6 +31,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.tbaehr.lunchtime.controller.DashboardFragment;
+import com.tbaehr.lunchtime.controller.HelpFragment;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -108,8 +111,8 @@ public class MasterPageActivity extends AppCompatActivity implements NavigationV
 
 class FragmentHolder {
 
-    private FragmentDashboard dashboard;
-    private FragmentHelp help;
+    private DashboardFragment dashboard;
+    private HelpFragment help;
 
     private static final String TAG_DASHBOARD = "dashboard";
     private static final String TAG_HELP = "help";
@@ -122,15 +125,15 @@ class FragmentHolder {
         this.context = context;
 
         // Add 'dashboard' page
-        dashboard = (FragmentDashboard) context.getSupportFragmentManager().findFragmentByTag(TAG_DASHBOARD);
+        dashboard = (DashboardFragment) context.getSupportFragmentManager().findFragmentByTag(TAG_DASHBOARD);
         if (dashboard == null) {
-            dashboard = new FragmentDashboard();
+            dashboard = new DashboardFragment();
         }
 
         // Add 'help' page
-        help = (FragmentHelp) context.getSupportFragmentManager().findFragmentByTag(TAG_HELP);
+        help = (HelpFragment) context.getSupportFragmentManager().findFragmentByTag(TAG_HELP);
         if (help == null) {
-            help = new FragmentHelp();
+            help = new HelpFragment();
         }
 
         // Default: Show 'dashboard' page

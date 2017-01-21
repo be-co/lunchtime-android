@@ -1,6 +1,20 @@
 <resources>
     <string name="app_name">Lunchtime</string>
 
+    <string name="agb"><b>Allgemeine Nutzungsbedingungen\nder Lunchtime-Software und Haftungsausschluss</b>\n\nDie nachfolgenden <i>Allgemeinen Nutzungsbedingungen</i> gelten für die Nutzung der nativen Applikation <i>Lunchtime</i> für Android, iOS und Windows sowie der zugehörigen Web-App im Browser sowie der Desktop-Applikation <i>Lunchtime</i> für Apple OSX, Linux und Windows nebst indirekter Nutzung der Datenspeicherung auf von <i>Lunchtime</i> verwendeten Servern (zusammen die „Lunchtime-Software“).\n\nMit der Lunchtime-Software bieten die Betreiber (im Folgenden „wir“ bzw. „uns“) ihren Nutzern die Möglichkeit, veränderliche Daten wie WLAN-Einwahldaten (über die ShareX-App) oder Kontaktdaten (über die ShareContacts-App) (im Folgenden „Inhalte“) miteinander zu teilen. Alle dynamischen Inhalte der Applikationen sind von den Nutzern selbst erstellt und werden soweit nicht von Nutzer als „unangebracht“ gemeldet, nicht kontrolliert.\n\nWenn ein Nutzer Inhalte über ShareX-Software teilt, gewährt der Nutzer uns die Weitergabe über die ShareX-Software an wahlweise alle Nutzer, Nutzer in den vom teilenden Nutzer ausgewählten Kontaktlisten oder alle Geräte, auf denen der teilende Nutzer angemeldet ist. Der Nutzer bekommt über die ShareX-Software die Möglichkeit, anzugeben, welche Nutzer die von ihm geteilten Inhalte nutzen dürfen. Der Nutzer <b>versichert mit dem Prozess des Teilens von Inhalten, dass der Besitzer ausdrücklich mit dem Teilen der Inhalte über die ShareX-Software einverstanden ist</b> und mit den <b>Risiken der Nutzung der ShareX-Software vertraut</b> ist. Der Besitzer von Kontaktdaten ist der in den Kontaktdaten beschriebene Nutzer selbst. Der Besitzer eines WLAN-Netzes ist die im Internet-/Telefon-Vertrag angegebene Person.\n\n<b>Haftungsansprüche</b> gegenüber uns, welche sich auf Schäden materieller oder ideeller Art beziehen, die durch die Nutzung oder Nichtnutzung der geteilten Inhalte resultieren können, <b>sind grundsätzlich ausgeschlossen</b>. Wir behalten es uns ausdrücklich vor, Teile der ShareX-Software oder die gesamte ShareX-Software ohne gesonderte Ankündigung zu verändern, zu ergänzen, zu löschen oder die Veröffentlichung zeitweise oder endgültig einzustellen. Verstoßen Nutzer gegen diese Nutzungsbedingungen, behalten wir uns vor, den Account und alle geteilten Inhalte ohne Vorwarnung zu löschen.\n\nFür die Nutzung der Software muss sich der Nutzer registrieren. Dies ist notwendig, da eine eindeutige Identifikation für den Prozess des „Teilens“ notwendig ist und andere Nutzer wissen möchten, mit wem sie Inhalte teilen. Die Nutzung der im Registrierungsprozess abgefragten persönlichen Daten zu einem anderen Zweck als der Identifikation zwischen Benutzern der ShareX-Software wird ausdrücklich ausgeschlossen.</string>
+    <string name="agb_accept">Wenn Du fortsetzt, akzeptierst Du damit die vollständigen <![CDATA[<a href="">Nutzungsbedingungen</a>]]>.</string> <!-- Wenn Du fortsetzt, akzeptierst Du damit die vollständigen -->
+    <string name="agb_terms_of_use">Nutzungsbedingungen</string>
+
+    <!-- 1:1 translations -->
+    <string name="_cancel">@android:string/cancel</string>
+    <string name="_no">@android:string/no</string>
+    <string name="_yes">@android:string/yes</string>
+    <string name="_settings">Einstellungen</string>
+    <string name="_continue">Fortsetzen</string>
+    <string name="_close">Schließen</string>
+    <string name="_accept">Zustimmen</string>
+    <string name="_decline">Ablehnen</string>
+
     <string name="nav_content_desc_drawer_open">Navigationsbar öffnen</string>
     <string name="nav_content_desc_drawer_close">Navigationsbar schließen</string>
 
@@ -37,4 +51,18 @@
     <string name="no_offers_today4">Heute keine Angebote verfügbar, pass auf, dass Du nicht in Teufels Küche kommst.</string>
     <string name="no_offers_today5">Heute keine Angebote verfügbar, das Geheimnis einer sauberen Küche? Nicht kochen…</string>
     <string name="status_loading">Aktualisiere Angebote</string>
+
+    <!-- Help page -->
+    <string name="about_lunchtime">Lunchtime beantwortet eine immer wiederkehrende Frage: \"Was kann ich essen?\"</string>
+
+    <string name="help_legal_headline">Rechtliches</string>
+    <string name="help_legal_terms_of_use">Nutzungsbedingungen &#38; Haftungsausschluss</string>
+
+    <string name="help_feedback_headline">Deine Meinung</string>
+    <string name="help_feedback_playstore">Bewerte uns</string>
+    <string name="help_feedback_googleplus">Gebe Feedback oder mache Vorschläge</string>
+
+    <string name="help_about_headline">Über die Lunchtime-App</string>
+    <string name="help_about_version">Version %1$s</string>
+    <string name="help_about_faq">Fragen &#38; Antworten</string>
 </resources>

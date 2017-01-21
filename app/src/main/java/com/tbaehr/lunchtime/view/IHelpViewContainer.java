@@ -27,6 +27,6 @@ public interface IHelpViewContainer {
 
     View getRootView();
 
-    void showWebContent(String webContent);
+    void setVersionName(String versionName);
 
 }

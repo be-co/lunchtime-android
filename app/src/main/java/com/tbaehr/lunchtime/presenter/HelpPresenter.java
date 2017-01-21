@@ -18,9 +18,9 @@
  */
 package com.tbaehr.lunchtime.presenter;
 
-import android.content.Context;
-
 import com.propaneapps.tomorrow.presenter.BasePresenter;
+import com.tbaehr.lunchtime.BuildConfig;
+import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.view.HelpViewContainer;
 
@@ -29,15 +29,14 @@ import com.tbaehr.lunchtime.view.HelpViewContainer;
  */
 public class HelpPresenter extends BasePresenter<HelpViewContainer> {
 
-    private Context context;
-
-    public HelpPresenter(Context context) {
-        this.context = context;
+    public HelpPresenter() {
+        // ;
     }
 
     @Override
     public void bindView(HelpViewContainer view) {
         super.bindView(view);
-        getView().showWebContent(context.getString(R.string.webview_help));
+        String versionName = LunchtimeApplication.getContext().getString(R.string.help_about_version, BuildConfig.VERSION_NAME);
+        getView().setVersionName(versionName);
     }
 }

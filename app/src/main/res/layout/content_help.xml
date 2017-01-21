@@ -1,35 +1,179 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="@dimen/activity_horizontal_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.tbaehr.lunchtime.controller.MasterPageActivity">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/help_login_status_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:gravity="center_vertical"
+            android:text="@string/about_lunchtime"
+            android:textAppearance="@style/TextAppearance.AppCompat" />
+
+        <TextView
+            android:id="@+id/help_law_title"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingBottom="@dimen/view_vertical_margin"
-            android:paddingLeft="@dimen/view_horizontal_margin"
-            android:paddingRight="@dimen/view_horizontal_margin"
-            android:paddingTop="@dimen/view_vertical_margin"
-            android:gravity="center"
-            android:orientation="vertical"
-            tools:ignore="ScrollViewSize">
+            android:gravity="center_vertical"
+            android:layout_marginTop="14dp"
+            android:text="@string/help_legal_headline"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            android:textColor="@color/colorPrimaryDark" />
 
-            <WebView
-                android:id="@+id/webview"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+        <android.support.v7.widget.CardView
+            android:id="@+id/help_terms_of_usage_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp">
 
-        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/help_terms_of_usage"
+                style="@style/Widget.CardContent">
 
-    </ScrollView>
+                <ImageView
+                    android:id="@+id/help_terms_of_usage_image"
+                    android:layout_width="@dimen/card_drawable_size"
+                    android:layout_height="@dimen/card_drawable_size"
+                    android:layout_marginLeft="@dimen/card_margin"
+                    android:layout_marginRight="@dimen/card_margin"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_contract" />
 
-</LinearLayout>
+                <TextView
+                    android:id="@+id/help_terms_of_usage_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="@string/help_legal_terms_of_use"
+                    android:textAppearance="@style/TextAppearance.AppCompat" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <TextView
+            android:id="@+id/help_feedback_title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_marginTop="14dp"
+            android:text="@string/help_feedback_headline"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            android:textColor="@color/colorPrimaryDark" />
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/help_feedback1_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp">
+
+            <LinearLayout
+                android:id="@+id/help_feedback1"
+                style="@style/Widget.CardContent">
+
+                <ImageView
+                    android:id="@+id/help_feedback1_image"
+                    android:layout_width="@dimen/card_drawable_size"
+                    android:layout_height="@dimen/card_drawable_size"
+                    android:layout_marginLeft="@dimen/card_margin"
+                    android:layout_marginRight="@dimen/card_margin"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_googleplay_light_normal" />
+
+                <TextView
+                    android:id="@+id/help_feedback1_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="@string/help_feedback_playstore"
+                    android:textAppearance="@style/TextAppearance.AppCompat" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/help_feedback2_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp">
+
+            <LinearLayout
+                android:id="@+id/help_feedback2"
+                style="@style/Widget.CardContent">
+
+                <ImageView
+                    android:id="@+id/help_feedback2_image"
+                    android:layout_width="@dimen/card_drawable_size"
+                    android:layout_height="@dimen/card_drawable_size"
+                    android:src="@drawable/ic_googleplus_light_normal" />
+
+                <TextView
+                    android:id="@+id/help_feedback2_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="@string/help_feedback_googleplus"
+                    android:textAppearance="@style/TextAppearance.AppCompat" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <TextView
+            android:id="@+id/help_about_title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_marginTop="14dp"
+            android:text="@string/help_about_headline"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            android:textColor="@color/colorPrimaryDark" />
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/help_about1_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp">
+
+            <LinearLayout
+                android:id="@+id/help_about1"
+                style="@style/Widget.CardContent">
+
+                <ImageView
+                    android:id="@+id/help_about1_image"
+                    android:layout_width="@dimen/card_drawable_size"
+                    android:layout_height="@dimen/card_drawable_size"
+                    android:layout_marginLeft="@dimen/card_margin"
+                    android:layout_marginRight="@dimen/card_margin"
+                    android:padding="4dp"
+                    android:src="@drawable/app_icon" />
+
+                <TextView
+                    android:id="@+id/help_about1_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="@string/help_about_version"
+                    android:textAppearance="@style/TextAppearance.AppCompat" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+
+</ScrollView>

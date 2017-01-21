@@ -1,6 +1,20 @@
 <resources>
     <string name="app_name">Lunchtime</string>
 
+    <string name="agb">Terms of use\n of the Lunchtime software and exclusion of liability claims</string>
+    <string name="agb_accept">With proceeding you accept the full <![CDATA[<a href="">terms of use</a>]]>.</string>
+    <string name="agb_terms_of_use">Terms of use</string>
+
+    <!-- 1:1 translations -->
+    <string name="_cancel">@android:string/cancel</string>
+    <string name="_no">@android:string/no</string>
+    <string name="_yes">@android:string/yes</string>
+    <string name="_settings">Settings</string>
+    <string name="_continue">Continue</string>
+    <string name="_close">Close</string>
+    <string name="_accept">Accept</string>
+    <string name="_decline">Decline</string>
+
     <string name="nav_content_desc_drawer_open">Open navigation drawer</string>
     <string name="nav_content_desc_drawer_close">Close navigation drawer</string>
 
@@ -36,4 +50,18 @@
     <string name="no_offers_today4">No offers for today, a messy kitchen is a sign of happiness.</string>
     <string name="no_offers_today5">No offers for today. The onions aren\'t making me cry, it\'s being in the kitchen in general.</string>
     <string name="status_loading">Loading offers</string>
+
+    <!-- Help page -->
+    <string name="about_lunchtime">Always the same question… \"What can I eat?\" Lunchtime fills the gap.</string>
+
+    <string name="help_legal_headline">Legal Info</string>
+    <string name="help_legal_terms_of_use">Terms of usage &#38; exclusion of liability claims</string>
+
+    <string name="help_feedback_headline">Your Opinion</string>
+    <string name="help_feedback_playstore">Rate us</string>
+    <string name="help_feedback_googleplus">Give feedback or provide suggestions</string>
+
+    <string name="help_about_headline">About the Lunchtime App</string>
+    <string name="help_about_version">Version %1$s</string>
+    <string name="help_about_faq">Questions &#38; answers</string>
 </resources>

@@ -50,5 +50,4 @@
 
     <string name="help_about_headline">About the Lunchtime App</string>
     <string name="help_about_version">Version %1$s</string>
-    <string name="help_about_faq">Questions &#38; answers</string>
 </resources>

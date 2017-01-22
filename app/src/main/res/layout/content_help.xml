@@ -49,7 +49,8 @@
                     android:layout_marginLeft="@dimen/card_margin"
                     android:layout_marginRight="@dimen/card_margin"
                     android:padding="4dp"
-                    android:src="@drawable/ic_contract" />
+                    android:src="@drawable/ic_contract"
+                    android:contentDescription="@string/help_legal_terms_of_use" />
 
                 <TextView
                     android:id="@+id/help_terms_of_usage_text"
@@ -90,7 +91,8 @@
                     android:layout_marginLeft="@dimen/card_margin"
                     android:layout_marginRight="@dimen/card_margin"
                     android:padding="8dp"
-                    android:src="@drawable/ic_googleplay_light_normal" />
+                    android:src="@drawable/ic_googleplay_light_normal"
+                    android:contentDescription="@string/help_feedback_playstore" />
 
                 <TextView
                     android:id="@+id/help_feedback1_text"
@@ -120,7 +122,8 @@
                     android:layout_height="@dimen/card_drawable_size"
                     android:layout_marginLeft="@dimen/card_margin"
                     android:layout_marginRight="@dimen/card_margin"
-                    android:src="@drawable/ic_googleplus_light_normal" />
+                    android:src="@drawable/ic_googleplus_light_normal"
+                    android:contentDescription="@string/help_feedback_googleplus" />
 
                 <TextView
                     android:id="@+id/help_feedback2_text"
@@ -161,7 +164,8 @@
                     android:layout_marginLeft="@dimen/card_margin"
                     android:layout_marginRight="@dimen/card_margin"
                     android:padding="4dp"
-                    android:src="@drawable/app_icon" />
+                    android:src="@drawable/app_icon"
+                    android:contentDescription="@string/app_name" />
 
                 <TextView
                     android:id="@+id/help_about1_text"

@@ -18,6 +18,7 @@
  */
 package com.tbaehr.lunchtime.view;
 
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -59,6 +60,9 @@ public class MasterPageView implements IMasterPageViewContainer {
     @BindView(R.id.nav_view)
     NavigationView navigationView;
 
+    @BindView(R.id.app_bar_layout)
+    AppBarLayout appBarLayout;
+
     @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbar;
 
@@ -94,11 +98,13 @@ public class MasterPageView implements IMasterPageViewContainer {
 
     @Override
     public void showDashboardFragment() {
+        appBarLayout.setExpanded(true, false);
         fragmentHolder.showDashboardFragment();
     }
 
     @Override
     public void showHelpFragment() {
+        appBarLayout.setExpanded(false, false);
         fragmentHolder.showHelpFragment();
     }
 

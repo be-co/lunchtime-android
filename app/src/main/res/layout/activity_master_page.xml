@@ -14,6 +14,7 @@
         android:fitsSystemWindows="true">
 
         <android.support.design.widget.AppBarLayout
+            android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
             android:layout_height="256dp"
             android:fitsSystemWindows="true"
@@ -38,7 +39,8 @@
                     android:scaleType="centerCrop"
                     android:src="@drawable/eat_with_style"
                     app:layout_collapseMode="parallax"
-                    app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed" />
+                    app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
+                    android:contentDescription="@string/nav_item_dashboard" />
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
@@ -69,17 +71,10 @@
             android:layout_marginTop="0dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <LinearLayout
+            <FrameLayout
+                android:id="@+id/fragment_container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <FrameLayout
-                    android:id="@+id/fragment_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-            </LinearLayout>
+                android:layout_height="match_parent" />
 
         </android.support.v4.widget.NestedScrollView>
 

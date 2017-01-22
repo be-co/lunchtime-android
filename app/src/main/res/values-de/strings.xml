@@ -25,20 +25,6 @@
 
     <string name="nav_item_dashboard">Startseite</string>
     <string name="nav_item_help">Hilfe</string>
-    <string name="webview_help"><![CDATA[
-    <h2>Willkommen bei Lunchtime</h2>
-    <b>Entdecke</b> wo und was Du mittags essen kannst und verabrede Dich mit anderen.<br/><br/>
-    <b>Verstecke</b> Angebote, die Dich nicht interessieren, z.B. Fleischgerichte als Vegetarier.<br/><br/>
-    <b>Helfe mit</b> durch Dein <a href=\"mailto:timo.baehr@gmail.com\">Feedback</a>, Code-Beitr&aumlge oder dem Hinzuf&uuml;gen weiterer Restaurants.
-
-    <h3>&Uuml;ber diese Version</h3>
-    Die App befindet sich noch in der Entwicklung. Daher sind noch nicht alle Features nutzbar.
-
-    <h3>Rechtliches</h3>
-    Bisher handelt es sich bei dieser App um ein Freizeitprojekt von Timo B&auml;hr.
-    Durch Deine Nutzung verzichtest Du auf jegliche Haftungsanspr&uuml;che, die durch Nutzung der App entstehen k&ouml;nnen.
-    ]]>
-    </string>
     <string name="more">Mehr</string>
     <string name="starts">Ab </string>
     <string name="ends">Bis </string>
@@ -53,7 +39,11 @@
     <string name="status_loading">Aktualisiere Angebote</string>
 
     <!-- Help page -->
-    <string name="about_lunchtime">Lunchtime beantwortet eine immer wiederkehrende Frage: \"Was kann ich essen?\"</string>
+    <string name="about_lunchtime">Lunchtime beantwortet die immer wiederkehrende Frage:
+        <b>\"<i>Was kann</i> ICH <i>essen?</i>\"</b>
+        \n\nAktuell zeigt es den Mittagstisch dreier Restaurants in Weiterstand an: <i>Feinkost Hamm</i>, <i>Gehe-Betriebsrestaurant</i> und <i>Darmstädter Hof</i>.
+        \n\n<b>Hinweis:</b> Die App befindet sich in einem frühen Stadium der Entwicklung. Wir arbeiten - soweit in einem Freizeitprojekt möglich - an dem Ausbau der Funktionalität.
+    </string>
 
     <string name="help_legal_headline">Rechtliches</string>
     <string name="help_legal_terms_of_use">Nutzungsbedingungen &#38; Haftungsausschluss</string>

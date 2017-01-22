@@ -36,7 +36,8 @@ public class HelpPresenter extends BasePresenter<HelpViewContainer> {
     @Override
     public void bindView(HelpViewContainer view) {
         super.bindView(view);
+        String debug = BuildConfig.DEBUG ? "-debug" : "";
         String versionName = LunchtimeApplication.getContext().getString(R.string.help_about_version, BuildConfig.VERSION_NAME);
-        getView().setVersionName(versionName);
+        getView().setVersionName(versionName + debug);
     }
 }

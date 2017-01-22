@@ -389,7 +389,7 @@ public class DataProvider {
     }
 
     private void autoSearchForTags(Set<Offer.Ingredient> ingredientList, String title) {
-        if (contains(title, "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
+        if (contains(title, "Bolognese", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
             if (title.contains("Carne")) {
                 if (!title.contains("vom Rind")) {
                     ingredientList.add(Offer.Ingredient.PIG);

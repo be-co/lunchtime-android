@@ -29,4 +29,14 @@ public interface IHelpViewContainer {
 
     void setVersionName(String versionName);
 
+    void setOnPlayStoreCardClickListener(View.OnClickListener onPlayStoreCardClickListener);
+
+    void setOnGooglePlusCardClickListener(View.OnClickListener onGooglePlusCardClickListener);
+
+    void setOnTermsOfUsageClickListener(View.OnClickListener onTermsOfUsageClickListener);
+
+    void setOnAboutTeamClickListener(View.OnClickListener onAboutTeamClickListener);
+
+    void removeOnClickListeners();
+
 }

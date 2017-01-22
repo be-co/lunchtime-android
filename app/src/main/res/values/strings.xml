@@ -39,7 +39,10 @@
     <string name="status_loading">Loading offers</string>
 
     <!-- Help page -->
-    <string name="about_lunchtime">Always the same question… \"What can I eat?\" Lunchtime fills the gap.</string>
+    <string name="about_lunchtime">Always the same question… <b>\"<i>What can </i> I <i>eat?</i>\"</b> Lunchtime helps out.
+        \n\nCurrently the app contains three restaurants in Darmstadt/Weiterstadt: <i>Feinkost Hamm</i>, <i>Gehe-Betriebsrestaurant</i> and <i>Darmstädter Hof</i>.
+        \n\n<b>Note:</b> The app is under development. We are working on additional features during our free time.
+    </string>
 
     <string name="help_legal_headline">Legal Info</string>
     <string name="help_legal_terms_of_use">Terms of usage &#38; exclusion of liability claims</string>

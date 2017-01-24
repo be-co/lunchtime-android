@@ -18,9 +18,10 @@
     <string name="nav_content_desc_drawer_open">Open navigation drawer</string>
     <string name="nav_content_desc_drawer_close">Close navigation drawer</string>
 
-    <string name="breakfast_time">Need a breakfast?</string>
-    <string name="lunch_time">It\'s lunchtime</string>
-    <string name="coffee_time">It\'s never to late for a coffee</string>
+    <string name="breakfast_time">Time for breakfast</string>
+    <string name="brunch_time">Brunchtime!</string>
+    <string name="lunch_time">Lunchtime!</string>
+    <string name="coffee_time">Coffee break?</string>
     <string name="dinner_time">A dinner tonight?</string>
 
     <string name="nav_item_dashboard">Dashboard</string>

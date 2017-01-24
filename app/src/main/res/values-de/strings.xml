@@ -26,8 +26,9 @@
     <string name="nav_content_desc_drawer_close">Navigationsbar schließen</string>
 
     <string name="breakfast_time">Frühstücken?</string>
-    <string name="lunch_time">Mittagessenszeit!</string>
-    <string name="coffee_time">Ein Kaffee geht immer</string>
+    <string name="brunch_time">Brunchtime!</string>
+    <string name="lunch_time">Lunchtime!</string>
+    <string name="coffee_time">Kaffeepause gefällig?</string>
     <string name="dinner_time">Heute abend essen gehen?</string>
 
     <string name="nav_item_dashboard">Startseite</string>

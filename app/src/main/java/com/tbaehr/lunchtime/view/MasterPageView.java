@@ -26,6 +26,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -59,6 +60,9 @@ public class MasterPageView implements IMasterPageViewContainer {
 
     @BindView(R.id.nav_view)
     NavigationView navigationView;
+
+    @BindView(R.id.nested_scroll_view)
+    NestedScrollView nestedScrollView;
 
     @BindView(R.id.app_bar_layout)
     AppBarLayout appBarLayout;
@@ -98,13 +102,11 @@ public class MasterPageView implements IMasterPageViewContainer {
 
     @Override
     public void showDashboardFragment() {
-        appBarLayout.setExpanded(true, false);
         fragmentHolder.showDashboardFragment();
     }
 
     @Override
     public void showHelpFragment() {
-        appBarLayout.setExpanded(false, false);
         fragmentHolder.showHelpFragment();
     }
 

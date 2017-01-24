@@ -28,12 +28,12 @@ import android.view.WindowManager;
 
 import com.propaneapps.tomorrow.base.BasePresenterActivity;
 import com.propaneapps.tomorrow.common.FactoryWithType;
-import com.propaneapps.tomorrow.presenter.Presenter;
+import com.tbaehr.lunchtime.presenter.CustomBasePresenter;
 
 /**
  * Created by timo.baehr@gmail.com on 30.12.16.
  */
-public abstract class BaseActivity<V, P extends Presenter<V>> extends BasePresenterActivity<V, P>
+public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends BasePresenterActivity<V, P>
 implements FactoryWithType<P> {
 
     private P presenter;
@@ -56,6 +56,18 @@ implements FactoryWithType<P> {
     public void onPresenterProvided(P presenter) {
         super.onPresenterProvided(presenter);
         this.presenter = presenter;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        presenter.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        presenter.onPause();
     }
 
     public <T extends Activity> void startActivity(Class<T> activityClazz) {

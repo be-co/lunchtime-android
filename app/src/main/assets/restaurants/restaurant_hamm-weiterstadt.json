@@ -1,0 +1,19 @@
+{
+  "title": "Hamm",
+  "shortDescription": "Feinkost Metzgerei und Bistro im Loop 5",
+  "longDescription": "<h1>Qualität zum günstigen Preis</h1>Wechselnder Mittagstisch, erhältlich in allen Filialen.",
+  "address": "Gutenbergstraße 5, 64331 Weiterstadt",
+  "openingTimes": {
+    "monday": [480, 1200],
+    "tuesday": [480, 1200],
+    "wednesday": [480, 1200],
+    "thursday": [480, 1200],
+    "friday": [480, 1260],
+    "saturday": [480, 1260],
+    "sunday": []
+  },
+  "phoneNumber": "+49 6151 6674641",
+  "email": "info@hamm-hamm.de",
+  "website": "http://www.hamm-hamm.de/index.php/aktuelles/mittagstisch",
+  "photoUrls": []
+}

@@ -4,6 +4,11 @@
     <string name="nav_content_desc_drawer_open">Open navigation drawer</string>
     <string name="nav_content_desc_drawer_close">Close navigation drawer</string>
 
+    <string name="breakfast_time">Need a breakfast?</string>
+    <string name="lunch_time">It\'s lunchtime</string>
+    <string name="coffee_time">It\'s never to late for a coffee</string>
+    <string name="dinner_time">A dinner tonight?</string>
+
     <string name="nav_item_dashboard">Dashboard</string>
     <string name="nav_item_help">Help</string>
     <string name="webview_help"><![CDATA[
@@ -19,4 +24,15 @@
     This is developed by Timo B&auml;hr inside his leisure time. By using this app you confirm not to make him liable for any damages which are caused by the app\'s usage.
     ]]>
     </string>
+    <string name="more">More</string>
+    <string name="starts">Starts </string>
+    <string name="ends">Ends </string>
+    <string name="expired">Expired</string>
+    <string name="no_offers">No offers available</string>
+    <string name="excellentChoice">Excellent choice!</string>
+    <string name="no_offers_today1">No offers for today, my friends think you are a cooking genius.</string>
+    <string name="no_offers_today2">No offers for today, the secret to a clean kitchen is simple, don\'t cook.</string>
+    <string name="no_offers_today3">No offers for today, make full use of your burger rights, go voting.</string>
+    <string name="no_offers_today4">No offers for today, a messy kitchen is a sign of happiness.</string>
+    <string name="no_offers_today5">No offers for today. The onions aren\'t making me cry, it\'s being in the kitchen in general.</string>
 </resources>

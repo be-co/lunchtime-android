@@ -20,35 +20,93 @@ package com.tbaehr.lunchtime.presenter;
 
 import android.support.design.widget.Snackbar;
 import android.view.View;
+import android.widget.Toast;
 
 import com.propaneapps.tomorrow.presenter.BasePresenter;
 import com.tbaehr.lunchtime.DataProvider;
+import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
+import com.tbaehr.lunchtime.controller.DashboardFragment;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Offers;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
-import java.util.Date;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
-public class DashboardPresenter extends BasePresenter<IDashboardViewContainer> {
+public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
+        implements DataProvider.LoadJobListener<List<Offers>> {
 
-    private boolean foundOffers = false;
+    private DataProvider dataProvider;
+
+    private DashboardFragment dashboardFragment;
+
+    public DashboardPresenter(DashboardFragment fragment) {
+        this.dashboardFragment = fragment;
+    }
 
     @Override
     public void bindView(IDashboardViewContainer view) {
         super.bindView(view);
-        DataProvider dataProvider = new DataProvider();
-        boolean isInitialized = getView().isInitialized();
-        // TODO: Insert longitue, latitude and radius (in km)
-        Map<String, Date> nearbyRestaurants = dataProvider.getNearbyRestaurants(-1, -1, -1);
-        for (String key : nearbyRestaurants.keySet()) {
-            Offers nearbyOffers = dataProvider.getOffers(key);
+        dataProvider = new DataProvider();
+        dataProvider.syncOffers(this);
 
+        if (!view.isInitialized()) {
+            presentOffers(dataProvider.loadOffersFromCache());
+        }
+    }
+
+    @Override
+    public void unbindView() {
+        super.unbindView();
+    }
+
+    @Override
+    public void onDownloadStarted() {
+        dashboardFragment.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                getView().clearOffers();
+                getView().hideNoOffersView();
+                getView().setProgressBarVisibility(true);
+            }
+        });
+    }
+
+    @Override
+    public void onDownloadFailed(final String message) {
+        dashboardFragment.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                presentOffers(dataProvider.loadOffersFromCache());
+                Toast.makeText(LunchtimeApplication.getContext(), message, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    @Override
+    public void onNewOffersDownloaded(List<Offers> offersList) {
+        IDashboardViewContainer view = getView();
+        if (view == null) {
+            return;
+        }
+
+        view.setProgressBarVisibility(false);
+        presentOffers(offersList);
+    }
+
+    private void presentOffers(List<Offers> offersList) {
+        IDashboardViewContainer view = getView();
+        boolean foundOffers = false;
+
+        view.setProgressBarVisibility(false);
+        view.hideNoOffersView();
+        view.clearOffers();
+
+        for (Offers nearbyOffers : offersList) {
             HorizontalSliderView.OnSliderItemClickListener onSliderItemClickListener = new HorizontalSliderView.OnSliderItemClickListener() {
                 @Override
                 public void onSliderItemClick(Offer offer, View view) {
@@ -56,7 +114,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer> {
                     Snackbar.make(view, R.string.excellentChoice, Snackbar.LENGTH_SHORT).show();
                 }
             };
-            if (nearbyOffers.isEmpty() || isInitialized) {
+            if (nearbyOffers.isEmpty()) {
                 continue;
             }
 
@@ -68,7 +126,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer> {
                     // TODO: Add action on header clicks
                 }
             };
-            getView().addOffers(
+            view.addOffers(
                     nearbyOffers.getRestaurantName(),
                     nearbyOffers.getRestaurantDescription(),
                     nearbyOffers.getOffers(),
@@ -86,12 +144,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer> {
                     R.string.no_offers_today5
             };
             int randomNumber = (int) (Math.random() * 5);
-            getView().enableNoOffersView(noOffersMessages[randomNumber]);
+            view.enableNoOffersView(noOffersMessages[randomNumber]);
         }
-    }
-
-    @Override
-    public void unbindView() {
-        super.unbindView();
     }
 }

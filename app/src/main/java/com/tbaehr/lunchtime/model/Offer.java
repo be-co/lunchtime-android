@@ -22,10 +22,8 @@ import android.content.Context;
 import android.support.annotation.DrawableRes;
 
 import com.tbaehr.lunchtime.R;
+import com.tbaehr.lunchtime.utils.DateUtils;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
@@ -44,6 +42,7 @@ public class Offer {
     }
 
     public enum ValidationState {
+        INVALID,
         NEXT_DAYS_VALID,
         SOON_VALID,
         NOW_VALID,
@@ -55,7 +54,9 @@ public class Offer {
         LACTOSE(R.drawable.ic_milk),
         EGG(R.drawable.ic_eggs),
         COW(R.drawable.ic_cow),
-        PIG(R.drawable.ic_pig),
+
+        // TODO: Rename to PORK
+        PIG(R.drawable.ic_pork),
         CHICKEN(R.drawable.ic_chicken),
         FISH(R.drawable.ic_fish);
 
@@ -95,13 +96,8 @@ public class Offer {
         this.description = description;
         this.prize = prize;
 
-        DateFormat dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT);
-        try {
-            startDate = dateFormat.parse(starts);
-            endDate = dateFormat.parse(ends);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        startDate = DateUtils.createDateFromString(starts);
+        endDate = DateUtils.createDateFromString(ends);
 
         this.category = category;
         this.ingredients = ingredients;
@@ -186,6 +182,10 @@ public class Offer {
     }
 
     public ValidationState getValidationState() {
+        if (startDate == null || endDate == null) {
+            return ValidationState.INVALID;
+        }
+
         Date now = new Date(System.currentTimeMillis());
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(now);

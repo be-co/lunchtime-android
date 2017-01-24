@@ -52,6 +52,10 @@ public class DashboardFragment extends BaseFragment<IDashboardViewContainer, Das
 
     @Override
     public DashboardPresenter create() {
-        return new DashboardPresenter();
+        return new DashboardPresenter(this);
+    }
+
+    public void runOnUiThread(Runnable runnable) {
+        getActivity().runOnUiThread(runnable);
     }
 }

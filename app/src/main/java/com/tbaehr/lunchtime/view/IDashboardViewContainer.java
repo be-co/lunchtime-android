@@ -42,5 +42,11 @@ public interface IDashboardViewContainer {
             HorizontalSliderView.OnSliderItemClickListener sliderItemClickListener
     );
 
+    void hideNoOffersView();
+
     void enableNoOffersView(@StringRes int message);
+
+    void setProgressBarVisibility(boolean visible);
+
+    void clearOffers();
 }

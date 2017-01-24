@@ -16,42 +16,21 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.tbaehr.lunchtime;
+package com.tbaehr.lunchtime.presenter;
 
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.WebView;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
+import com.propaneapps.tomorrow.presenter.BasePresenter;
 
 /**
- * Created by timo on 26.12.16.
+ * Created by timo.baehr@gmail.com on 24.01.17.
  */
-public class FragmentHelp extends Fragment {
+public class CustomBasePresenter<V> extends BasePresenter<V> {
 
-    private Unbinder butterKnife;
-
-    @BindView(R.id.webview)
-    WebView webView;
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.content_help, container, false);
-        butterKnife = ButterKnife.bind(this, view);
-
-        webView.loadData(getString(R.string.webview_help), "text/html", "UTF-8");
-
-        return view;
+    public void onPause() {
+        //;
     }
 
-    @Override public void onDestroyView() {
-        super.onDestroyView();
-        butterKnife.unbind();
+    public void onResume() {
+        //;
     }
 
 }

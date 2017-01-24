@@ -1,29 +1,31 @@
 <resources>
     <string name="app_name">Lunchtime</string>
 
+    <string name="agb">Terms of use\n of the Lunchtime software and exclusion of liability claims</string>
+    <string name="agb_accept">With proceeding you accept the full <![CDATA[<a href="">terms of use</a>]]>.</string>
+    <string name="agb_terms_of_use">Terms of use</string>
+
+    <!-- 1:1 translations -->
+    <string name="_cancel">@android:string/cancel</string>
+    <string name="_no">@android:string/no</string>
+    <string name="_yes">@android:string/yes</string>
+    <string name="_settings">Settings</string>
+    <string name="_continue">Continue</string>
+    <string name="_close">Close</string>
+    <string name="_accept">Accept</string>
+    <string name="_decline">Decline</string>
+
     <string name="nav_content_desc_drawer_open">Open navigation drawer</string>
     <string name="nav_content_desc_drawer_close">Close navigation drawer</string>
 
-    <string name="breakfast_time">Need a breakfast?</string>
-    <string name="lunch_time">It\'s lunchtime</string>
-    <string name="coffee_time">It\'s never to late for a coffee</string>
+    <string name="breakfast_time">Time for breakfast</string>
+    <string name="brunch_time">Brunchtime!</string>
+    <string name="lunch_time">Lunchtime!</string>
+    <string name="coffee_time">Coffee break?</string>
     <string name="dinner_time">A dinner tonight?</string>
 
     <string name="nav_item_dashboard">Dashboard</string>
     <string name="nav_item_help">Help</string>
-    <string name="webview_help"><![CDATA[
-    <h2>Welcome to Lunchtime</h2>
-    <b>Explore</b> where and what you can eat for lunch and who may come with you.<br/><br/>
-    <b>Hide</b> offers you are not interested in, such as meat if your are vegetarian.<br/><br/>
-    <b>Contribute</b> by giving <a href=\"mailto:timo.baehr@gmail.com\">feedback</a>, contributing code, or adding new restaurants.
-
-    <h3>About this version</h3>
-    This is under development. Hence, not all features are implemented yet.
-
-    <h3>Legal information</h3>
-    This is developed by Timo B&auml;hr inside his leisure time. By using this app you confirm not to make him liable for any damages which are caused by the app\'s usage.
-    ]]>
-    </string>
     <string name="more">More</string>
     <string name="starts">Starts </string>
     <string name="ends">Ends </string>
@@ -36,4 +38,26 @@
     <string name="no_offers_today4">No offers for today, a messy kitchen is a sign of happiness.</string>
     <string name="no_offers_today5">No offers for today. The onions aren\'t making me cry, it\'s being in the kitchen in general.</string>
     <string name="status_loading">Loading offers</string>
+
+    <!-- Help page -->
+    <string name="about_lunchtime">Always the same question… <b>\"<i>What can </i> I <i>eat?</i>\"</b> Lunchtime helps out.
+        \n\nCurrently the app contains three restaurants in Darmstadt/Weiterstadt: <i>Feinkost Hamm</i>, <i>Gehe-Betriebsrestaurant</i> and <i>Darmstädter Hof</i>.
+        \n\n<b>Note:</b> The app is under development. We are working on additional features during our free time.
+    </string>
+
+    <string name="help_legal_headline">Legal Info</string>
+    <string name="help_legal_terms_of_use">Terms of usage &#38; exclusion of liability claims</string>
+
+    <string name="help_feedback_headline">Your Opinion</string>
+    <string name="help_feedback_playstore">Rate us</string>
+    <string name="help_feedback_googleplus">Give feedback or provide suggestions</string>
+
+    <string name="help_about_headline">About the Lunchtime App</string>
+    <string name="help_about_version">Version %1$s</string>
+    <string name="help_about_team">About the team</string>
+    <string name="help_about_team_content"><b>Coding of Android App</b>
+        /nTimo Bähr
+        /n/n<b>Updating Offers</b>
+        /nIman Naghashian, Timo Bähr
+    </string>
 </resources>

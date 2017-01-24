@@ -18,10 +18,11 @@
  */
 package com.tbaehr.lunchtime.view;
 
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
+import android.widget.TextView;
 
 import com.tbaehr.lunchtime.R;
 
@@ -35,8 +36,20 @@ public class HelpViewContainer implements IHelpViewContainer {
 
     private View rootView;
 
-    @BindView(R.id.webview)
-    WebView webView;
+    @BindView(R.id.help_about1_text)
+    TextView mHelpAbout1;
+
+    @BindView(R.id.help_about2_text)
+    TextView mHelpAbout2;
+
+    @BindView(R.id.help_terms_of_usage_card)
+    CardView termsOfUsageCard;
+
+    @BindView(R.id.help_feedback1_card)
+    CardView playStoreCard;
+
+    @BindView(R.id.help_feedback2_card)
+    CardView googlePlusCard;
 
     public HelpViewContainer(LayoutInflater inflater, ViewGroup container) {
         rootView = inflater.inflate(R.layout.content_help, container, false);
@@ -44,12 +57,40 @@ public class HelpViewContainer implements IHelpViewContainer {
     }
 
     @Override
-    public void showWebContent(String webContent) {
-        webView.loadData(webContent, "text/html", "UTF-8");
+    public View getRootView() {
+        return rootView;
     }
 
     @Override
-    public View getRootView() {
-        return rootView;
+    public void setVersionName(String versionName) {
+        mHelpAbout1.setText(versionName);
+    }
+
+    @Override
+    public void setOnPlayStoreCardClickListener(View.OnClickListener onPlayStoreCardClickListener) {
+        playStoreCard.setOnClickListener(onPlayStoreCardClickListener);
+    }
+
+    @Override
+    public void setOnGooglePlusCardClickListener(View.OnClickListener onGooglePlusCardClickListener) {
+        googlePlusCard.setOnClickListener(onGooglePlusCardClickListener);
+    }
+
+    @Override
+    public void setOnTermsOfUsageClickListener(View.OnClickListener onTermsOfUsageClickListener) {
+        termsOfUsageCard.setOnClickListener(onTermsOfUsageClickListener);
+    }
+
+    @Override
+    public void setOnAboutTeamClickListener(View.OnClickListener onAboutTeamClickListener) {
+        mHelpAbout2.setOnClickListener(onAboutTeamClickListener);
+    }
+
+    @Override
+    public void removeOnClickListeners() {
+        termsOfUsageCard.setOnClickListener(null);
+        playStoreCard.setOnClickListener(null);
+        googlePlusCard.setOnClickListener(null);
+        mHelpAbout2.setOnClickListener(null);
     }
 }

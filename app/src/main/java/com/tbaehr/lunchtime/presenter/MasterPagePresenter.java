@@ -26,7 +26,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import com.propaneapps.tomorrow.presenter.BasePresenter;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
 
@@ -36,7 +35,7 @@ import static com.tbaehr.lunchtime.view.MasterPageView.TAG_HELP_FRAGMENT;
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
-public class MasterPagePresenter extends BasePresenter<IMasterPageViewContainer>
+public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewContainer>
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private final static String KEY_TOOLBAR_TITLE = "toolbarTitle";

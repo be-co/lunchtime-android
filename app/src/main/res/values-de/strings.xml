@@ -1,30 +1,38 @@
 <resources>
     <string name="app_name">Lunchtime</string>
 
+    <string name="agb"><b>Allgemeine Nutzungsbedingungen\nder Lunchtime-Software und Haftungsausschluss</b>
+        \n\nDie nachfolgenden <i>Allgemeinen Nutzungsbedingungen</i> gelten für die Nutzung der
+        nativen Applikation <i>Lunchtime</i> für Android, iOS und Windows Universal sowie der
+        zugehörigen Web-App im Browser sowie der Desktop-Applikation <i>Lunchtime</i> für Apple OSX,
+        Linux und Windows nebst indirekter Nutzung der Datenspeicherung auf von <i>Lunchtime</i>
+        verwendeten Servern (zusammen die „Lunchtime-Software“).
+        \n\nWillkommen auf der grünen Wiese. Die AGBs sind noch in Bearbeitung.
+    </string>
+    <string name="agb_accept">Wenn Du fortsetzt, akzeptierst Du damit die vollständigen <![CDATA[<a href="">Nutzungsbedingungen</a>]]>.</string> <!-- Wenn Du fortsetzt, akzeptierst Du damit die vollständigen -->
+    <string name="agb_terms_of_use">Nutzungsbedingungen</string>
+
+    <!-- 1:1 translations -->
+    <string name="_cancel">@android:string/cancel</string>
+    <string name="_no">@android:string/no</string>
+    <string name="_yes">@android:string/yes</string>
+    <string name="_settings">Einstellungen</string>
+    <string name="_continue">Fortsetzen</string>
+    <string name="_close">Schließen</string>
+    <string name="_accept">Zustimmen</string>
+    <string name="_decline">Ablehnen</string>
+
     <string name="nav_content_desc_drawer_open">Navigationsbar öffnen</string>
     <string name="nav_content_desc_drawer_close">Navigationsbar schließen</string>
 
     <string name="breakfast_time">Frühstücken?</string>
-    <string name="lunch_time">Mittagessenszeit!</string>
-    <string name="coffee_time">Ein Kaffee geht immer</string>
+    <string name="brunch_time">Brunchtime!</string>
+    <string name="lunch_time">Lunchtime!</string>
+    <string name="coffee_time">Kaffeepause gefällig?</string>
     <string name="dinner_time">Heute abend essen gehen?</string>
 
     <string name="nav_item_dashboard">Startseite</string>
     <string name="nav_item_help">Hilfe</string>
-    <string name="webview_help"><![CDATA[
-    <h2>Willkommen bei Lunchtime</h2>
-    <b>Entdecke</b> wo und was Du mittags essen kannst und verabrede Dich mit anderen.<br/><br/>
-    <b>Verstecke</b> Angebote, die Dich nicht interessieren, z.B. Fleischgerichte als Vegetarier.<br/><br/>
-    <b>Helfe mit</b> durch Dein <a href=\"mailto:timo.baehr@gmail.com\">Feedback</a>, Code-Beitr&aumlge oder dem Hinzuf&uuml;gen weiterer Restaurants.
-
-    <h3>&Uuml;ber diese Version</h3>
-    Die App befindet sich noch in der Entwicklung. Daher sind noch nicht alle Features nutzbar.
-
-    <h3>Rechtliches</h3>
-    Bisher handelt es sich bei dieser App um ein Freizeitprojekt von Timo B&auml;hr.
-    Durch Deine Nutzung verzichtest Du auf jegliche Haftungsanspr&uuml;che, die durch Nutzung der App entstehen k&ouml;nnen.
-    ]]>
-    </string>
     <string name="more">Mehr</string>
     <string name="starts">Ab </string>
     <string name="ends">Bis </string>
@@ -37,4 +45,27 @@
     <string name="no_offers_today4">Heute keine Angebote verfügbar, pass auf, dass Du nicht in Teufels Küche kommst.</string>
     <string name="no_offers_today5">Heute keine Angebote verfügbar, das Geheimnis einer sauberen Küche? Nicht kochen…</string>
     <string name="status_loading">Aktualisiere Angebote</string>
+
+    <!-- Help page -->
+    <string name="about_lunchtime">Lunchtime beantwortet die immer wiederkehrende Frage:
+        <b>\"<i>Was kann</i> ICH <i>essen?</i>\"</b>
+        \n\nAktuell zeigt es den Mittagstisch dreier Restaurants in Weiterstadt an: <i>Feinkost Hamm</i>, <i>Gehe-Betriebsrestaurant</i> und <i>Darmstädter Hof</i>.
+        \n\n<b>Hinweis:</b> Die App befindet sich in einem frühen Stadium der Entwicklung. Wir arbeiten - soweit in einem Freizeitprojekt möglich - an dem Ausbau der Funktionalität.
+    </string>
+
+    <string name="help_legal_headline">Rechtliches</string>
+    <string name="help_legal_terms_of_use">Nutzungsbedingungen &#38; Haftungsausschluss</string>
+
+    <string name="help_feedback_headline">Deine Meinung</string>
+    <string name="help_feedback_playstore">Bewerte uns</string>
+    <string name="help_feedback_googleplus">Gebe Feedback oder mache Vorschläge</string>
+
+    <string name="help_about_headline">Über die Lunchtime-App</string>
+    <string name="help_about_version">Version %1$s</string>
+    <string name="help_about_team">Über das Team</string>
+    <string name="help_about_team_content"><b>Programmierung der Android-App</b>
+        \nTimo Bähr
+        \n\n<b>Pflege der Angebote</b>
+        \nIman Naghashian, Timo Bähr
+    </string>
 </resources>

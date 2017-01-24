@@ -241,8 +241,8 @@ public class DataProvider {
                 }
             }
 
-            autoSearchForTags(ingredients, offerTitle);
-            autoSearchForTags(ingredients, offerDescription);
+            autoSearchForIngredients(ingredients, offerTitle);
+            autoSearchForIngredients(ingredients, offerDescription);
             Offer offer = new Offer(
                     offerTitle,
                     offerDescription,
@@ -388,14 +388,14 @@ public class DataProvider {
         }
     }
 
-    private void autoSearchForTags(Set<Offer.Ingredient> ingredientList, String title) {
-        if (contains(title, "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
+    private void autoSearchForIngredients(Set<Offer.Ingredient> ingredientList, String title) {
+        if (contains(title, "Bolognese", "bratwurst", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
             if (title.contains("Carne")) {
                 if (!title.contains("vom Rind")) {
-                    ingredientList.add(Offer.Ingredient.PIG);
+                    ingredientList.add(Offer.Ingredient.PORK);
                 }
             } else {
-                ingredientList.add(Offer.Ingredient.PIG);
+                ingredientList.add(Offer.Ingredient.PORK);
             }
         }
         if (contains(title, "Rumpsteak", "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Rindswurst", "Carne", "Hacksteak", "Bockwurst")) {
@@ -407,7 +407,7 @@ public class DataProvider {
         if (contains(title, "Pasta", "Futtuccine", "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
             ingredientList.add(Offer.Ingredient.GLUTEN);
         }
-        if (contains(title, "quark", "schmarrn", "Käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand", "Frischkaese", "Kochkaese", "Frischkäse", "Kochkäs")) {
+        if (contains(title, "quark", "schmarrn", "Käse", "käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand", "Frischkaese", "Kochkaese", "Frischkäse", "Kochkäs")) {
             ingredientList.add(Offer.Ingredient.LACTOSE);
         }
         if (contains(title, "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {

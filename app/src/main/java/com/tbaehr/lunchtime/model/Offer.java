@@ -26,6 +26,7 @@ import com.tbaehr.lunchtime.utils.DateUtils;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -49,14 +50,18 @@ public class Offer {
         OUTDATED;
     }
 
+    public enum Tag {
+        VEGETARIAN,
+        VEGAN
+    }
+
     public enum Ingredient {
         GLUTEN(R.drawable.ic_gluten),
         LACTOSE(R.drawable.ic_milk),
         EGG(R.drawable.ic_eggs),
         COW(R.drawable.ic_cow),
-
-        // TODO: Rename to PORK
-        PIG(R.drawable.ic_pork),
+        PORK(R.drawable.ic_pork),
+        @Deprecated PIG(R.drawable.ic_pork),
         CHICKEN(R.drawable.ic_chicken),
         FISH(R.drawable.ic_fish);
 
@@ -231,6 +236,27 @@ public class Offer {
 
     public Set<Ingredient> getIngredients() {
         return ingredients;
+    }
+
+    public Set<Tag> getTags() {
+        Set<Tag> tags = new HashSet<>();
+        if (!contains(ingredients, Ingredient.CHICKEN, Ingredient.PORK, Ingredient.COW, Ingredient.FISH)) {
+            tags.add(Tag.VEGETARIAN);
+
+            if (!contains(ingredients, Ingredient.EGG, Ingredient.LACTOSE)) {
+                tags.add(Tag.VEGAN);
+            }
+        }
+        return tags;
+    }
+
+    private boolean contains(Set<Ingredient> ingredients, Ingredient... ingredient) {
+        for (Ingredient ingr : ingredient) {
+            if (ingredients.contains(ingr)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

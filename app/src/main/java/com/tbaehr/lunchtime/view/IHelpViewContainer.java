@@ -27,6 +27,16 @@ public interface IHelpViewContainer {
 
     View getRootView();
 
-    void showWebContent(String webContent);
+    void setVersionName(String versionName);
+
+    void setOnPlayStoreCardClickListener(View.OnClickListener onPlayStoreCardClickListener);
+
+    void setOnGooglePlusCardClickListener(View.OnClickListener onGooglePlusCardClickListener);
+
+    void setOnTermsOfUsageClickListener(View.OnClickListener onTermsOfUsageClickListener);
+
+    void setOnAboutTeamClickListener(View.OnClickListener onAboutTeamClickListener);
+
+    void removeOnClickListeners();
 
 }

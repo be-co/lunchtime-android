@@ -55,12 +55,15 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         dataProvider.syncOffers(this);
 
         if (!view.isInitialized()) {
-            presentOffers(dataProvider.loadOffersFromCache());
+            List<Offers> offersList = dataProvider.loadOffersFromCache();
+            // TODO: Start the timer task for relevant offers
+            presentOffers(offersList);
         }
     }
 
     @Override
     public void unbindView() {
+        // TODO: Stop all timer tasks
         super.unbindView();
     }
 

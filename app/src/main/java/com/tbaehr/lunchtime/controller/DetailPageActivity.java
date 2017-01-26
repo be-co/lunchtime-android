@@ -697,7 +697,7 @@ public class DetailPageActivity extends BaseActivity<IDetailPageViewContainer, D
 
     @Override
     public DetailPagePresenter create() {
-        return new DetailPagePresenter();
+        return new DetailPagePresenter(this);
     }
 
     @Override
@@ -708,5 +708,11 @@ public class DetailPageActivity extends BaseActivity<IDetailPageViewContainer, D
     @Override
     public IDetailPageViewContainer getViewLayer() {
         return view;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        getPresenter().onBackPressed();
     }
 }

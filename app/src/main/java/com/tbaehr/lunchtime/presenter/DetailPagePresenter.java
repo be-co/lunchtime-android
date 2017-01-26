@@ -679,6 +679,7 @@ package com.tbaehr.lunchtime.presenter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
+import com.tbaehr.lunchtime.controller.DetailPageActivity;
 import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
 
 /**
@@ -686,8 +687,10 @@ import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
  */
 public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewContainer> {
 
-    public DetailPagePresenter() {
-        // ;
+    private DetailPageActivity activity;
+
+    public DetailPagePresenter(DetailPageActivity activity) {
+        this.activity = activity;
     }
 
     @Override
@@ -703,5 +706,10 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+    }
+
+    public void onBackPressed() {
+        activity.finish();
+        getView().onBackPressed();
     }
 }

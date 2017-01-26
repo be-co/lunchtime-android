@@ -676,6 +676,7 @@
  */
 package com.tbaehr.lunchtime.presenter;
 
+import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.Toast;
@@ -685,6 +686,7 @@ import com.tbaehr.lunchtime.DataProvider;
 import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DashboardFragment;
+import com.tbaehr.lunchtime.controller.DetailPageActivity;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Offers;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
@@ -827,7 +829,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
             HorizontalSliderView.OnSliderHeaderClickListener headerClickListener = new HorizontalSliderView.OnSliderHeaderClickListener() {
                 @Override
                 public void onSliderHeaderClick() {
-                    // TODO: Add action on header clicks
+                    openDetailPage();
                 }
             };
             view.addOffers(
@@ -850,5 +852,10 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
             int randomNumber = (int) (Math.random() * 5);
             view.enableNoOffersView(noOffersMessages[randomNumber]);
         }
+    }
+
+    private void openDetailPage() {
+        Intent openFetchOrderActivityIntent = new Intent(dashboardFragment.getActivity(), DetailPageActivity.class);
+        dashboardFragment.startActivity(openFetchOrderActivityIntent);
     }
 }

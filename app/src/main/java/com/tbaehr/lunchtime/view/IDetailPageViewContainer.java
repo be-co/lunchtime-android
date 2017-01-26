@@ -681,4 +681,6 @@ package com.tbaehr.lunchtime.view;
  */
 public interface IDetailPageViewContainer {
 
+    void onBackPressed();
+
 }

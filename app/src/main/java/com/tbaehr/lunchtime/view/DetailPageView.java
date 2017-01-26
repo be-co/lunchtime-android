@@ -676,11 +676,18 @@
  */
 package com.tbaehr.lunchtime.view;
 
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -688,12 +695,58 @@ import butterknife.ButterKnife;
  */
 public class DetailPageView implements IDetailPageViewContainer {
 
+    @BindView(R.id.collapsing_toolbar)
+    CollapsingToolbarLayout collapsingToolbar;
+
+    private DetailPageActivity activity;
+
     public DetailPageView(DetailPageActivity activity) {
-        // TODO: Create layout
+        this.activity = activity;
         activity.setContentView(R.layout.activity_detail_page);
         activity.setAsFullScreenActivity();
+        activity.overridePendingTransition(R.anim.slide_in, R.anim.slide_nothing);
         View rootView = activity.findViewById(R.id.coordinator_layout);
         ButterKnife.bind(this, rootView);
+
+        configureToolbar();
+    }
+
+    private void configureToolbar() {
+        final Toolbar toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
+        activity.setSupportActionBar(toolbar);
+        ActionBar actionBar = activity.getSupportActionBar();
+
+        // Set title of this activity including the network name
+        String title = "Titel";
+        collapsingToolbar.setTitle(title);
+        // TODO: Setting color really needed?
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            collapsingToolbar.setExpandedTitleColor(activity.getColor(android.R.color.white));
+        } else {
+            collapsingToolbar.setExpandedTitleColor(activity.getResources().getColor(android.R.color.white));
+        }*/
+
+        // Make back arrow white or disable it if opened over notification
+        final Drawable backArrow;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            backArrow = activity.getDrawable(R.drawable.abc_ic_ab_back_material);
+        } else {
+            backArrow = activity.getResources().getDrawable(R.drawable.abc_ic_ab_back_material);
+        }
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        int color;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            color = activity.getColor(android.R.color.white);
+        } else {
+            color = activity.getResources().getColor(android.R.color.white);
+        }
+        backArrow.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        activity.getSupportActionBar().setHomeAsUpIndicator(backArrow);
+    }
+
+    @Override
+    public void onBackPressed() {
+        activity.overridePendingTransition(R.anim.slide_nothing, R.anim.slide_out);
     }
 }
 

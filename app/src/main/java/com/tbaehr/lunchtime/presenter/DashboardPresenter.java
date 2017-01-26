@@ -32,7 +32,12 @@ import com.tbaehr.lunchtime.model.Offers;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.
@@ -43,6 +48,8 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     private DataProvider dataProvider;
 
     private DashboardFragment dashboardFragment;
+
+    private Timer timer;
 
     public DashboardPresenter(DashboardFragment fragment) {
         this.dashboardFragment = fragment;
@@ -56,15 +63,42 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
         if (!view.isInitialized()) {
             List<Offers> offersList = dataProvider.loadOffersFromCache();
-            // TODO: Start the timer task for relevant offers
+            startTimeBasedRefresh(offersList);
             presentOffers(offersList);
         }
     }
 
     @Override
     public void unbindView() {
-        // TODO: Stop all timer tasks
+        stopTimeBasedRefresh();
         super.unbindView();
+    }
+
+    private void startTimeBasedRefresh(List<Offers> offersList) {
+        Set<Date> refreshDates = new HashSet<>();
+        for (Offers offers : offersList) {
+            refreshDates.addAll(offers.getUiRefreshDates());
+        }
+        startTimers(refreshDates);
+    }
+
+    private void startTimers(Set<Date> dates) {
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                presentOffers(dataProvider.loadOffersFromCache());
+            }
+        };
+        if (timer == null) {
+            timer = new Timer();
+        }
+        for (Date date : dates) {
+            timer.schedule(task, date);
+        }
+    }
+
+    private void stopTimeBasedRefresh() {
+        timer.cancel();
     }
 
     @Override

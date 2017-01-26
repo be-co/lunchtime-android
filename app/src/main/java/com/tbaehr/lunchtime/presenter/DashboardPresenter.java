@@ -690,7 +690,12 @@ import com.tbaehr.lunchtime.model.Offers;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.
@@ -702,6 +707,8 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
     private DashboardFragment dashboardFragment;
 
+    private Timer timer;
+
     public DashboardPresenter(DashboardFragment fragment) {
         this.dashboardFragment = fragment;
     }
@@ -712,14 +719,53 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         dataProvider = new DataProvider();
         dataProvider.syncOffers(this);
 
+        List<Offers> offersList = dataProvider.loadOffersFromCache();
+        startTimeBasedRefresh(offersList);
+
         if (!view.isInitialized()) {
-            presentOffers(dataProvider.loadOffersFromCache());
+            presentOffers(offersList);
         }
     }
 
     @Override
     public void unbindView() {
+        stopTimeBasedRefresh();
         super.unbindView();
+    }
+
+    private void startTimeBasedRefresh(List<Offers> offersList) {
+        Set<Date> refreshDates = new HashSet<>();
+        for (Offers offers : offersList) {
+            refreshDates.addAll(offers.getUiRefreshDates());
+        }
+        startTimers(refreshDates);
+    }
+
+    private void startTimers(Set<Date> dates) {
+        if (timer == null) {
+            timer = new Timer();
+        }
+        for (Date date : dates) {
+            timer.schedule(createTimerTask(), date);
+        }
+    }
+
+    private TimerTask createTimerTask() {
+        return new TimerTask() {
+            @Override
+            public void run() {
+                dashboardFragment.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        presentOffers(dataProvider.loadOffersFromCache());
+                    }
+                });
+            }
+        };
+    }
+
+    private void stopTimeBasedRefresh() {
+        timer.cancel();
     }
 
     @Override

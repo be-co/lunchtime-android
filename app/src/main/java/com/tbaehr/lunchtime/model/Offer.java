@@ -794,6 +794,14 @@ public class Offer {
                 title.hashCode();
     }
 
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
     /**
      * @param prize prize in smallest unit, e.g. cents for Euro
      */

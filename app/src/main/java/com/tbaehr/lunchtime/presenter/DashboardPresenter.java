@@ -61,9 +61,10 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         dataProvider = new DataProvider();
         dataProvider.syncOffers(this);
 
+        List<Offers> offersList = dataProvider.loadOffersFromCache();
+        startTimeBasedRefresh(offersList);
+
         if (!view.isInitialized()) {
-            List<Offers> offersList = dataProvider.loadOffersFromCache();
-            startTimeBasedRefresh(offersList);
             presentOffers(offersList);
         }
     }
@@ -83,18 +84,26 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     }
 
     private void startTimers(Set<Date> dates) {
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                presentOffers(dataProvider.loadOffersFromCache());
-            }
-        };
         if (timer == null) {
             timer = new Timer();
         }
         for (Date date : dates) {
-            timer.schedule(task, date);
+            timer.schedule(createTimerTask(), date);
         }
+    }
+
+    private TimerTask createTimerTask() {
+        return new TimerTask() {
+            @Override
+            public void run() {
+                dashboardFragment.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        presentOffers(dataProvider.loadOffersFromCache());
+                    }
+                });
+            }
+        };
     }
 
     private void stopTimeBasedRefresh() {

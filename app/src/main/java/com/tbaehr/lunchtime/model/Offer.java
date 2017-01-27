@@ -769,7 +769,7 @@ public class Offer {
     public Offer(String title, String description, int prize,
                  String starts, String ends,
                  Category category) {
-        this(title, description, prize, starts, ends, category, null);
+        this(title, description, prize, starts, ends, category, new HashSet<Ingredient>());
     }
 
     @Override

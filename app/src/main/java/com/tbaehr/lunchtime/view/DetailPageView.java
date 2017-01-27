@@ -714,17 +714,13 @@ public class DetailPageView implements IDetailPageViewContainer {
     private void configureToolbar() {
         final Toolbar toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
         activity.setSupportActionBar(toolbar);
-        ActionBar actionBar = activity.getSupportActionBar();
 
-        // Set title of this activity including the network name
-        String title = "Titel";
+        // Set title of this activity including the restaurant name
+        String title = "Restaurant XY";
         collapsingToolbar.setTitle(title);
-        // TODO: Setting color really needed?
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            collapsingToolbar.setExpandedTitleColor(activity.getColor(android.R.color.white));
-        } else {
-            collapsingToolbar.setExpandedTitleColor(activity.getResources().getColor(android.R.color.white));
-        }*/
+
+        ActionBar actionBar = activity.getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         // Make back arrow white or disable it if opened over notification
         final Drawable backArrow;
@@ -733,7 +729,6 @@ public class DetailPageView implements IDetailPageViewContainer {
         } else {
             backArrow = activity.getResources().getDrawable(R.drawable.abc_ic_ab_back_material);
         }
-        actionBar.setDisplayHomeAsUpEnabled(true);
         int color;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             color = activity.getColor(android.R.color.white);

@@ -677,6 +677,7 @@
 package com.tbaehr.lunchtime.controller;
 
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import com.tbaehr.lunchtime.presenter.DetailPagePresenter;
 import com.tbaehr.lunchtime.view.DetailPageView;
@@ -708,6 +709,12 @@ public class DetailPageActivity extends BaseActivity<IDetailPageViewContainer, D
     @Override
     public IDetailPageViewContainer getViewLayer() {
         return view;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        getPresenter().onOptionsItemSelected(item);
+        return true;
     }
 
     @Override

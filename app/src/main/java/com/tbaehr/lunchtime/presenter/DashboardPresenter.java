@@ -768,6 +768,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
     private void stopTimeBasedRefresh() {
         timer.cancel();
+        timer = null;
     }
 
     @Override

@@ -714,4 +714,9 @@ public class MasterPageActivity extends BaseActivity<IMasterPageViewContainer, M
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        view = null;
+        super.onDestroy();
+    }
 }

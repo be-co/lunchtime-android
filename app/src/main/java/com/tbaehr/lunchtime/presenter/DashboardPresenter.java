@@ -677,7 +677,6 @@
 package com.tbaehr.lunchtime.presenter;
 
 import android.content.Intent;
-import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.Toast;
 
@@ -817,8 +816,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
             HorizontalSliderView.OnSliderItemClickListener onSliderItemClickListener = new HorizontalSliderView.OnSliderItemClickListener() {
                 @Override
                 public void onSliderItemClick(Offer offer, View view) {
-                    // TODO: Add action on item clicks
-                    Snackbar.make(view, R.string.excellentChoice, Snackbar.LENGTH_SHORT).show();
+                    openDetailPage();
                 }
             };
             if (nearbyOffers.isEmpty()) {
@@ -858,5 +856,13 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     private void openDetailPage() {
         Intent openFetchOrderActivityIntent = new Intent(dashboardFragment.getActivity(), DetailPageActivity.class);
         dashboardFragment.startActivity(openFetchOrderActivityIntent);
+    }
+
+    @Override
+    public void onDestroy() {
+        dataProvider = null;
+        dashboardFragment = null;
+        timer = null;
+        super.onDestroy();
     }
 }

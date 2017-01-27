@@ -728,6 +728,12 @@ implements FactoryWithType<P> {
         presenter.onPause();
     }
 
+    @Override
+    protected void onDestroy() {
+        presenter = null;
+        super.onDestroy();
+    }
+
     public <T extends Activity> void startActivity(Class<T> activityClazz) {
         startActivity(new Intent(this, activityClazz));
     }

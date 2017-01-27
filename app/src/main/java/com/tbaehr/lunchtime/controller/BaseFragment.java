@@ -706,6 +706,12 @@ public abstract class BaseFragment<V, P extends Presenter<V>> extends BasePresen
         this.presenter = presenter;
     }
 
+    @Override
+    public void onDestroy() {
+        presenter = null;
+        super.onDestroy();
+    }
+
     /**
      * Create an intent with a given action and for a given data url.
      *

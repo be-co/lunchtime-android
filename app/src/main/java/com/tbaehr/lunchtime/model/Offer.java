@@ -735,6 +735,8 @@ public class Offer {
         }
     }
 
+    private String restaurantId;
+
     private String title;
 
     private String description;
@@ -750,11 +752,13 @@ public class Offer {
     //@DrawableRes
     //private int drawableRes;
 
-    public Offer(//@DrawableRes int drawableRes,
+    public Offer(String restaurantId,
+                 //@DrawableRes int drawableRes,
                  String title, String description, int prize,
                  String starts, String ends,
                  Category category, Set<Ingredient> ingredients) {
         //this.drawableRes = drawableRes;
+        this.restaurantId = restaurantId;
         this.title = title;
         this.description = description;
         this.prize = prize;
@@ -766,10 +770,11 @@ public class Offer {
         this.ingredients = ingredients;
     }
 
-    public Offer(String title, String description, int prize,
+    public Offer(String restaurantId,
+                 String title, String description, int prize,
                  String starts, String ends,
                  Category category) {
-        this(title, description, prize, starts, ends, category, new HashSet<Ingredient>());
+        this(restaurantId, title, description, prize, starts, ends, category, new HashSet<Ingredient>());
     }
 
     @Override
@@ -792,6 +797,10 @@ public class Offer {
         return prize +
                 //drawableRes +
                 title.hashCode();
+    }
+
+    public String getRestaurantId() {
+        return restaurantId;
     }
 
     public Date getStartDate() {

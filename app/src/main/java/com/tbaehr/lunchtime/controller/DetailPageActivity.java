@@ -680,7 +680,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.tbaehr.lunchtime.presenter.DetailPagePresenter;
-import com.tbaehr.lunchtime.view.DetailPageView;
+import com.tbaehr.lunchtime.view.DetailPageViewContainer;
 import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
 
 /**
@@ -688,12 +688,16 @@ import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
  */
 public class DetailPageActivity extends BaseActivity<IDetailPageViewContainer, DetailPagePresenter> {
 
+    public final static String KEY_RESTAURANT_ID = "key_restaurant";
+
+    public final static String KEY_OFFER_INDEX = "offer_index";
+
     private IDetailPageViewContainer view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        view = new DetailPageView(this);
+        view = new DetailPageViewContainer(this);
     }
 
     @Override

@@ -698,6 +698,9 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_OFFER_INDEX;
+import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_ID;
+
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
@@ -794,7 +797,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     }
 
     @Override
-    public void onNewOffersDownloaded(List<Offers> offersList) {
+    public void onDownloadFinished(List<Offers> offersList) {
         IDashboardViewContainer view = getView();
         if (view == null) {
             return;
@@ -812,11 +815,11 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         view.hideNoOffersView();
         view.clearOffers();
 
-        for (Offers nearbyOffers : offersList) {
-            HorizontalSliderView.OnSliderItemClickListener onSliderItemClickListener = new HorizontalSliderView.OnSliderItemClickListener() {
+        for (final Offers nearbyOffers : offersList) {
+            final HorizontalSliderView.OnSliderItemClickListener onSliderItemClickListener = new HorizontalSliderView.OnSliderItemClickListener() {
                 @Override
                 public void onSliderItemClick(Offer offer, View view) {
-                    openDetailPage();
+                    openDetailPage(offer.getRestaurantId(), nearbyOffers.getIndex(offer));
                 }
             };
             if (nearbyOffers.isEmpty()) {
@@ -825,10 +828,11 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
             foundOffers = true;
 
-            HorizontalSliderView.OnSliderHeaderClickListener headerClickListener = new HorizontalSliderView.OnSliderHeaderClickListener() {
+            final String restaurantId = nearbyOffers.getRestaurantId();
+            final HorizontalSliderView.OnSliderHeaderClickListener headerClickListener = new HorizontalSliderView.OnSliderHeaderClickListener() {
                 @Override
                 public void onSliderHeaderClick() {
-                    openDetailPage();
+                    openDetailPage(restaurantId, -1);
                 }
             };
             view.addOffers(
@@ -841,20 +845,24 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         }
 
         if (!foundOffers) {
-            int[] noOffersMessages = new int[] {
+            final int[] noOffersMessages = new int[] {
                     R.string.no_offers_today1,
                     R.string.no_offers_today2,
                     R.string.no_offers_today3,
                     R.string.no_offers_today4,
                     R.string.no_offers_today5
             };
-            int randomNumber = (int) (Math.random() * 5);
+            final int randomNumber = (int) (Math.random() * 5);
             view.enableNoOffersView(noOffersMessages[randomNumber]);
         }
     }
 
-    private void openDetailPage() {
+    private void openDetailPage(String restaurantId, int index) {
         Intent openFetchOrderActivityIntent = new Intent(dashboardFragment.getActivity(), DetailPageActivity.class);
+        openFetchOrderActivityIntent.putExtra(KEY_RESTAURANT_ID, restaurantId);
+        if (index != -1) {
+            openFetchOrderActivityIntent.putExtra(KEY_OFFER_INDEX, index);
+        }
         dashboardFragment.startActivity(openFetchOrderActivityIntent);
     }
 

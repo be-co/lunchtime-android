@@ -680,28 +680,47 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.MenuItem;
 
+import com.tbaehr.lunchtime.DataProvider;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
+import com.tbaehr.lunchtime.model.Offers;
+import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
+
+import java.util.List;
+
+import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_OFFER_INDEX;
+import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_ID;
 
 /**
  * Created by timo.baehr@gmail.com on 26.01.17.
  */
-public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewContainer> {
+public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewContainer> implements DataProvider.LoadJobListener<List<Restaurant>> {
 
-    private DetailPageActivity activity;
+    private final DetailPageActivity activity;
+
+    private final String restaurantId;
+
+    private final int index;
+
+    private final DataProvider dataProvider;
 
     public DetailPagePresenter(DetailPageActivity activity) {
         this.activity = activity;
+        this.restaurantId = activity.getIntent().getStringExtra(KEY_RESTAURANT_ID);
+        this.index = activity.getIntent().getIntExtra(KEY_OFFER_INDEX, -1);
+        this.dataProvider = new DataProvider();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        dataProvider.syncRestaurants(this);
     }
 
     @Override
     public void bindView(IDetailPageViewContainer view) {
         super.bindView(view);
+        getView().setTitle(getTitle());
     }
 
     @Override
@@ -719,5 +738,29 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     public void onBackPressed() {
         activity.finish();
         getView().onBackPressed();
+    }
+
+    private String getTitle() {
+        if (index == -1) {
+            return dataProvider.loadOffersFromCache(restaurantId).getRestaurantName();
+        } else {
+            return dataProvider.loadOffersFromCache(restaurantId).getOffer(index).getTitle();
+        }
+    }
+
+    @Override
+    public void onDownloadStarted() {
+
+    }
+
+    @Override
+    public void onDownloadFailed(String message) {
+
+    }
+
+    @Override
+    public void onDownloadFinished(List<Restaurant> downloadedObject) {
+        Restaurant restaurant = dataProvider.loadRestaurantFromCache(restaurantId);
+        Offers offers = dataProvider.loadOffersFromCache(restaurantId);
     }
 }

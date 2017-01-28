@@ -683,4 +683,6 @@ public interface IDetailPageViewContainer {
 
     void onBackPressed();
 
+    void setTitle(String title);
+
 }

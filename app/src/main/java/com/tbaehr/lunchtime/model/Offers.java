@@ -686,13 +686,16 @@ import java.util.Set;
  */
 public class Offers {
 
+    private String restaurantId;
+
     private String title;
 
     private String description;
 
     private List<Offer> offers;
 
-    public Offers(String title, String description, List<Offer> offers) {
+    public Offers(String restaurantId, String title, String description, List<Offer> offers) {
+        this.restaurantId = restaurantId;
         this.title = title;
         this.description = description;
         this.offers = offers;
@@ -708,6 +711,10 @@ public class Offers {
 
     public List<Offer> getOffers() {
         return offers;
+    }
+
+    public int getIndex(Offer offer) {
+        return offers.indexOf(offer);
     }
 
     public boolean isEmpty() {
@@ -727,5 +734,13 @@ public class Offers {
             }
         }
         return refreshDates;
+    }
+
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    public Offer getOffer(int index) {
+        return offers.get(index);
     }
 }

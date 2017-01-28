@@ -682,6 +682,7 @@ import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.util.Pair;
 
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Offers;
@@ -735,7 +736,7 @@ public class DataProvider {
 
         void onDownloadFailed(String message);
 
-        void onNewOffersDownloaded(T downloadedObject);
+        void onDownloadFinished(T downloadedObject);
     }
 
     public void syncOffers(final LoadJobListener callback) {
@@ -753,7 +754,8 @@ public class DataProvider {
                 // Server answered with json -> save to cache and update offers
                 if (jsonDownloaded != null) {
                     storeToCache(keySync, jsonDownloaded);
-                    Map<String, String> nearbyRestaurantKeys = parseNearbyRestaurantKeys(jsonDownloaded);
+                    Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurantKeys(jsonDownloaded);
+                    Map<String, String> nearbyRestaurantKeys = nearbyKeys.second;
                     for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
                         dataSetChanged = updateOffers(restaurantKey, nearbyRestaurantKeys.get(restaurantKey), callback) || dataSetChanged;
                     }
@@ -767,7 +769,42 @@ public class DataProvider {
                 if (dataSetChanged) {
                     List<Offers> offersList = null;
                     offersList = loadOffersFromCache();
-                    callback.onNewOffersDownloaded(offersList);
+                    callback.onDownloadFinished(offersList);
+                }
+                super.onPostExecute(aVoid);
+            }
+        }.execute();
+    }
+
+    public void syncRestaurants(final LoadJobListener callback) {
+        final String uriSync = String.format(URI_NEARBY_RESTAURANTS, "weiterstadt");
+        final String keySync = String.format(KEY_NEARBY_OFFERS, "weiterstadt");
+
+        new AsyncTask<Void, Void, Void>() {
+            private boolean dataSetChanged = false;
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                // Try to download restaurants json from server
+                String jsonDownloaded = downloadTextFromServer(uriSync);
+
+                // Server answered with json -> save to cache and update offers
+                if (jsonDownloaded != null) {
+                    storeToCache(keySync, jsonDownloaded);
+                    Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurantKeys(jsonDownloaded);
+                    Map<String, String> nearbyRestaurantKeys = nearbyKeys.first;
+                    for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
+                        dataSetChanged = updateRestaurant(restaurantKey, nearbyRestaurantKeys.get(restaurantKey), callback) || dataSetChanged;
+                    }
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                if (dataSetChanged) {
+                    callback.onDownloadFinished(null);
                 }
                 super.onPostExecute(aVoid);
             }
@@ -779,7 +816,8 @@ public class DataProvider {
         List<Offers> offersList = new ArrayList<>();
         String jsonNearbyRestaurantsCached = loadFromCache(keySync);
         if (jsonNearbyRestaurantsCached != null) {
-            Map<String, String> nearbyRestaurantKeys = parseNearbyRestaurantKeys(jsonNearbyRestaurantsCached);
+            Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurantKeys(jsonNearbyRestaurantsCached);
+            Map<String, String> nearbyRestaurantKeys = nearbyKeys.second;
             for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
                 Offers offers = loadOffersFromCache(restaurantKey);
                 if (offers != null) {
@@ -790,7 +828,7 @@ public class DataProvider {
         return offersList;
     }
 
-    private Offers loadOffersFromCache(@NonNull String restaurantKey) {
+    public Offers loadOffersFromCache(@NonNull String restaurantKey) {
         final String keyRestaurant = String.format(KEY_OFFER, restaurantKey);
         String jsonOffers = loadFromCache(keyRestaurant);
 
@@ -805,7 +843,7 @@ public class DataProvider {
         return null;
     }
 
-    private Restaurant loadRestaurantFromCache(@NonNull String keyRestaurant) {
+    public Restaurant loadRestaurantFromCache(@NonNull String keyRestaurant) {
         try {
             String json = loadFromCache(String.format(KEY_RESTAURANT, keyRestaurant));
             if (json != null) {
@@ -820,9 +858,9 @@ public class DataProvider {
 
     private boolean updateRestaurant(@NonNull String restaurantKey, @NonNull String dateUpdated, final LoadJobListener callback) {
         final String uriRestaurant = String.format(URI_RESTAURANT, restaurantKey);
-        final String keyUpdated = String.format(KEY_RESTAURANT_UPDATED, restaurantKey);
+        final String keyRestaurantUpdated = String.format(KEY_RESTAURANT_UPDATED, restaurantKey);
 
-        Date cachedDate = DateUtils.createDateFromString(loadFromCache(keyUpdated));
+        Date cachedDate = DateUtils.createDateFromString(loadFromCache(keyRestaurantUpdated));
         Date downloadDate = DateUtils.createDateFromString(dateUpdated);
 
         String jsonRestaurant;
@@ -834,7 +872,7 @@ public class DataProvider {
                     Restaurant restaurant = parseRestaurantFromJson(jsonRestaurant);
                     if (restaurant != null) {
                         storeToCache(String.format(KEY_RESTAURANT, restaurantKey), jsonRestaurant);
-                        storeToCache(keyUpdated, dateUpdated);
+                        storeToCache(keyRestaurantUpdated, dateUpdated);
                         return true;
                     }
                 } catch (JSONException jsonException) {
@@ -849,9 +887,9 @@ public class DataProvider {
 
     private boolean updateOffers(@NonNull String restaurantKey, @NonNull String dateUpdated, final LoadJobListener callback) {
         final String uriRestaurantOffers = String.format(URI_OFFER, restaurantKey);
-        final String keyUpdated = String.format(KEY_OFFER_UPDATED, restaurantKey);
+        final String keyOfferUpdated = String.format(KEY_OFFER_UPDATED, restaurantKey);
 
-        Date cachedDate = DateUtils.createDateFromString(loadFromCache(keyUpdated));
+        Date cachedDate = DateUtils.createDateFromString(loadFromCache(keyOfferUpdated));
         Date downloadDate = DateUtils.createDateFromString(dateUpdated);
 
         String jsonOffers;
@@ -863,7 +901,7 @@ public class DataProvider {
                     Offers offers = parseOffersFromJson(jsonOffers);
                     if (offers != null) {
                         storeToCache(String.format(KEY_OFFER, restaurantKey), jsonOffers);
-                        storeToCache(keyUpdated, dateUpdated);
+                        storeToCache(keyOfferUpdated, dateUpdated);
                         return true;
                     }
                 } catch (JSONException jsonException) {
@@ -876,39 +914,43 @@ public class DataProvider {
         return false;
     }
 
-    private Map<String, String> parseNearbyRestaurantKeys(@NonNull String json) {
+    private Pair<Map<String, String>, Map<String, String>> parseNearbyRestaurantKeys(@NonNull String json) {
         Map<String, String> nearbyRestaurants = new HashMap<>();
+        Map<String, String> nearbyOffers = new HashMap<>();
         try {
             JSONArray jsonArray = new JSONArray(json);
             for (int index = 0; index < jsonArray.length(); index++) {
                 JSONObject restaurant = jsonArray.getJSONObject(index);
                 String key = restaurant.getString("key");
-                String lastUpdated = restaurant.getString("lastUpdated");
-                nearbyRestaurants.put(key, lastUpdated);
+                String offersLastUpdated = restaurant.getString("offersLastUpdated");
+                String restaurantLastUpdated = restaurant.getString("restaurantLastUpdated");
+                nearbyRestaurants.put(key, restaurantLastUpdated);
+                nearbyOffers.put(key, offersLastUpdated);
             }
         } catch (JSONException jsonException) {
             jsonException.printStackTrace();
         }
 
-        return nearbyRestaurants;
+        return new Pair<>(nearbyRestaurants, nearbyOffers);
     }
 
     private Offers parseOffersFromJson(@NonNull String json) throws JSONException {
         JSONObject restaurantObject = new JSONObject(json);
-        String restaurantTitle = restaurantObject.getString("title");
-        String restaurantDescription = restaurantObject.getString("description");
-        JSONArray restaurantOffersArray = restaurantObject.getJSONArray("offers");
-        List<Offer> offers = new ArrayList<>();
+        final String restaurantId = restaurantObject.getString("restaurantID");
+        final String restaurantTitle = restaurantObject.getString("title");
+        final String restaurantDescription = restaurantObject.getString("description");
+        final JSONArray restaurantOffersArray = restaurantObject.getJSONArray("offers");
+        final List<Offer> offers = new ArrayList<>();
         for (int offerIndex = 0; offerIndex < restaurantOffersArray.length(); offerIndex++) {
-            JSONObject offerObject = restaurantOffersArray.getJSONObject(offerIndex);
-            String offerTitle = offerObject.getString("title");
-            String offerDescription = offerObject.getString("description");
-            int offerPrize = offerObject.getInt("prize");
-            String starts = offerObject.getString("starts");
-            String ends = offerObject.getString("ends");
-            Offer.Category category = Offer.Category.valueOf(offerObject.getString("category").toUpperCase());
-            JSONArray ingredientsArray = offerObject.getJSONArray("ingredients");
-            Set<Offer.Ingredient> ingredients = new HashSet<>();
+            final JSONObject offerObject = restaurantOffersArray.getJSONObject(offerIndex);
+            final String offerTitle = offerObject.getString("title");
+            final String offerDescription = offerObject.getString("description");
+            final int offerPrize = offerObject.getInt("prize");
+            final String starts = offerObject.getString("starts");
+            final String ends = offerObject.getString("ends");
+            final Offer.Category category = Offer.Category.valueOf(offerObject.getString("category").toUpperCase());
+            final JSONArray ingredientsArray = offerObject.getJSONArray("ingredients");
+            final Set<Offer.Ingredient> ingredients = new HashSet<>();
             for (int ingrIndex = 0; ingrIndex < ingredientsArray.length(); ingrIndex++) {
                 try {
                     ingredients.add(Offer.Ingredient.valueOf(ingredientsArray.getString(ingrIndex)));
@@ -919,14 +961,15 @@ public class DataProvider {
 
             autoSearchForIngredients(ingredients, offerTitle);
             autoSearchForIngredients(ingredients, offerDescription);
-            Offer offer = new Offer(
+            final Offer offer = new Offer(
+                    restaurantId,
                     offerTitle,
                     offerDescription,
                     offerPrize,
                     starts, ends,
                     category,
                     ingredients);
-            Offer.ValidationState validationState = offer.getValidationState();
+            final Offer.ValidationState validationState = offer.getValidationState();
             if (validationState.equals(Offer.ValidationState.NOW_VALID) ||
                     validationState.equals(Offer.ValidationState.SOON_VALID)) {
                 offers.add(offer);
@@ -934,7 +977,7 @@ public class DataProvider {
                 throw new JSONException("Invalid offer " + offer.getTitle() + " for " + restaurantTitle + ": Check date format: " + starts + "," + ends);
             }
         }
-        return new Offers(restaurantTitle, restaurantDescription, offers);
+        return new Offers(restaurantId, restaurantTitle, restaurantDescription, offers);
     }
 
     private Restaurant parseRestaurantFromJson(@NonNull String json) throws JSONException {

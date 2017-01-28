@@ -693,14 +693,14 @@ import butterknife.ButterKnife;
 /**
  * Created by timo.baehr@gmail.com on 26.01.17.
  */
-public class DetailPageView implements IDetailPageViewContainer {
+public class DetailPageViewContainer implements IDetailPageViewContainer {
 
     @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbar;
 
     private DetailPageActivity activity;
 
-    public DetailPageView(DetailPageActivity activity) {
+    public DetailPageViewContainer(DetailPageActivity activity) {
         this.activity = activity;
         activity.setContentView(R.layout.activity_detail_page);
         activity.setAsFullScreenActivity();
@@ -714,10 +714,6 @@ public class DetailPageView implements IDetailPageViewContainer {
     private void configureToolbar() {
         final Toolbar toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
         activity.setSupportActionBar(toolbar);
-
-        // Set title of this activity including the restaurant name
-        String title = "Restaurant XY";
-        collapsingToolbar.setTitle(title);
 
         ActionBar actionBar = activity.getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -742,6 +738,11 @@ public class DetailPageView implements IDetailPageViewContainer {
     @Override
     public void onBackPressed() {
         activity.overridePendingTransition(R.anim.slide_nothing, R.anim.slide_out);
+    }
+
+    @Override
+    public void setTitle(String title) {
+        collapsingToolbar.setTitle(title);
     }
 }
 

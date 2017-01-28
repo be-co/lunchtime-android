@@ -676,22 +676,30 @@
  */
 package com.tbaehr.lunchtime.view;
 
+import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
+import com.tbaehr.lunchtime.model.Offer;
+
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.tbaehr.lunchtime.view.HorizontalSliderView.INGREDIENTS_PADDING_IN_PIXELS;
 
 /**
  * Created by timo.baehr@gmail.com on 26.01.17.
@@ -707,8 +715,17 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
     @BindView(R.id.selected_offer_text_view)
     TextView selectedOfferTextView;
 
+    @BindView(R.id.selected_offer_prize)
+    TextView selectedOfferPrizeTextView;
+
+    @BindView(R.id.selected_offer_availability)
+    TextView selectedOfferAvailability;
+
+    @BindView(R.id.ingredients)
+    LinearLayout ingredientsView;
+
     @BindView(R.id.selected_offer_layout)
-    RelativeLayout selectedOfferLayout;
+    LinearLayout selectedOfferLayout;
 
     private DetailPageActivity activity;
 
@@ -763,9 +780,29 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
     }
 
     @Override
-    public void setSelectedOffer(String title) {
+    public void setSelectedOffer(String title, String prize, String availability, Set<Offer.Ingredient> ingredients) {
         selectedOfferLayout.setVisibility(View.VISIBLE);
-        selectedOfferTextView.setText(title);
+        selectedOfferTextView.setText(Html.fromHtml(title));
+
+        if (ingredients.isEmpty()) {
+            ingredientsView.setVisibility(View.GONE);
+        } else {
+            ingredientsView.removeAllViews();
+            Context context = LunchtimeApplication.getContext();
+            for (Offer.Ingredient ingredient : ingredients) {
+                ImageView tagView = new ImageView(context);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    tagView.setImageDrawable(context.getDrawable(ingredient.getDrawableResource()));
+                } else {
+                    tagView.setImageDrawable(context.getResources().getDrawable(ingredient.getDrawableResource()));
+                }
+                tagView.setPadding(INGREDIENTS_PADDING_IN_PIXELS, 0, INGREDIENTS_PADDING_IN_PIXELS, 0);
+                ingredientsView.addView(tagView);
+            }
+        }
+
+        selectedOfferPrizeTextView.setText(prize);
+        selectedOfferAvailability.setText(availability);
     }
 }
 

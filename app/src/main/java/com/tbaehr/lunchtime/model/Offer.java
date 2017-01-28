@@ -679,6 +679,7 @@ package com.tbaehr.lunchtime.model;
 import android.content.Context;
 import android.support.annotation.DrawableRes;
 
+import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.utils.DateUtils;
 
@@ -885,10 +886,11 @@ public class Offer {
         }
     }
 
-    public String getOpeningTimeShortDescription(Context context) {
+    public String getOpeningTimeShortDescription() {
         Calendar calendar = Calendar.getInstance();
         ValidationState validationState = getValidationState();
         int currentTimeInMinutes;
+        Context context = LunchtimeApplication.getContext();
 
         switch (validationState) {
             case SOON_VALID:

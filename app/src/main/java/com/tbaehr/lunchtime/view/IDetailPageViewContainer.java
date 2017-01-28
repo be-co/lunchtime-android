@@ -678,6 +678,10 @@ package com.tbaehr.lunchtime.view;
 
 import android.graphics.drawable.Drawable;
 
+import com.tbaehr.lunchtime.model.Offer;
+
+import java.util.Set;
+
 /**
  * Created by timo.baehr@gmail.com on 26.01.17.
  */
@@ -689,6 +693,6 @@ public interface IDetailPageViewContainer {
 
     void setBackgroundDrawable(Drawable drawable);
 
-    void setSelectedOffer(String title);
+    void setSelectedOffer(String title, String prize, String availability, Set<Offer.Ingredient> ingredients);
 
 }

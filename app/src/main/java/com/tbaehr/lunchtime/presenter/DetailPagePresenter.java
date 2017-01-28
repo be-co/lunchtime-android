@@ -682,11 +682,13 @@ import android.view.MenuItem;
 
 import com.tbaehr.lunchtime.DataProvider;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
+import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Offers;
 import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_OFFER_INDEX;
 import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_ID;
@@ -722,7 +724,12 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         super.bindView(view);
         getView().setTitle(getRestaurantName());
         if (index != -1) {
-            getView().setSelectedOffer(getSelectedOfferTitle());
+            Offer offer = getSelectedOffer();
+            String title = "<b>" + offer.getTitle() + "</b><br/>" + " " + offer.getDescription();
+            String prize = Offer.formatPrize(offer.getPrize());
+            String availability = offer.getOpeningTimeShortDescription();
+            Set<Offer.Ingredient> ingredients = offer.getIngredients();
+            getView().setSelectedOffer(title, prize, availability, ingredients);
         }
     }
 
@@ -747,8 +754,8 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         return dataProvider.loadOffersFromCache(restaurantId).getRestaurantName();
     }
 
-    private String getSelectedOfferTitle() {
-        return dataProvider.loadOffersFromCache(restaurantId).getOffer(index).getTitle();
+    private Offer getSelectedOffer() {
+        return dataProvider.loadOffersFromCache(restaurantId).getOffer(index);
     }
 
     private void onDataSetChanged() {

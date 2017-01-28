@@ -684,6 +684,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
@@ -701,6 +703,12 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
 
     @BindView(R.id.header_image)
     ImageView headerImage;
+
+    @BindView(R.id.selected_offer_text_view)
+    TextView selectedOfferTextView;
+
+    @BindView(R.id.selected_offer_layout)
+    RelativeLayout selectedOfferLayout;
 
     private DetailPageActivity activity;
 
@@ -752,6 +760,12 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
     @Override
     public void setBackgroundDrawable(Drawable drawable) {
         headerImage.setImageDrawable(drawable);
+    }
+
+    @Override
+    public void setSelectedOffer(String title) {
+        selectedOfferLayout.setVisibility(View.VISIBLE);
+        selectedOfferTextView.setText(title);
     }
 }
 

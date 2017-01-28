@@ -689,4 +689,6 @@ public interface IDetailPageViewContainer {
 
     void setBackgroundDrawable(Drawable drawable);
 
+    void setSelectedOffer(String title);
+
 }

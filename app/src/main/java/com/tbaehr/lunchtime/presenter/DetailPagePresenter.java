@@ -720,7 +720,10 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     @Override
     public void bindView(IDetailPageViewContainer view) {
         super.bindView(view);
-        getView().setTitle(getTitle());
+        getView().setTitle(getRestaurantName());
+        if (index != -1) {
+            getView().setSelectedOffer(getSelectedOfferTitle());
+        }
     }
 
     @Override
@@ -740,12 +743,12 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         getView().onBackPressed();
     }
 
-    private String getTitle() {
-        if (index == -1) {
-            return dataProvider.loadOffersFromCache(restaurantId).getRestaurantName();
-        } else {
-            return dataProvider.loadOffersFromCache(restaurantId).getOffer(index).getTitle();
-        }
+    private String getRestaurantName() {
+        return dataProvider.loadOffersFromCache(restaurantId).getRestaurantName();
+    }
+
+    private String getSelectedOfferTitle() {
+        return dataProvider.loadOffersFromCache(restaurantId).getOffer(index).getTitle();
     }
 
     private void onDataSetChanged() {

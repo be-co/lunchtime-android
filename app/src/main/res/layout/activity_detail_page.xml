@@ -65,10 +65,35 @@
         android:layout_marginTop="0dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <FrameLayout
-            android:id="@+id/fragment_container"
+        <RelativeLayout
+            android:id="@+id/selected_offer_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:background="@color/colorAccent"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/selected_offers_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_centerVertical="true"
+                android:contentDescription="@string/your_choice"
+                android:src="@drawable/ic_menu_dashboard" />
+
+            <TextView
+                android:id="@+id/selected_offer_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/your_choice"
+                android:layout_toRightOf="@+id/selected_offers_icon"
+                android:layout_toEndOf="@+id/selected_offers_icon"
+                android:layout_centerVertical="true" />
+
+        </RelativeLayout>
 
     </android.support.v4.widget.NestedScrollView>
 

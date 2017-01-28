@@ -695,4 +695,6 @@ public interface IDetailPageViewContainer {
 
     void setSelectedOffer(String title, String prize, String availability, Set<Offer.Ingredient> ingredients);
 
+    void setRestaurantData(String shortDescription, String location);
+
 }

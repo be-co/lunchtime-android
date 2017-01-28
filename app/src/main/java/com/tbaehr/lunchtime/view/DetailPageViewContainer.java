@@ -727,6 +727,12 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
     @BindView(R.id.selected_offer_layout)
     LinearLayout selectedOfferLayout;
 
+    @BindView(R.id.restaurant_short_description)
+    TextView restaurantDescription;
+
+    @BindView(R.id.restaurant_location)
+    TextView restaurantLocation;
+
     private DetailPageActivity activity;
 
     public DetailPageViewContainer(DetailPageActivity activity) {
@@ -803,6 +809,12 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
 
         selectedOfferPrizeTextView.setText(prize);
         selectedOfferAvailability.setText(availability);
+    }
+
+    @Override
+    public void setRestaurantData(String shortDescription, String location) {
+        restaurantDescription.setText(shortDescription);
+        restaurantLocation.setText(location);
     }
 }
 

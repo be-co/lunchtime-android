@@ -683,7 +683,6 @@ import android.view.MenuItem;
 import com.tbaehr.lunchtime.DataProvider;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
 import com.tbaehr.lunchtime.model.Offer;
-import com.tbaehr.lunchtime.model.Offers;
 import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
 
@@ -731,6 +730,17 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
             Set<Offer.Ingredient> ingredients = offer.getIngredients();
             getView().setSelectedOffer(title, prize, availability, ingredients);
         }
+
+        updateRestaurantData();
+    }
+
+    private void updateRestaurantData() {
+        Restaurant restaurant = getRestaurant();
+        if (restaurant != null) {
+            String shortDescription = restaurant.getShortDescription();
+            String location = restaurant.getLocationDescription();
+            getView().setRestaurantData(shortDescription, location);
+        }
     }
 
     @Override
@@ -750,17 +760,16 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         getView().onBackPressed();
     }
 
+    private Restaurant getRestaurant() {
+        return dataProvider.loadRestaurantFromCache(restaurantId);
+    }
+
     private String getRestaurantName() {
         return dataProvider.loadOffersFromCache(restaurantId).getRestaurantName();
     }
 
     private Offer getSelectedOffer() {
         return dataProvider.loadOffersFromCache(restaurantId).getOffer(index);
-    }
-
-    private void onDataSetChanged() {
-        final Restaurant restaurant = dataProvider.loadRestaurantFromCache(restaurantId);
-        Offers offers = dataProvider.loadOffersFromCache(restaurantId);
     }
 
     @Override
@@ -775,6 +784,6 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     @Override
     public void onDownloadFinished(List<Restaurant> downloadedObject) {
-        onDataSetChanged();
+        updateRestaurantData();
     }
 }

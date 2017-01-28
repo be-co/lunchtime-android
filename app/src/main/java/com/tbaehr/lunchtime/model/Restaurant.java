@@ -757,4 +757,8 @@ public class Restaurant {
     public String getUrl() {
         return url;
     }
+
+    public String[] getPhotoUrls() {
+        return photoUrls;
+    }
 }

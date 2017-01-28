@@ -683,6 +683,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
@@ -697,6 +698,9 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
 
     @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbar;
+
+    @BindView(R.id.header_image)
+    ImageView headerImage;
 
     private DetailPageActivity activity;
 
@@ -743,6 +747,11 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
     @Override
     public void setTitle(String title) {
         collapsingToolbar.setTitle(title);
+    }
+
+    @Override
+    public void setBackgroundDrawable(Drawable drawable) {
+        headerImage.setImageDrawable(drawable);
     }
 }
 

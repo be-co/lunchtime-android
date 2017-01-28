@@ -676,6 +676,8 @@
  */
 package com.tbaehr.lunchtime.view;
 
+import android.graphics.drawable.Drawable;
+
 /**
  * Created by timo.baehr@gmail.com on 26.01.17.
  */
@@ -684,5 +686,7 @@ public interface IDetailPageViewContainer {
     void onBackPressed();
 
     void setTitle(String title);
+
+    void setBackgroundDrawable(Drawable drawable);
 
 }

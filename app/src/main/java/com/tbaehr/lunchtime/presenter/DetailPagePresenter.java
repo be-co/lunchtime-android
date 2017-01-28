@@ -748,19 +748,23 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         }
     }
 
+    private void onDataSetChanged() {
+        final Restaurant restaurant = dataProvider.loadRestaurantFromCache(restaurantId);
+        Offers offers = dataProvider.loadOffersFromCache(restaurantId);
+    }
+
     @Override
     public void onDownloadStarted() {
-
+        // ;
     }
 
     @Override
     public void onDownloadFailed(String message) {
-
+        // TODO: User feedback
     }
 
     @Override
     public void onDownloadFinished(List<Restaurant> downloadedObject) {
-        Restaurant restaurant = dataProvider.loadRestaurantFromCache(restaurantId);
-        Offers offers = dataProvider.loadOffersFromCache(restaurantId);
+        onDataSetChanged();
     }
 }

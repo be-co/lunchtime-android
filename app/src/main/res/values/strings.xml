@@ -67,4 +67,12 @@
     <string name="closes_at">Closes at %1$s</string>
     <string name="closed">Closed</string>
 
+    <string name="available_at">Disponsable in %s$1</string>
+    <string name="available_since">Disponsable for %s$1</string>
+
+    <string name="hours">hours</string>
+    <string name="hour">hour</string>
+    <string name="minutes">minutes</string>
+    <string name="minute">minute</string>
+
 </resources>

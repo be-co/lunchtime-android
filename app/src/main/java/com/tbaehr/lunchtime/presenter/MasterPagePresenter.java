@@ -687,8 +687,8 @@ import android.view.MenuItem;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
 
-import static com.tbaehr.lunchtime.view.MasterPageView.TAG_DASHBOARD_FRAGMENT;
-import static com.tbaehr.lunchtime.view.MasterPageView.TAG_HELP_FRAGMENT;
+import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_DASHBOARD_FRAGMENT;
+import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_HELP_FRAGMENT;
 
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.

@@ -73,4 +73,12 @@
     <string name="opens_at">Öffnet um %1$s Uhr</string>
     <string name="closes_at">Schließt um %1$s Uhr</string>
     <string name="closed">Geschlossen</string>
+
+    <string name="available_at">Verfügbar in %1$s</string>
+    <string name="available_since">Noch %1$s</string>
+
+    <string name="hour">Stunde</string>
+    <string name="hours">Stunden</string>
+    <string name="minute">Minute</string>
+    <string name="minutes">Minuten</string>
 </resources>

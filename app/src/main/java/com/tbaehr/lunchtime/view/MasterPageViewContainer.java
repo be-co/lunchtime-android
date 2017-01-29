@@ -698,13 +698,13 @@ import com.tbaehr.lunchtime.controller.MasterPageActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.tbaehr.lunchtime.view.MasterPageView.TAG_DASHBOARD_FRAGMENT;
-import static com.tbaehr.lunchtime.view.MasterPageView.TAG_HELP_FRAGMENT;
+import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_DASHBOARD_FRAGMENT;
+import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_HELP_FRAGMENT;
 
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
-public class MasterPageView implements IMasterPageViewContainer {
+public class MasterPageViewContainer implements IMasterPageViewContainer {
 
     public static final String TAG_DASHBOARD_FRAGMENT = DashboardFragment.class.getCanonicalName();
 
@@ -730,7 +730,7 @@ public class MasterPageView implements IMasterPageViewContainer {
 
     private FragmentHolder fragmentHolder;
 
-    public MasterPageView(MasterPageActivity activity, FragmentManager fragmentManager) {
+    public MasterPageViewContainer(MasterPageActivity activity, FragmentManager fragmentManager) {
         activity.setContentView(R.layout.activity_master_page);
         activity.setAsFullScreenActivity();
         View rootView = activity.findViewById(R.id.drawer_layout);

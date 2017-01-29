@@ -681,13 +681,18 @@ import android.support.annotation.Nullable;
 import android.view.MenuItem;
 
 import com.tbaehr.lunchtime.DataProvider;
+import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_OFFER_INDEX;
 import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_ID;
@@ -704,6 +709,8 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     private final int index;
 
     private final DataProvider dataProvider;
+
+    private Timer timer;
 
     public DetailPagePresenter(DetailPageActivity activity) {
         this.activity = activity;
@@ -722,16 +729,101 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     public void bindView(IDetailPageViewContainer view) {
         super.bindView(view);
         getView().setTitle(getRestaurantName());
+        updateSelectedOffer();
+        if (index != -1) {
+            startTimer();
+        }
+        Restaurant restaurant = getRestaurant();
+        Date openingDate = restaurant.getOpeningDate();
+        Date closingDate = restaurant.getClosingDate();
+        if (openingDate != null && closingDate != null) {
+            startTimeBasedRefresh(openingDate, closingDate);
+        }
+
+        updateRestaurantData();
+    }
+
+    @Override
+    public void unbindView() {
+        stopTimer();
+        super.unbindView();
+    }
+
+    private TimerTask createTimerTask(final Runnable runnable) {
+        return new TimerTask() {
+            @Override
+            public void run() {
+                activity.runOnUiThread(runnable);
+            }
+        };
+    }
+
+    private void startTimeBasedRefresh(Date... date) {
+        if (timer == null) {
+            timer = new Timer();
+        }
+        for (Date d : date) {
+            timer.schedule(createTimerTask(new Runnable() {
+                @Override
+                public void run() {
+                    updateRestaurantData();
+                }
+            }), d);
+        }
+    }
+
+    private void startTimer() {
+        if (timer == null) {
+            timer = new Timer();
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), 0);
+        Date now = calendar.getTime();
+        timer.schedule(createTimerTask(new Runnable() {
+            @Override
+            public void run() {
+                updateSelectedOffer();
+            }
+        }), now, 1000);
+    }
+
+    private void stopTimer() {
+        if (timer != null) {
+            timer.cancel();
+        }
+        timer = null;
+    }
+
+    private void updateSelectedOffer() {
         if (index != -1) {
             Offer offer = getSelectedOffer();
             String title = "<b>" + offer.getTitle() + "</b>" + " " + offer.getDescription();
             String prize = Offer.formatPrize(offer.getPrize());
-            String availability = offer.getOpeningTimeShortDescription();
+
+            Offer.ValidationState validationState = offer.getValidationState();
+            String availability;
+            if (validationState.equals(Offer.ValidationState.OUTDATED)
+                    || validationState.equals(Offer.ValidationState.NEXT_DAYS_VALID)
+                    || validationState.equals(Offer.ValidationState.INVALID)) {
+                availability = offer.getOpeningTimeShortDescription();
+            } else {
+                Date now = new Date();
+                now.setTime(System.currentTimeMillis());
+
+                if (validationState.equals(Offer.ValidationState.SOON_VALID)) {
+                    Date opens = offer.getStartDate();
+                    availability = activity.getString(R.string.available_at, offer.differenceInHourMinutes(opens, now));
+                } else {
+                    Date closes = offer.getEndDate();
+                    availability = activity.getString(R.string.available_since, offer.differenceInHourMinutes(now, closes));
+                }
+            }
+
             Set<Offer.Ingredient> ingredients = offer.getIngredients();
             getView().setSelectedOffer(title, prize, availability, ingredients);
         }
-
-        updateRestaurantData();
     }
 
     private void updateRestaurantData() {

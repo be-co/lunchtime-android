@@ -886,6 +886,60 @@ public class Offer {
         }
     }
 
+    public String differenceInHourMinutes(Date first, Date second) {
+        Date firstDate, secondDate;
+        if (first.after(second)) {
+            firstDate = first;
+            secondDate = second;
+        } else {
+            firstDate = second;
+            secondDate = first;
+        }
+        Calendar calendar = Calendar.getInstance();
+
+        // first date
+        calendar.setTime(firstDate);
+        int firstHours = calendar.get(Calendar.HOUR_OF_DAY);
+        int firstMinutes = calendar.get(Calendar.MINUTE);
+
+        // second date
+        calendar.setTime(secondDate);
+        int scndHours = calendar.get(Calendar.HOUR_OF_DAY);
+        int scndMinutes = calendar.get(Calendar.MINUTE);
+
+        // difference
+        int minutes = firstMinutes - scndMinutes;
+        int hours;
+        if (minutes < 0) {
+            hours = firstHours - scndHours;
+            hours -= 1;
+            minutes = 60 - minutes;
+        } else {
+            hours = firstHours - scndHours;
+        }
+
+        // Constants
+        Context context = LunchtimeApplication.getContext();
+        StringBuilder sb = new StringBuilder("");
+        if (hours > 0) {
+            sb.append(hours).append(" ");
+            if (hours > 1) {
+                sb.append(context.getString(R.string.hours));
+            } else {
+                sb.append(context.getString(R.string.hour));
+            }
+            sb.append(", ");
+        }
+        sb.append(minutes).append(" ");
+        if (minutes > 1 || minutes == 0) {
+            sb.append(context.getString(R.string.minutes));
+        } else {
+            sb.append(context.getString(R.string.minute));
+        }
+
+        return sb.toString();
+    }
+
     public String getOpeningTimeShortDescription() {
         Calendar calendar = Calendar.getInstance();
         ValidationState validationState = getValidationState();

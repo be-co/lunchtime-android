@@ -680,7 +680,7 @@ import android.os.Bundle;
 
 import com.tbaehr.lunchtime.presenter.MasterPagePresenter;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
-import com.tbaehr.lunchtime.view.MasterPageView;
+import com.tbaehr.lunchtime.view.MasterPageViewContainer;
 
 public class MasterPageActivity extends BaseActivity<IMasterPageViewContainer, MasterPagePresenter> {
 
@@ -689,7 +689,7 @@ public class MasterPageActivity extends BaseActivity<IMasterPageViewContainer, M
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        view = new MasterPageView(this, getSupportFragmentManager());
+        view = new MasterPageViewContainer(this, getSupportFragmentManager());
     }
 
     @Override

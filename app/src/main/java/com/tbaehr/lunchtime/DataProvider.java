@@ -730,11 +730,11 @@ public class DataProvider {
 
     private static final String KEY_RESTAURANT_UPDATED = "restaurant_updated_%s";
 
-    private static final String URI_NEARBY_RESTAURANTS = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/debug/nearby_restaurants_%s.json";
+    private static final String URI_NEARBY_RESTAURANTS = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/nearby_restaurants_%s.json";
 
-    private static final String URI_RESTAURANT = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/debug/restaurant_%s.json";
+    private static final String URI_RESTAURANT = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/restaurant_%s.json";
 
-    private static final String URI_OFFER = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/debug/offers_%s.json";
+    private static final String URI_OFFER = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/offers_%s.json";
 
     public interface LoadJobListener<T> {
         void onDownloadStarted();
@@ -1000,14 +1000,14 @@ public class DataProvider {
         JSONArray fridayArray = openingTimesObject.getJSONArray("friday");
         JSONArray saturdayArray = openingTimesObject.getJSONArray("saturday");
         JSONArray sundayArray = openingTimesObject.getJSONArray("sunday");
-        Map<Integer, int[]> openingTimes = new HashMap<>();
-        openingTimes.put(Calendar.MONDAY, convertToIntArray(mondayArray));
-        openingTimes.put(Calendar.TUESDAY, convertToIntArray(tuesdayArray));
-        openingTimes.put(Calendar.WEDNESDAY, convertToIntArray(wednesdayArray));
-        openingTimes.put(Calendar.THURSDAY, convertToIntArray(thursdayArray));
-        openingTimes.put(Calendar.FRIDAY, convertToIntArray(fridayArray));
-        openingTimes.put(Calendar.SATURDAY, convertToIntArray(saturdayArray));
-        openingTimes.put(Calendar.SUNDAY, convertToIntArray(sundayArray));
+        Map<Integer, String[]> openingTimes = new HashMap<>();
+        openingTimes.put(Calendar.MONDAY, convertToArray(mondayArray));
+        openingTimes.put(Calendar.TUESDAY, convertToArray(tuesdayArray));
+        openingTimes.put(Calendar.WEDNESDAY, convertToArray(wednesdayArray));
+        openingTimes.put(Calendar.THURSDAY, convertToArray(thursdayArray));
+        openingTimes.put(Calendar.FRIDAY, convertToArray(fridayArray));
+        openingTimes.put(Calendar.SATURDAY, convertToArray(saturdayArray));
+        openingTimes.put(Calendar.SUNDAY, convertToArray(sundayArray));
 
         String phoneNumber = restaurant.getString("phoneNumber");
         String email = restaurant.getString("email");
@@ -1069,18 +1069,6 @@ public class DataProvider {
         } catch (IOException e) {
         }
         return null;
-    }
-
-    private int[] convertToIntArray(JSONArray array) throws JSONException {
-        if (array.length() == 0) {
-            return null;
-        }
-
-        int[] listOfInts = new int[array.length()];
-        for (int i = 0; i < listOfInts.length; i++) {
-            listOfInts[i] = array.getInt(i);
-        }
-        return listOfInts;
     }
 
     private String[] convertToArray(JSONArray array) throws JSONException {

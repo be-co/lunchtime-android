@@ -694,7 +694,7 @@ public class Restaurant {
 
     private String locationDescription;
 
-    private Map<Integer, int[]> openingTimes;
+    private Map<Integer, String[]> openingTimes;
 
     private String phoneNumber;
 
@@ -708,7 +708,7 @@ public class Restaurant {
                       String shortDescription,
                       String longDescription,
                       String locationDescription,
-                      Map<Integer, int[]> openingTimes,
+                      Map<Integer, String[]> openingTimes,
                       String phoneNumber, String email, String url, String[] photoUrls) {
         this.name = name;
         this.shortDescription = shortDescription;
@@ -741,7 +741,7 @@ public class Restaurant {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
 
-        int[] dayOpeningTimes = openingTimes.get(calendar.get(Calendar.DAY_OF_WEEK));
+        String[] dayOpeningTimes = openingTimes.get(calendar.get(Calendar.DAY_OF_WEEK));
 
         if (dayOpeningTimes == null) {
             return LunchtimeApplication.getContext().getString(R.string.closed);
@@ -749,21 +749,23 @@ public class Restaurant {
 
         Date now = calendar.getTime();
 
-        long openingTime = dayOpeningTimes[0];
-        int hoursO = (int) openingTime / 60;
-        int minutesO = (int) openingTime - (hoursO * 60);
+        String openingTime = dayOpeningTimes[0];
+        String[] openingValues = openingTime.split(":");
+        int hoursO = Integer.valueOf(openingValues[0]);
+        int minutesO = Integer.valueOf(openingValues[1]);
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), hoursO, minutesO, 0);
         Date opens = calendar.getTime();
         String sMinutesO = String.valueOf(minutesO);
         sMinutesO = sMinutesO.length() == 1 ? sMinutesO + "0" : sMinutesO;
         String sOpens = hoursO + ":" + sMinutesO;
 
-        long closingTime = dayOpeningTimes[0];
-        int hoursC = (int) closingTime / 60;
-        int minutesC = (int) closingTime - (hoursO * 60);
+        String closingTime = dayOpeningTimes[1];
+        String[] closingValues = closingTime.split(":");
+        int hoursC = Integer.valueOf(closingValues[0]);
+        int minutesC = Integer.valueOf(closingValues[1]);
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), hoursC, minutesC, 0);
         Date closes = calendar.getTime();
-        String sMinutesC = String.valueOf(minutesO);
+        String sMinutesC = String.valueOf(minutesC);
         sMinutesC = sMinutesC.length() == 1 ? sMinutesC + "0" : sMinutesC;
         String sCloses = hoursC + ":" + sMinutesC;
 

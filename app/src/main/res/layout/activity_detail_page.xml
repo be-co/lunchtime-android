@@ -136,8 +136,8 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
-                android:drawableStart="@drawable/ic_menu_dashboard"
-                android:drawableLeft="@drawable/ic_menu_dashboard"
+                android:drawableStart="@drawable/ic_text"
+                android:drawableLeft="@drawable/ic_text"
                 android:drawablePadding="@dimen/card_margin"
                 android:gravity="center_vertical"
                 android:text="@string/lunch_time" />
@@ -156,6 +156,36 @@
                 android:drawablePadding="@dimen/card_margin"
                 android:gravity="center_vertical"
                 android:text="@string/lunch_time" />
+
+            <TextView
+                android:id="@+id/restaurant_opening_times"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/activity_horizontal_margin"
+                android:paddingStart="@dimen/activity_horizontal_margin"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:drawableStart="@drawable/ic_time"
+                android:drawableLeft="@drawable/ic_time"
+                android:drawablePadding="@dimen/card_margin"
+                android:gravity="center_vertical"
+                android:text="@string/starts" />
+
+            <TextView
+                android:id="@+id/restaurant_url"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/activity_horizontal_margin"
+                android:paddingStart="@dimen/activity_horizontal_margin"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:drawableStart="@drawable/ic_webpage"
+                android:drawableLeft="@drawable/ic_webpage"
+                android:drawablePadding="@dimen/card_margin"
+                android:gravity="center_vertical"
+                android:text="@string/app_name" />
 
         </LinearLayout>
 

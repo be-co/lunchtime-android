@@ -69,4 +69,8 @@
         \nIman Naghashian, Timo Bähr
     </string>
     <string name="your_choice">Deine Wahl</string>
+
+    <string name="opens_at">Öffnet um %1$s Uhr</string>
+    <string name="closes_at">Schließt um %1$s Uhr</string>
+    <string name="closed">Geschlossen</string>
 </resources>

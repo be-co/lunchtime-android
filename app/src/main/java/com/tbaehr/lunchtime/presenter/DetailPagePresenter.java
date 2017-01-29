@@ -724,7 +724,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         getView().setTitle(getRestaurantName());
         if (index != -1) {
             Offer offer = getSelectedOffer();
-            String title = "<b>" + offer.getTitle() + "</b><br/>" + " " + offer.getDescription();
+            String title = "<b>" + offer.getTitle() + "</b>" + " " + offer.getDescription();
             String prize = Offer.formatPrize(offer.getPrize());
             String availability = offer.getOpeningTimeShortDescription();
             Set<Offer.Ingredient> ingredients = offer.getIngredients();
@@ -739,7 +739,9 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         if (restaurant != null) {
             String shortDescription = restaurant.getShortDescription();
             String location = restaurant.getLocationDescription();
-            getView().setRestaurantData(shortDescription, location);
+            String openingTimes = restaurant.getOpeningTimeDescription();
+            String url = restaurant.getUrl();
+            getView().setRestaurantData(shortDescription, location, openingTimes, url);
         }
     }
 

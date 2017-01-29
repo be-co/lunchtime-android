@@ -733,6 +733,12 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
     @BindView(R.id.restaurant_location)
     TextView restaurantLocation;
 
+    @BindView(R.id.restaurant_opening_times)
+    TextView restaurantOpeningTimes;
+
+    @BindView(R.id.restaurant_url)
+    TextView restaurantUrl;
+
     private DetailPageActivity activity;
 
     public DetailPageViewContainer(DetailPageActivity activity) {
@@ -812,9 +818,11 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
     }
 
     @Override
-    public void setRestaurantData(String shortDescription, String location) {
+    public void setRestaurantData(String shortDescription, String location, String openingTimes, String url) {
         restaurantDescription.setText(shortDescription);
         restaurantLocation.setText(location);
+        restaurantOpeningTimes.setText(openingTimes);
+        restaurantUrl.setText(url);
     }
 }
 

@@ -730,11 +730,11 @@ public class DataProvider {
 
     private static final String KEY_RESTAURANT_UPDATED = "restaurant_updated_%s";
 
-    private static final String URI_NEARBY_RESTAURANTS = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/nearby_restaurants_%s.json";
+    private static final String URI_NEARBY_RESTAURANTS = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/debug/nearby_restaurants_%s.json";
 
-    private static final String URI_RESTAURANT = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/restaurant_%s.json";
+    private static final String URI_RESTAURANT = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/debug/restaurant_%s.json";
 
-    private static final String URI_OFFER = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/offers_%s.json";
+    private static final String URI_OFFER = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/debug/offers_%s.json";
 
     public interface LoadJobListener<T> {
         void onDownloadStarted();

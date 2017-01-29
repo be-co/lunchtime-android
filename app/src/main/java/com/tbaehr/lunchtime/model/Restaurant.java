@@ -676,6 +676,11 @@
  */
 package com.tbaehr.lunchtime.model;
 
+import com.tbaehr.lunchtime.LunchtimeApplication;
+import com.tbaehr.lunchtime.R;
+
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -732,18 +737,43 @@ public class Restaurant {
         return locationDescription;
     }
 
-    public String getOpeningTimeDescription(int weekDay) {
-        long openingTime = openingTimes.get(weekDay)[0];
-        long hours = openingTime / 60;
-        long minutes = openingTime - (hours * 60);
-        return ""+ hours + ":" + minutes;
-    }
+    public String getOpeningTimeDescription() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
 
-    public String getClosingTimeDescription(int weekDay) {
-        long openingTime = openingTimes.get(weekDay)[1];
-        long hours = openingTime / 60;
-        long minutes = openingTime - (hours * 60);
-        return ""+ hours + ":" + minutes;
+        int[] dayOpeningTimes = openingTimes.get(calendar.get(Calendar.DAY_OF_WEEK));
+
+        if (dayOpeningTimes == null) {
+            return LunchtimeApplication.getContext().getString(R.string.closed);
+        }
+
+        Date now = calendar.getTime();
+
+        long openingTime = dayOpeningTimes[0];
+        int hoursO = (int) openingTime / 60;
+        int minutesO = (int) openingTime - (hoursO * 60);
+        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), hoursO, minutesO, 0);
+        Date opens = calendar.getTime();
+        String sMinutesO = String.valueOf(minutesO);
+        sMinutesO = sMinutesO.length() == 1 ? sMinutesO + "0" : sMinutesO;
+        String sOpens = hoursO + ":" + sMinutesO;
+
+        long closingTime = dayOpeningTimes[0];
+        int hoursC = (int) closingTime / 60;
+        int minutesC = (int) closingTime - (hoursO * 60);
+        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), hoursC, minutesC, 0);
+        Date closes = calendar.getTime();
+        String sMinutesC = String.valueOf(minutesO);
+        sMinutesC = sMinutesC.length() == 1 ? sMinutesC + "0" : sMinutesC;
+        String sCloses = hoursC + ":" + sMinutesC;
+
+        if (now.before(opens)) {
+            return LunchtimeApplication.getContext().getString(R.string.opens_at, sOpens);
+        } else if (now.before(closes)) {
+            return LunchtimeApplication.getContext().getString(R.string.closes_at, sCloses);
+        } else {
+            return LunchtimeApplication.getContext().getString(R.string.closed);
+        }
     }
 
     public String getPhoneNumber() {

@@ -62,4 +62,9 @@
     </string>
 
     <string name="your_choice">Your choice</string>
+
+    <string name="opens_at">Opens at %1$s</string>
+    <string name="closes_at">Closes at %1$s</string>
+    <string name="closed">Closed</string>
+
 </resources>

@@ -797,7 +797,8 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     }
 
     private void updateSelectedOffer() {
-        if (index != -1) {
+        IDetailPageViewContainer view = getView();
+        if (index != -1 && view != null) {
             Offer offer = getSelectedOffer();
             String title = "<b>" + offer.getTitle() + "</b>" + " " + offer.getDescription();
             String prize = Offer.formatPrize(offer.getPrize());
@@ -822,7 +823,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
             }
 
             Set<Offer.Ingredient> ingredients = offer.getIngredients();
-            getView().setSelectedOffer(title, prize, availability, ingredients);
+            view.setSelectedOffer(title, prize, availability, ingredients);
         }
     }
 

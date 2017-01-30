@@ -676,6 +676,7 @@
  */
 package com.tbaehr.lunchtime.presenter;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
 import android.widget.Toast;
@@ -709,12 +710,12 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
     private DataProvider dataProvider;
 
-    private DashboardFragment dashboardFragment;
+    private Activity activity;
 
     private Timer timer;
 
     public DashboardPresenter(DashboardFragment fragment) {
-        this.dashboardFragment = fragment;
+        this.activity = fragment.getActivity();
     }
 
     @Override
@@ -758,7 +759,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         return new TimerTask() {
             @Override
             public void run() {
-                dashboardFragment.runOnUiThread(new Runnable() {
+                activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         presentOffers(dataProvider.loadOffersFromCache());
@@ -775,7 +776,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
     @Override
     public void onDownloadStarted() {
-        dashboardFragment.runOnUiThread(new Runnable() {
+        activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 getView().clearOffers();
@@ -787,7 +788,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
     @Override
     public void onDownloadFailed(final String message) {
-        dashboardFragment.runOnUiThread(new Runnable() {
+        activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 presentOffers(dataProvider.loadOffersFromCache());
@@ -858,18 +859,18 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     }
 
     private void openDetailPage(String restaurantId, int index) {
-        Intent openFetchOrderActivityIntent = new Intent(dashboardFragment.getActivity(), DetailPageActivity.class);
+        Intent openFetchOrderActivityIntent = new Intent(activity, DetailPageActivity.class);
         openFetchOrderActivityIntent.putExtra(KEY_RESTAURANT_ID, restaurantId);
         if (index != -1) {
             openFetchOrderActivityIntent.putExtra(KEY_OFFER_INDEX, index);
         }
-        dashboardFragment.startActivity(openFetchOrderActivityIntent);
+        activity.startActivity(openFetchOrderActivityIntent);
     }
 
     @Override
     public void onDestroy() {
         dataProvider = null;
-        dashboardFragment = null;
+        activity = null;
         timer = null;
         super.onDestroy();
     }

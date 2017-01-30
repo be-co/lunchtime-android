@@ -823,6 +823,8 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
         restaurantLocation.setText(location);
         restaurantOpeningTimes.setText(openingTimes);
         restaurantUrl.setText(url);
+
+        // TODO: Set listeners
     }
 }
 

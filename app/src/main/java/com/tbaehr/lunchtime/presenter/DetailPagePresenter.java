@@ -676,6 +676,7 @@
  */
 package com.tbaehr.lunchtime.presenter;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -691,6 +692,7 @@ import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -901,7 +903,9 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     @Override
     public void onRestaurantLocationClicked() {
-        // TODO: Fire Maps Intent
+        String uri = String.format(Locale.ENGLISH, "geo:0,0?q=%s$1", restaurant.getLocationDescription());
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+        activity.startActivity(intent);
     }
 
     @Override

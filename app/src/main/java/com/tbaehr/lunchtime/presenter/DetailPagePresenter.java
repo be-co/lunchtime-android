@@ -702,13 +702,13 @@ import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_
  */
 public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewContainer> implements DataProvider.LoadJobListener<List<Restaurant>> {
 
-    private final DetailPageActivity activity;
+    private DetailPageActivity activity;
 
-    private final String restaurantId;
+    private String restaurantId;
 
     private final int index;
 
-    private final DataProvider dataProvider;
+    private DataProvider dataProvider;
 
     private Timer timer;
 
@@ -723,6 +723,14 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dataProvider.syncRestaurants(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        dataProvider = null;
+        activity = null;
+        restaurantId = null;
+        super.onDestroy();
     }
 
     @Override

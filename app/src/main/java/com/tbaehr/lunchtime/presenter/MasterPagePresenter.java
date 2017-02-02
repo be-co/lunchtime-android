@@ -766,6 +766,14 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         return true;
     }
 
+    @Override
+    public void onDestroy() {
+        toolbarTitle = null;
+        activeFragment = null;
+        activity = null;
+        super.onDestroy();
+    }
+
     private String getDashboardTitle() {
         return getString(R.string.lunch_time);
     }

@@ -10,15 +10,19 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:fullBackupContent="@xml/backup_rules"
         android:theme="@style/AppTheme.NoActionBarLight">
-        <activity android:name=".controller.MasterPageActivity">
+        <activity
+            android:name=".controller.MasterPageActivity"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".controller.DetailPageActivity" />
+        <activity
+            android:name=".controller.DetailPageActivity"
+            android:label="@string/app_name" />
     </application>
 
 </manifest>

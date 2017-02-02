@@ -719,6 +719,14 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     }
 
     @Override
+    public void onDestroy() {
+        dataProvider = null;
+        activity = null;
+        timer = null;
+        super.onDestroy();
+    }
+
+    @Override
     public void bindView(IDashboardViewContainer view) {
         super.bindView(view);
         dataProvider = new DataProvider();
@@ -865,13 +873,5 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
             openFetchOrderActivityIntent.putExtra(KEY_OFFER_INDEX, index);
         }
         activity.startActivity(openFetchOrderActivityIntent);
-    }
-
-    @Override
-    public void onDestroy() {
-        dataProvider = null;
-        activity = null;
-        timer = null;
-        super.onDestroy();
     }
 }

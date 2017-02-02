@@ -78,7 +78,7 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
-                android:background="@color/colorAccent"
+                android:background="@color/greenLight"
                 android:orientation="vertical"
                 android:visibility="gone">
 

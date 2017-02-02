@@ -713,10 +713,6 @@ public class DashboardFragment extends BaseFragment<IDashboardViewContainer, Das
         return new DashboardPresenter(this);
     }
 
-    public void runOnUiThread(Runnable runnable) {
-        getActivity().runOnUiThread(runnable);
-    }
-
     @Override
     public void onDestroy() {
         viewContainer = null;

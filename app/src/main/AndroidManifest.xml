@@ -21,8 +21,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".controller.DetailPageActivity"
-            android:label="@string/app_name" />
+            android:name=".controller.DetailPageActivity" />
     </application>
 
 </manifest>

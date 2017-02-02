@@ -698,6 +698,7 @@ import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 import static com.tbaehr.lunchtime.view.HorizontalSliderView.INGREDIENTS_PADDING_IN_PIXELS;
 
@@ -739,6 +740,8 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
     @BindView(R.id.restaurant_url)
     TextView restaurantUrl;
 
+    private ClickListener clickListener;
+
     private DetailPageActivity activity;
 
     public DetailPageViewContainer(DetailPageActivity activity) {
@@ -774,6 +777,16 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
         }
         backArrow.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
         activity.getSupportActionBar().setHomeAsUpIndicator(backArrow);
+    }
+
+    @Override
+    public void expandCollapseDescription() {
+        // TODO: Implementation
+    }
+
+    @Override
+    public void expandCollapseOpeningTimes() {
+        // TODO: Implementation
     }
 
     @Override
@@ -817,14 +830,45 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
         selectedOfferAvailability.setText(availability);
     }
 
+    @OnClick(R.id.restaurant_short_description)
+    void onRestaurantShortDescriptionClicked() {
+        if (clickListener == null) {
+            return;
+        }
+        clickListener.onRestaurantShortDescriptionClicked();
+    }
+
+    @OnClick(R.id.restaurant_location)
+    void onRestaurantLocationClicked() {
+        if (clickListener == null) {
+            return;
+        }
+        clickListener.onRestaurantLocationClicked();
+    }
+
+    @OnClick(R.id.restaurant_opening_times)
+    void onRestaurantOpeningTimesClicked() {
+        if (clickListener == null) {
+            return;
+        }
+        clickListener.onRestaurantOpeningTimesClicked();
+    }
+
+    @OnClick(R.id.restaurant_url)
+    void onRestaurantUrlClicked() {
+        if (clickListener == null) {
+            return;
+        }
+        clickListener.onRestaurantUrlClicked();
+    }
+
     @Override
-    public void setRestaurantData(String shortDescription, String location, String openingTimes, String url) {
+    public void setRestaurantData(ClickListener listener, String shortDescription, String location, String openingTimes, String url) {
+        this.clickListener = listener;
         restaurantDescription.setText(shortDescription);
         restaurantLocation.setText(location);
         restaurantOpeningTimes.setText(openingTimes);
         restaurantUrl.setText(url);
-
-        // TODO: Set listeners
     }
 }
 

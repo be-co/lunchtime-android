@@ -676,6 +676,7 @@
  */
 package com.tbaehr.lunchtime.presenter;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.MenuItem;
@@ -700,11 +701,13 @@ import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_
 /**
  * Created by timo.baehr@gmail.com on 26.01.17.
  */
-public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewContainer> implements DataProvider.LoadJobListener<List<Restaurant>> {
+public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewContainer> implements DataProvider.LoadJobListener<List<Restaurant>>, IDetailPageViewContainer.ClickListener {
 
     private DetailPageActivity activity;
 
     private String restaurantId;
+
+    private Restaurant restaurant;
 
     private final int index;
 
@@ -730,6 +733,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         dataProvider = null;
         activity = null;
         restaurantId = null;
+        restaurant = null;
         super.onDestroy();
     }
 
@@ -741,7 +745,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         if (index != -1) {
             startTimer();
         }
-        Restaurant restaurant = getRestaurant();
+        restaurant = getRestaurant();
         Date openingDate = restaurant.getOpeningDate();
         Date closingDate = restaurant.getClosingDate();
         if (openingDate != null && closingDate != null) {
@@ -836,13 +840,13 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     }
 
     private void updateRestaurantData() {
-        Restaurant restaurant = getRestaurant();
+        restaurant = getRestaurant();
         if (restaurant != null) {
             String shortDescription = restaurant.getShortDescription();
             String location = restaurant.getLocationDescription();
             String openingTimes = restaurant.getOpeningTimeDescription();
             String url = restaurant.getUrl();
-            getView().setRestaurantData(shortDescription, location, openingTimes, url);
+            getView().setRestaurantData(this, shortDescription, location, openingTimes, url);
         }
     }
 
@@ -888,5 +892,25 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     @Override
     public void onDownloadFinished(List<Restaurant> downloadedObject) {
         updateRestaurantData();
+    }
+
+    @Override
+    public void onRestaurantShortDescriptionClicked() {
+        getView().expandCollapseDescription();
+    }
+
+    @Override
+    public void onRestaurantLocationClicked() {
+        // TODO: Fire Maps Intent
+    }
+
+    @Override
+    public void onRestaurantOpeningTimesClicked() {
+        getView().expandCollapseOpeningTimes();
+    }
+
+    @Override
+    public void onRestaurantUrlClicked() {
+        activity.openUrl(Uri.parse(restaurant.getUrl()));
     }
 }

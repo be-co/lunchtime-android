@@ -687,6 +687,20 @@ import java.util.Set;
  */
 public interface IDetailPageViewContainer {
 
+    interface ClickListener {
+        void onRestaurantShortDescriptionClicked();
+
+        void onRestaurantLocationClicked();
+
+        void onRestaurantOpeningTimesClicked();
+
+        void onRestaurantUrlClicked();
+    }
+
+    void expandCollapseDescription();
+
+    void expandCollapseOpeningTimes();
+
     void onBackPressed();
 
     void setTitle(String title);
@@ -695,6 +709,5 @@ public interface IDetailPageViewContainer {
 
     void setSelectedOffer(String title, String prize, String availability, Set<Offer.Ingredient> ingredients);
 
-    void setRestaurantData(String shortDescription, String location, String openingTimes, String url);
-
+    void setRestaurantData(ClickListener clickListener, String shortDescription, String location, String openingTimes, String url);
 }

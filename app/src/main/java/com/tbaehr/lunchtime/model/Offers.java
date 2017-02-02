@@ -721,6 +721,9 @@ public class Offers {
         return offers.isEmpty();
     }
 
+    /**
+     * @return Refresh dates at the same day
+     */
     public Set<Date> getUiRefreshDates() {
         Set<Date> refreshDates = new HashSet<>();
         for (Offer offer : getOffers()) {

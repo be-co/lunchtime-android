@@ -81,4 +81,13 @@
     <string name="hours">Stunden</string>
     <string name="minute">Minute</string>
     <string name="minutes">Minuten</string>
+
+    <string name="tomorrow">Morgen</string>
+    <string name="monday">Montag</string>
+    <string name="tuesday">Dienstag</string>
+    <string name="wednesday">Mittwoch</string>
+    <string name="thursday">Donnerstag</string>
+    <string name="friday">Freitag</string>
+    <string name="saturday">Samstag</string>
+    <string name="sunday">Sonntag</string>
 </resources>

@@ -955,6 +955,25 @@ public class Offer {
                 calendar.setTimeInMillis(endDate.getTime());
                 currentTimeInMinutes = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
                 return context.getString(R.string.ends) + " " + formatMinutes(currentTimeInMinutes);
+            case NEXT_DAYS_VALID:
+                calendar.setTimeInMillis(startDate.getTime());
+                int dayOfYearStart = calendar.get(Calendar.DAY_OF_YEAR);
+                int weekDayStart = calendar.get(Calendar.DAY_OF_WEEK);
+                calendar.setTimeInMillis(System.currentTimeMillis());
+                int todayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+                if (dayOfYearStart - todayOfYear == 1) {
+                    return context.getString(R.string.tomorrow);
+                } else {
+                    switch (weekDayStart) {
+                        case Calendar.MONDAY: return context.getString(R.string.monday);
+                        case Calendar.TUESDAY: return context.getString(R.string.tuesday);
+                        case Calendar.WEDNESDAY: return context.getString(R.string.wednesday);
+                        case Calendar.THURSDAY: return context.getString(R.string.thursday);
+                        case Calendar.FRIDAY: return context.getString(R.string.friday);
+                        case Calendar.SATURDAY: return context.getString(R.string.saturday);
+                        case Calendar.SUNDAY: return context.getString(R.string.sunday);
+                    }
+                }
             default:
             case OUTDATED:
                 return context.getString(R.string.expired);

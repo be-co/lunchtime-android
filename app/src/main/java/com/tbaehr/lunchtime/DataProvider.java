@@ -976,7 +976,8 @@ public class DataProvider {
                     ingredients);
             final Offer.ValidationState validationState = offer.getValidationState();
             if (validationState.equals(Offer.ValidationState.NOW_VALID) ||
-                    validationState.equals(Offer.ValidationState.SOON_VALID)) {
+                    validationState.equals(Offer.ValidationState.SOON_VALID) ||
+                    validationState.equals(Offer.ValidationState.NEXT_DAYS_VALID)) {
                 offers.add(offer);
             } else if (validationState.equals(Offer.ValidationState.INVALID)) {
                 throw new JSONException("Invalid offer " + offer.getTitle() + " for " + restaurantTitle + ": Check date format: " + starts + "," + ends);
@@ -1114,7 +1115,7 @@ public class DataProvider {
     }
 
     private void autoSearchForIngredients(Set<Offer.Ingredient> ingredientList, String title) {
-        if (contains(title, "Bolognese", "bratwurst", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
+        if (contains(title, "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
             if (title.contains("Carne")) {
                 if (!title.contains("vom Rind")) {
                     ingredientList.add(Offer.Ingredient.PORK);

@@ -977,7 +977,7 @@ public class DataProvider {
             final Offer.ValidationState validationState = offer.getValidationState();
             if (validationState.equals(Offer.ValidationState.NOW_VALID) ||
                     validationState.equals(Offer.ValidationState.SOON_VALID) ||
-                    validationState.equals(Offer.ValidationState.NEXT_DAYS_VALID)) {
+                    (BuildConfig.DEBUG && validationState.equals(Offer.ValidationState.NEXT_DAYS_VALID))) {
                 offers.add(offer);
             } else if (validationState.equals(Offer.ValidationState.INVALID)) {
                 throw new JSONException("Invalid offer " + offer.getTitle() + " for " + restaurantTitle + ": Check date format: " + starts + "," + ends);

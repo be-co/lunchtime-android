@@ -714,6 +714,8 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
     private Timer timer;
 
+    List<Offers> offersList;
+
     public DashboardPresenter(DashboardFragment fragment) {
         this.activity = fragment.getActivity();
     }
@@ -723,6 +725,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         dataProvider = null;
         activity = null;
         timer = null;
+        offersList = null;
         super.onDestroy();
     }
 
@@ -732,10 +735,13 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         dataProvider = new DataProvider();
         dataProvider.syncOffers(this);
 
-        List<Offers> offersList = dataProvider.loadOffersFromCache();
+        List<Offers> offersListTemp = dataProvider.loadOffersFromCache();
+        int sizeTemp = offersListTemp.size();
+        offersList = offersListTemp;
+
         startTimeBasedRefresh(offersList);
 
-        if (!view.isInitialized()) {
+        if (!view.isInitialized() || sizeTemp != offersList.size()) {
             presentOffers(offersList);
         }
     }
@@ -744,6 +750,11 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     public void unbindView() {
         stopTimeBasedRefresh();
         super.unbindView();
+    }
+
+    private void restartTimeBasedRefresh(List<Offers> offersList) {
+        stopTimeBasedRefresh();
+        startTimeBasedRefresh(offersList);
     }
 
     private void startTimeBasedRefresh(List<Offers> offersList) {
@@ -852,6 +863,8 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
                     onSliderItemClickListener
             );
         }
+
+        restartTimeBasedRefresh(offersList);
 
         if (!foundOffers) {
             final int[] noOffersMessages = new int[] {

@@ -1133,10 +1133,10 @@ public class DataProvider {
         if (contains(title, "Rigatoni", "Pasta", "Futtuccine", "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
             ingredientList.add(Offer.Ingredient.GLUTEN);
         }
-        if (contains(title, "quark", "schmarrn", "Käse", "käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand", "Frischkaese", "Kochkaese", "Frischkäse", "Kochkäs")) {
+        if (contains(title, "quark", "schmarrn", "Parmesan", "Käse", "käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand", "Frischkaese", "Kochkaese", "Frischkäse", "Kochkäs")) {
             ingredientList.add(Offer.Ingredient.LACTOSE);
         }
-        if (contains(title, "Kabeljau", "Schlemmerfilet", "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {
+        if (contains(title, "Wolfsbarsch", "Kabeljau", "Schlemmerfilet", "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {
             ingredientList.add(Offer.Ingredient.FISH);
         }
         if (contains(title, " Ei", "Ei ", "Eier", "eier", "Spiegelei", "Majonese", "Eierknöpfle", "Tagliatelle", "Spaghetti", "Spätzle", "Nudel", "nudel")) {

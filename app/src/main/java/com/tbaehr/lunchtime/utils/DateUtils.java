@@ -691,14 +691,15 @@ public class DateUtils {
      */
     private static final String DATE_FORMAT = "MMM dd yyyy HH:mm:ss 'GMT'Z";
 
-    public static Date createDateFromString(String date) {
+    public static DateTime createDateFromString(String date) {
         if (date == null) {
             return null;
         }
 
         DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
         try {
-            return dateFormat.parse(date);
+            Date dateTemp = dateFormat.parse(date);
+            return new DateTime(dateTemp.getTime());
         } catch (ParseException e) {
             e.printStackTrace();
         }

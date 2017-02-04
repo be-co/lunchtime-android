@@ -691,6 +691,7 @@ import android.util.Pair;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Offers;
 import com.tbaehr.lunchtime.model.Restaurant;
+import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
 
 import org.json.JSONArray;
@@ -706,7 +707,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -865,8 +865,8 @@ public class DataProvider {
         final String uriRestaurant = String.format(URI_RESTAURANT, restaurantKey);
         final String keyRestaurantUpdated = String.format(KEY_RESTAURANT_UPDATED, restaurantKey);
 
-        Date cachedDate = DateUtils.createDateFromString(loadFromCache(keyRestaurantUpdated));
-        Date downloadDate = DateUtils.createDateFromString(dateUpdated);
+        DateTime cachedDate = DateUtils.createDateFromString(loadFromCache(keyRestaurantUpdated));
+        DateTime downloadDate = DateUtils.createDateFromString(dateUpdated);
 
         String jsonRestaurant;
         if (downloadDate != null && (cachedDate == null || downloadDate.after(cachedDate))) {
@@ -894,8 +894,8 @@ public class DataProvider {
         final String uriRestaurantOffers = String.format(URI_OFFER, restaurantKey);
         final String keyOfferUpdated = String.format(KEY_OFFER_UPDATED, restaurantKey);
 
-        Date cachedDate = DateUtils.createDateFromString(loadFromCache(keyOfferUpdated));
-        Date downloadDate = DateUtils.createDateFromString(dateUpdated);
+        DateTime cachedDate = DateUtils.createDateFromString(loadFromCache(keyOfferUpdated));
+        DateTime downloadDate = DateUtils.createDateFromString(dateUpdated);
 
         String jsonOffers;
         if (downloadDate != null && (cachedDate == null || downloadDate.after(cachedDate))) {

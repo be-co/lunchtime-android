@@ -681,10 +681,10 @@ import android.support.annotation.DrawableRes;
 
 import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
+import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -744,7 +744,7 @@ public class Offer {
 
     private int prize;
 
-    private Date startDate, endDate;
+    private DateTime startDate, endDate;
 
     private Category category;
 
@@ -804,11 +804,11 @@ public class Offer {
         return restaurantId;
     }
 
-    public Date getStartDate() {
+    public DateTime getStartDate() {
         return startDate;
     }
 
-    public Date getEndDate() {
+    public DateTime getEndDate() {
         return endDate;
     }
 
@@ -832,14 +832,6 @@ public class Offer {
         // TODO: Fetch currency
         String prize = String.format("%d,%s€", euros, cents == 0 ? "00" : cents);
         return prize;
-    }
-
-    public static String formatMinutes(int timeInMinutes) {
-        int hours = timeInMinutes / 60;
-        int minutes = timeInMinutes - hours * 60;
-        String sMinutes = String.valueOf(minutes);
-        sMinutes = sMinutes.length() == 2 ? sMinutes : "0" + sMinutes;
-        return hours + ":" + sMinutes;
     }
 
     /*public int getDrawableRes() {
@@ -867,13 +859,9 @@ public class Offer {
             return ValidationState.INVALID;
         }
 
-        Date now = new Date(System.currentTimeMillis());
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(now);
-        int dayOfYearToday = calendar.get(Calendar.DAY_OF_YEAR);
-
-        calendar.setTime(startDate);
-        int dayOfYearStart = calendar.get(Calendar.DAY_OF_YEAR);
+        DateTime now = new DateTime();
+        int dayOfYearToday = now.get(Calendar.DAY_OF_YEAR);
+        int dayOfYearStart = startDate.get(Calendar.DAY_OF_YEAR);
 
         if (dayOfYearStart > dayOfYearToday) {
             return ValidationState.NEXT_DAYS_VALID;
@@ -886,93 +874,23 @@ public class Offer {
         }
     }
 
-    public String differenceInHourMinutes(Date first, Date second) {
-        Date firstDate, secondDate;
-        if (first.after(second)) {
-            firstDate = first;
-            secondDate = second;
-        } else {
-            firstDate = second;
-            secondDate = first;
-        }
-        Calendar calendar = Calendar.getInstance();
-
-        // first date
-        calendar.setTime(firstDate);
-        int firstHours = calendar.get(Calendar.HOUR_OF_DAY);
-        int firstMinutes = calendar.get(Calendar.MINUTE);
-
-        // second date
-        calendar.setTime(secondDate);
-        int scndHours = calendar.get(Calendar.HOUR_OF_DAY);
-        int scndMinutes = calendar.get(Calendar.MINUTE);
-
-        // difference
-        int minutes = firstMinutes - scndMinutes;
-        int hours;
-        if (minutes < 0) {
-            hours = firstHours - scndHours;
-            hours -= 1;
-            minutes = 60 - minutes;
-        } else {
-            hours = firstHours - scndHours;
-        }
-
-        // Constants
-        Context context = LunchtimeApplication.getContext();
-        StringBuilder sb = new StringBuilder("");
-        if (hours > 0) {
-            sb.append(hours).append(" ");
-            if (hours > 1) {
-                sb.append(context.getString(R.string.hours));
-            } else {
-                sb.append(context.getString(R.string.hour));
-            }
-            sb.append(", ");
-        }
-        sb.append(minutes).append(" ");
-        if (minutes > 1 || minutes == 0) {
-            sb.append(context.getString(R.string.minutes));
-        } else {
-            sb.append(context.getString(R.string.minute));
-        }
-
-        return sb.toString();
-    }
-
     public String getOpeningTimeShortDescription() {
-        Calendar calendar = Calendar.getInstance();
         ValidationState validationState = getValidationState();
-        int currentTimeInMinutes;
         Context context = LunchtimeApplication.getContext();
 
         switch (validationState) {
             case SOON_VALID:
-                calendar.setTimeInMillis(startDate.getTime());
-                currentTimeInMinutes = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
-                return context.getString(R.string.starts) + " " + formatMinutes(currentTimeInMinutes);
+                return context.getString(R.string.starts) + " " + startDate.asHourMinute();
             case NOW_VALID:
-                calendar.setTimeInMillis(endDate.getTime());
-                currentTimeInMinutes = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
-                return context.getString(R.string.ends) + " " + formatMinutes(currentTimeInMinutes);
+                return context.getString(R.string.ends) + " " + endDate.asHourMinute();
             case NEXT_DAYS_VALID:
-                calendar.setTimeInMillis(startDate.getTime());
-                int dayOfYearStart = calendar.get(Calendar.DAY_OF_YEAR);
-                int weekDayStart = calendar.get(Calendar.DAY_OF_WEEK);
-                calendar.setTimeInMillis(System.currentTimeMillis());
-                int todayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+                int dayOfYearStart = startDate.get(Calendar.DAY_OF_YEAR);
+                int todayOfYear = (new DateTime()).get(Calendar.DAY_OF_YEAR);
+
                 if (dayOfYearStart - todayOfYear == 1) {
                     return context.getString(R.string.tomorrow);
                 } else {
-                    switch (weekDayStart) {
-                        case Calendar.MONDAY: return context.getString(R.string.monday);
-                        case Calendar.TUESDAY: return context.getString(R.string.tuesday);
-                        case Calendar.WEDNESDAY: return context.getString(R.string.wednesday);
-                        case Calendar.THURSDAY: return context.getString(R.string.thursday);
-                        case Calendar.FRIDAY: return context.getString(R.string.friday);
-                        case Calendar.SATURDAY: return context.getString(R.string.saturday);
-                        case Calendar.SUNDAY: return context.getString(R.string.sunday);
-                    }
+                    return startDate.asWeekDay();
                 }
             default:
             case OUTDATED:

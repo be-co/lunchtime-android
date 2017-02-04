@@ -676,7 +676,8 @@
  */
 package com.tbaehr.lunchtime.model;
 
-import java.util.Date;
+import com.tbaehr.lunchtime.utils.DateTime;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -724,8 +725,8 @@ public class Offers {
     /**
      * @return Refresh dates at the same day
      */
-    public Set<Date> getUiRefreshDates() {
-        Set<Date> refreshDates = new HashSet<>();
+    public Set<DateTime> getUiRefreshDates() {
+        Set<DateTime> refreshDates = new HashSet<>();
         for (Offer offer : getOffers()) {
             boolean soonValid = offer.getValidationState().equals(Offer.ValidationState.SOON_VALID);
             boolean nowValid = offer.getValidationState().equals(Offer.ValidationState.NOW_VALID);

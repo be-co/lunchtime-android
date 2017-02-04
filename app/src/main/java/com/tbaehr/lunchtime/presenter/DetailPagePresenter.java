@@ -687,6 +687,7 @@ import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Restaurant;
+import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
 
 import java.util.Calendar;
@@ -824,15 +825,14 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
                     || validationState.equals(Offer.ValidationState.INVALID)) {
                 availability = offer.getOpeningTimeShortDescription();
             } else {
-                Date now = new Date();
-                now.setTime(System.currentTimeMillis());
+                DateTime now = new DateTime();
 
                 if (validationState.equals(Offer.ValidationState.SOON_VALID)) {
-                    Date opens = offer.getStartDate();
-                    availability = activity.getString(R.string.available_at, offer.differenceInHourMinutes(opens, now));
+                    DateTime opens = offer.getStartDate();
+                    availability = activity.getString(R.string.available_at, now.differenceAsHourMinute(opens));
                 } else {
-                    Date closes = offer.getEndDate();
-                    availability = activity.getString(R.string.available_since, offer.differenceInHourMinutes(now, closes));
+                    DateTime closes = offer.getEndDate();
+                    availability = activity.getString(R.string.available_since, now.differenceAsHourMinute(closes));
                 }
             }
 

@@ -674,217 +674,170 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.presenter;
+package com.tbaehr.lunchtime.utils;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.view.View;
-import android.widget.Toast;
+import android.content.Context;
 
-import com.propaneapps.tomorrow.presenter.BasePresenter;
-import com.tbaehr.lunchtime.DataProvider;
 import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
-import com.tbaehr.lunchtime.controller.DashboardFragment;
-import com.tbaehr.lunchtime.controller.DetailPageActivity;
-import com.tbaehr.lunchtime.model.Offer;
-import com.tbaehr.lunchtime.model.Offers;
-import com.tbaehr.lunchtime.utils.DateTime;
-import com.tbaehr.lunchtime.view.HorizontalSliderView;
-import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_OFFER_INDEX;
-import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_ID;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
- * Created by timo.baehr@gmail.com on 31.12.16.
+ * Created by timo.baehr@gmail.com on 04.02.17.
  */
-public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
-        implements DataProvider.LoadJobListener<List<Offers>> {
+public class DateTime implements Comparable<DateTime> {
 
-    private DataProvider dataProvider;
+    private final long timeInMillis;
 
-    private Activity activity;
-
-    private Timer timer;
-
-    List<Offers> offersList;
-
-    public DashboardPresenter(DashboardFragment fragment) {
-        this.activity = fragment.getActivity();
+    /**
+     * Create a date with the current time.
+     */
+    public DateTime() {
+        timeInMillis = System.currentTimeMillis();
     }
 
+    /**
+     * Create a date with the time represented by the argument <code>timeInMillis</code>.
+     */
+    public DateTime(long timeInMillis) {
+        this.timeInMillis = timeInMillis;
+    }
+
+    public long getMillis() {
+        return timeInMillis;
+    }
+
+    /**
+     * Returns the value of the given <code>java.util.Calendar</code> field.
+     *
+     * @param field the given <code>java.util.Calendar</code> field.
+     * @return the value for the given <code>java.util.Calendar</code> field.
+     */
+    public int get(int field) {
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTimeInMillis(timeInMillis);
+        return calendar.get(field);
+    }
+
+    /**
+     * @param anotherDate the <code>DateTime</code> to be compared.
+     * @return value <code>true</code> if this <code>DateTime</code> is before
+     * the time represented by the argument <code>anotherDate</code>, otherwise
+     * value <code>false</code>.
+     */
+    public boolean before(DateTime anotherDate) {
+        int comp = compareTo(anotherDate);
+        return comp == -1;
+    }
+
+    /**
+     * @param anotherDate the <code>DateTime</code> to be compared.
+     * @return value <code>true</code> if this <code>DateTime</code> is after
+     * the time represented by the argument <code>anotherDate</code>, otherwise
+     * value <code>false</code>.
+     */
+    public boolean after(DateTime anotherDate) {
+        int comp = compareTo(anotherDate);
+        return comp == 1;
+    }
+
+    /**
+     * @param anotherDate the <code>DateTime</code> to be compared.
+     * @return the value <code>0</code> if the time represented by the argument
+     * is equal to the time represented by this <code>DateTime</code>; value
+     * <code>-1</code> if the time of this <code>DateTime</code> is before
+     * the time represented by the argument; and value <code>1</code>
+     * if the time of this <code>DateTime</code> is after the
+     * time represented by the argument.
+     */
     @Override
-    public void onDestroy() {
-        dataProvider = null;
-        activity = null;
-        timer = null;
-        offersList = null;
-        super.onDestroy();
+    public int compareTo(DateTime anotherDate) {
+        long otherDateMillis = anotherDate.getMillis();
+        return (timeInMillis > otherDateMillis) ? 1 : (timeInMillis == otherDateMillis) ? 0 : -1;
     }
 
-    @Override
-    public void bindView(IDashboardViewContainer view) {
-        super.bindView(view);
-        dataProvider = new DataProvider();
-        dataProvider.syncOffers(this);
-
-        List<Offers> offersListTemp = dataProvider.loadOffersFromCache();
-        int sizeTemp = offersListTemp.size();
-        offersList = offersListTemp;
-
-        startTimeBasedRefresh(offersList);
-
-        if (!view.isInitialized() || sizeTemp != offersList.size()) {
-            presentOffers(offersList);
-        }
+    /**
+     * @param anotherDate the <code>DateTime</code> to be compared.
+     * @return the value <code>0</code> if the time represented by the argument
+     * is equal to the time represented by this <code>DateTime</code>; a value
+     * less than <code>0</code> if the time of this <code>DateTime</code> is
+     * before the time represented by the argument; and a value greater than
+     * <code>0</code> if the time of this <code>DateTime</code> is after the
+     * time represented by the argument.
+     */
+    public long differenceInMillis(DateTime anotherDate) {
+        long otherDateMillis = anotherDate.getMillis();
+        return timeInMillis - otherDateMillis;
     }
 
-    @Override
-    public void unbindView() {
-        stopTimeBasedRefresh();
-        super.unbindView();
+    /**
+     * @param anotherDate the <code>DateTime</code> to be compared.
+     * @return the difference in days, regardless of the hours between both.
+     */
+    public int differenceInDays(DateTime anotherDate) {
+        int day = get(Calendar.DAY_OF_YEAR);
+        int otherDay = anotherDate.get(Calendar.DAY_OF_YEAR);
+        return Math.abs(day - otherDay);
     }
 
-    private void restartTimeBasedRefresh(List<Offers> offersList) {
-        stopTimeBasedRefresh();
-        startTimeBasedRefresh(offersList);
-    }
+    public String differenceAsHourMinute(DateTime anotherDate) {
+        long differenceInMillis = differenceInMillis(anotherDate);
+        int differenceInMinutes = Math.abs((int) differenceInMillis / 1000 / 60);
 
-    private void startTimeBasedRefresh(List<Offers> offersList) {
-        Set<DateTime> refreshDates = new HashSet<>();
-        for (Offers offers : offersList) {
-            refreshDates.addAll(offers.getUiRefreshDates());
-        }
-        startTimers(refreshDates);
-    }
+        int hours = differenceInMinutes / 60;
+        int minutes = differenceInMinutes - (hours * 60);
 
-    private void startTimers(Set<DateTime> dates) {
-        if (timer == null) {
-            timer = new Timer();
-        }
-        for (DateTime date : dates) {
-            timer.schedule(createTimerTask(), date.toDate());
-        }
-    }
-
-    private TimerTask createTimerTask() {
-        return new TimerTask() {
-            @Override
-            public void run() {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        presentOffers(dataProvider.loadOffersFromCache());
-                    }
-                });
+        Context context = LunchtimeApplication.getContext();
+        StringBuilder sb = new StringBuilder("");
+        if (hours > 0) {
+            sb.append(hours).append(" ");
+            if (hours > 1) {
+                sb.append(context.getString(R.string.hours));
+            } else {
+                sb.append(context.getString(R.string.hour));
             }
-        };
-    }
-
-    private void stopTimeBasedRefresh() {
-        timer.cancel();
-        timer = null;
-    }
-
-    @Override
-    public void onDownloadStarted() {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                getView().clearOffers();
-                getView().hideNoOffersView();
-                getView().setProgressBarVisibility(true);
-            }
-        });
-    }
-
-    @Override
-    public void onDownloadFailed(final String message) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                presentOffers(dataProvider.loadOffersFromCache());
-                Toast.makeText(LunchtimeApplication.getContext(), message, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    @Override
-    public void onDownloadFinished(List<Offers> offersList) {
-        IDashboardViewContainer view = getView();
-        if (view == null) {
-            return;
+            sb.append(", ");
+        }
+        sb.append(minutes).append(" ");
+        if (minutes > 1 || minutes == 0) {
+            sb.append(context.getString(R.string.minutes));
+        } else {
+            sb.append(context.getString(R.string.minute));
         }
 
-        view.setProgressBarVisibility(false);
-        presentOffers(offersList);
+        return sb.toString();
     }
 
-    private void presentOffers(List<Offers> offersList) {
-        IDashboardViewContainer view = getView();
-        boolean foundOffers = false;
+    public String asHourMinute() {
+        int hours = get(Calendar.HOUR_OF_DAY);
+        int minutes = get(Calendar.MINUTE);
 
-        view.setProgressBarVisibility(false);
-        view.hideNoOffersView();
-        view.clearOffers();
+        StringBuilder sb = new StringBuilder("");
+        sb.append(hours).append(":").append(minutes);
+        return sb.toString();
+    }
 
-        for (final Offers nearbyOffers : offersList) {
-            final HorizontalSliderView.OnSliderItemClickListener onSliderItemClickListener = new HorizontalSliderView.OnSliderItemClickListener() {
-                @Override
-                public void onSliderItemClick(Offer offer, View view) {
-                    openDetailPage(offer.getRestaurantId(), nearbyOffers.getIndex(offer));
-                }
-            };
-            if (nearbyOffers.isEmpty()) {
-                continue;
-            }
-
-            foundOffers = true;
-
-            final String restaurantId = nearbyOffers.getRestaurantId();
-            final HorizontalSliderView.OnSliderHeaderClickListener headerClickListener = new HorizontalSliderView.OnSliderHeaderClickListener() {
-                @Override
-                public void onSliderHeaderClick() {
-                    openDetailPage(restaurantId, -1);
-                }
-            };
-            view.addOffers(
-                    nearbyOffers.getRestaurantName(),
-                    nearbyOffers.getRestaurantDescription(),
-                    nearbyOffers.getOffers(),
-                    headerClickListener,
-                    onSliderItemClickListener
-            );
-        }
-
-        restartTimeBasedRefresh(offersList);
-
-        if (!foundOffers) {
-            final int[] noOffersMessages = new int[] {
-                    R.string.no_offers_today1,
-                    R.string.no_offers_today2,
-                    R.string.no_offers_today3,
-                    R.string.no_offers_today4,
-                    R.string.no_offers_today5
-            };
-            final int randomNumber = (int) (Math.random() * 5);
-            view.enableNoOffersView(noOffersMessages[randomNumber]);
+    public String asWeekDay() {
+        Context context = LunchtimeApplication.getContext();
+        int weekDay = get(Calendar.DAY_OF_WEEK);
+        switch (weekDay) {
+            case Calendar.MONDAY: return context.getString(R.string.monday);
+            case Calendar.TUESDAY: return context.getString(R.string.tuesday);
+            case Calendar.WEDNESDAY: return context.getString(R.string.wednesday);
+            case Calendar.THURSDAY: return context.getString(R.string.thursday);
+            case Calendar.FRIDAY: return context.getString(R.string.friday);
+            case Calendar.SATURDAY: return context.getString(R.string.saturday);
+            case Calendar.SUNDAY: return context.getString(R.string.sunday);
+            default:
+                throw new RuntimeException("Weekday not found");
         }
     }
 
-    private void openDetailPage(String restaurantId, int index) {
-        Intent openFetchOrderActivityIntent = new Intent(activity, DetailPageActivity.class);
-        openFetchOrderActivityIntent.putExtra(KEY_RESTAURANT_ID, restaurantId);
-        if (index != -1) {
-            openFetchOrderActivityIntent.putExtra(KEY_OFFER_INDEX, index);
-        }
-        activity.startActivity(openFetchOrderActivityIntent);
+    public Date toDate() {
+        return new Date(getMillis());
     }
+
 }

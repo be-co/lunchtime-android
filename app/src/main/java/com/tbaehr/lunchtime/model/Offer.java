@@ -890,7 +890,8 @@ public class Offer {
                 if (dayOfYearStart - todayOfYear == 1) {
                     return context.getString(R.string.tomorrow);
                 } else {
-                    return startDate.asWeekDay();
+                    int weekDay = startDate.get(Calendar.DAY_OF_WEEK);
+                    return DateTime.asWeekDay(weekDay);
                 }
             default:
             case OUTDATED:

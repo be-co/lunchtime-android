@@ -690,7 +690,9 @@ import java.util.GregorianCalendar;
  */
 public class DateTime implements Comparable<DateTime> {
 
-    private static final long DAY_IN_MILLIS = 24 * 60 * 60 * 1000;
+    public static final long SECOND_IN_MILLIS = 1000L;
+
+    public static final long DAY_IN_MILLIS = 24 * 60 * 60 * SECOND_IN_MILLIS;
 
     private long timeInMillis;
 
@@ -816,15 +818,15 @@ public class DateTime implements Comparable<DateTime> {
     public String asHourMinute() {
         int hours = get(Calendar.HOUR_OF_DAY);
         int minutes = get(Calendar.MINUTE);
+        String sMinutes = minutes < 10 ? "0" + minutes : String.valueOf(minutes);
 
         StringBuilder sb = new StringBuilder("");
-        sb.append(hours).append(":").append(minutes);
+        sb.append(hours).append(":").append(sMinutes);
         return sb.toString();
     }
 
-    public String asWeekDay() {
+    public static String asWeekDay(int weekDay) {
         Context context = LunchtimeApplication.getContext();
-        int weekDay = get(Calendar.DAY_OF_WEEK);
         switch (weekDay) {
             case Calendar.MONDAY: return context.getString(R.string.monday);
             case Calendar.TUESDAY: return context.getString(R.string.tuesday);
@@ -840,6 +842,18 @@ public class DateTime implements Comparable<DateTime> {
 
     public Date toDate() {
         return new Date(getMillis());
+    }
+
+    public int[] nextWeekDays() {
+        int[] nextWeekdays = new int[6];
+        int currentWeekDay = get(Calendar.DAY_OF_WEEK);
+        for (int i = 0; i < nextWeekdays.length; i++) {
+            nextWeekdays[i] = currentWeekDay + 1 + i;
+            if (nextWeekdays[i] > 7) {
+                nextWeekdays[i] = nextWeekdays[i] - 7;
+            }
+        }
+        return nextWeekdays;
     }
 
     public DateTime updateWeekDay(int weekDay) {

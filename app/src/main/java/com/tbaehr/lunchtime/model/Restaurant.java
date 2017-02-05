@@ -681,11 +681,10 @@ import android.content.Context;
 import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.utils.DateTime;
+import com.tbaehr.lunchtime.utils.DateUtils;
 
 import java.util.Calendar;
 import java.util.Map;
-
-import static com.tbaehr.lunchtime.utils.DateUtils.getDate;
 
 /**
  * Created by timo.baehr@gmail.com on 27.12.16.
@@ -698,7 +697,7 @@ public class Restaurant {
 
     private String locationDescription;
 
-    private Map<Integer, String[]> openingTimes;
+    private Map<Integer, DateTime[]> openingTimes;
 
     private String phoneNumber;
 
@@ -712,7 +711,7 @@ public class Restaurant {
                       String shortDescription,
                       String longDescription,
                       String locationDescription,
-                      Map<Integer, String[]> openingTimes,
+                      Map<Integer, DateTime[]> openingTimes,
                       String phoneNumber, String email, String url, String[] photoUrls) {
         this.name = name;
         this.shortDescription = shortDescription;
@@ -741,82 +740,84 @@ public class Restaurant {
         return locationDescription;
     }
 
-    private String[] getOpeningTimes(int dayOfWeek) {
+    private DateTime[] getOpeningTimes(int dayOfWeek) {
         return openingTimes.get(dayOfWeek);
     }
 
-    private String[] getOpeningTimesForToday() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-        return getOpeningTimes(dayOfWeek);
+    private DateTime[] getOpeningTimesForToday() {
+        DateTime now = new DateTime();
+        return getOpeningTimes(now.get(Calendar.DAY_OF_WEEK));
     }
 
-    public String getOpeningTimeDescription() {
-        String[] dayOpeningTimes = getOpeningTimesForToday();
-        if (dayOpeningTimes == null || dayOpeningTimes.length == 0) {
-            return LunchtimeApplication.getContext().getString(R.string.closed);
+    public String getOpeningTimeDescriptionForToday() {
+        DateTime now = new DateTime();
+        return getOpeningTimeDescription(now.get(Calendar.DAY_OF_WEEK));
+    }
+
+    private String getOpeningTimeDescription(int weekDay) {
+        // TODO: Make this more beautiful
+        DateTime[] dayOpeningTimes = getOpeningTimes(weekDay);
+        DateTime openingTime = null;
+        DateTime closingTime = null;
+        if (dayOpeningTimes != null && dayOpeningTimes.length > 0) {
+            // TODO: Handle more than one opening/closing time
+            openingTime = dayOpeningTimes[0];
+            closingTime = dayOpeningTimes[1];
         }
 
         DateTime now = new DateTime();
-
-        String openingTime = dayOpeningTimes[0];
-        String[] openingValues = openingTime.split(":");
-        int hoursO = Integer.valueOf(openingValues[0]);
-        int minutesO = Integer.valueOf(openingValues[1]);
-
-        String closingTime = dayOpeningTimes[1];
-        String[] closingValues = closingTime.split(":");
-        int hoursC = Integer.valueOf(closingValues[0]);
-        int minutesC = Integer.valueOf(closingValues[1]);
-
-        if (now.before(getDate(hoursO, minutesO))) {
-            String sOpens = format(hoursO, minutesO);
-            return LunchtimeApplication.getContext().getString(R.string.opens_at, sOpens);
-        } else if (now.before(getDate(hoursC, minutesC))) {
-            String sCloses = format(hoursC, minutesC);
-            return LunchtimeApplication.getContext().getString(R.string.closes_at, sCloses);
+        DateTime weekDayTemp = DateUtils.getDate(weekDay, 0, 0);
+        Context context = LunchtimeApplication.getContext();
+        if (now.differenceInDays(weekDayTemp) == 0) {
+            if (openingTime == null) {
+                return context.getString(R.string.closed);
+            }
+            if (now.before(openingTime)) {
+                String sOpens = openingTime.asHourMinute();
+                return context.getString(R.string.opens_at, sOpens);
+            } else if (now.before(closingTime)) {
+                String sCloses = closingTime.asHourMinute();
+                return context.getString(R.string.closes_at, sCloses);
+            } else {
+                return context.getString(R.string.closed);
+            }
         } else {
-            return LunchtimeApplication.getContext().getString(R.string.closed);
+            if (openingTime == null) {
+                return DateTime.asWeekDay(weekDay) + " " + context.getString(R.string.closed);
+            }
+            String sOpens = openingTime.asHourMinute();
+            String sCloses = closingTime.asHourMinute();
+            return DateTime.asWeekDay(weekDay) + " " + sOpens + " - " + sCloses;
         }
     }
 
     public String getOpeningTimeDescriptionFull() {
-        Context context = LunchtimeApplication.getContext();
-        // TODO: Impl.
-        return "";
+        final String LINE_BREAK = "<br/><br/>";
+        DateTime now = new DateTime();
+        int[] nextWeekDays = now.nextWeekDays();
+
+        StringBuilder sb = new StringBuilder();
+        for (int weekDay : nextWeekDays) {
+            sb.append(getOpeningTimeDescription(weekDay)).append(LINE_BREAK);
+        }
+        sb.delete(sb.length() - LINE_BREAK.length(), sb.length());
+        return sb.toString();
     }
 
     public DateTime getOpeningDate() {
-        String[] dayOpeningTimes = getOpeningTimesForToday();
+        DateTime[] dayOpeningTimes = getOpeningTimesForToday();
         if (dayOpeningTimes == null || dayOpeningTimes.length == 0) {
             return null;
         }
-        String openingTime = dayOpeningTimes[0];
-        String[] openingValues = openingTime.split(":");
-        int hours = Integer.valueOf(openingValues[0]);
-        int minutes = Integer.valueOf(openingValues[1]);
-
-        return getDate(hours, minutes);
+        return dayOpeningTimes[0];
     }
 
     public DateTime getClosingDate() {
-        String[] dayClosingTimes = getOpeningTimesForToday();
+        DateTime[] dayClosingTimes = getOpeningTimesForToday();
         if (dayClosingTimes == null || dayClosingTimes.length == 0) {
             return null;
         }
-        String closingTime = dayClosingTimes[1];
-        String[] openingValues = closingTime.split(":");
-        int hours = Integer.valueOf(openingValues[0]);
-        int minutes = Integer.valueOf(openingValues[1]);
-
-        return getDate(hours, minutes);
-    }
-
-    private String format(int hours, int minutes) {
-        String sMinutes = String.valueOf(minutes);
-        sMinutes = sMinutes.length() == 1 ? sMinutes + "0" : sMinutes;
-        return hours + ":" + sMinutes;
+        return dayClosingTimes[1];
     }
 
     public String getPhoneNumber() {

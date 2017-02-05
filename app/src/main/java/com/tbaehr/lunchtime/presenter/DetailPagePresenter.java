@@ -700,6 +700,7 @@ import java.util.TimerTask;
 
 import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_OFFER_INDEX;
 import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_ID;
+import static com.tbaehr.lunchtime.utils.DateTime.SECOND_IN_MILLIS;
 
 /**
  * Created by timo.baehr@gmail.com on 26.01.17.
@@ -801,7 +802,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
             public void run() {
                 updateSelectedOffer();
             }
-        }), now, 1000);
+        }), now, SECOND_IN_MILLIS);
     }
 
     private void stopTimer() {
@@ -847,7 +848,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
             String shortDescription = restaurant.getShortDescription();
             String longDescription = restaurant.getLongDescription();
             String location = restaurant.getLocationDescription();
-            String openingTimes = restaurant.getOpeningTimeDescription();
+            String openingTimes = restaurant.getOpeningTimeDescriptionForToday();
             String openingTimesExpanded = restaurant.getOpeningTimeDescriptionFull();
             String url = restaurant.getUrl();
             getView().setRestaurantData(this, shortDescription, longDescription, location, openingTimes, openingTimesExpanded, url);

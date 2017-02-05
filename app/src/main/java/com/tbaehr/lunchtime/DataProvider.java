@@ -1001,14 +1001,14 @@ public class DataProvider {
         JSONArray fridayArray = openingTimesObject.getJSONArray("friday");
         JSONArray saturdayArray = openingTimesObject.getJSONArray("saturday");
         JSONArray sundayArray = openingTimesObject.getJSONArray("sunday");
-        Map<Integer, String[]> openingTimes = new HashMap<>();
-        openingTimes.put(Calendar.MONDAY, convertToArray(mondayArray));
-        openingTimes.put(Calendar.TUESDAY, convertToArray(tuesdayArray));
-        openingTimes.put(Calendar.WEDNESDAY, convertToArray(wednesdayArray));
-        openingTimes.put(Calendar.THURSDAY, convertToArray(thursdayArray));
-        openingTimes.put(Calendar.FRIDAY, convertToArray(fridayArray));
-        openingTimes.put(Calendar.SATURDAY, convertToArray(saturdayArray));
-        openingTimes.put(Calendar.SUNDAY, convertToArray(sundayArray));
+        Map<Integer, DateTime[]> openingTimes = new HashMap<>();
+        openingTimes.put(Calendar.MONDAY, convertToDateTimeArray(Calendar.MONDAY, mondayArray));
+        openingTimes.put(Calendar.TUESDAY, convertToDateTimeArray(Calendar.TUESDAY, tuesdayArray));
+        openingTimes.put(Calendar.WEDNESDAY, convertToDateTimeArray(Calendar.WEDNESDAY, wednesdayArray));
+        openingTimes.put(Calendar.THURSDAY, convertToDateTimeArray(Calendar.THURSDAY, thursdayArray));
+        openingTimes.put(Calendar.FRIDAY, convertToDateTimeArray(Calendar.FRIDAY, fridayArray));
+        openingTimes.put(Calendar.SATURDAY, convertToDateTimeArray(Calendar.SATURDAY, saturdayArray));
+        openingTimes.put(Calendar.SUNDAY, convertToDateTimeArray(Calendar.SUNDAY, sundayArray));
 
         String phoneNumber = restaurant.getString("phoneNumber");
         String email = restaurant.getString("email");
@@ -1070,6 +1070,22 @@ public class DataProvider {
         } catch (IOException e) {
         }
         return null;
+    }
+
+    private DateTime[] convertToDateTimeArray(int weekDay, JSONArray array) throws JSONException {
+        if (array.length() == 0) {
+            return null;
+        }
+
+        DateTime[] listOfStrings = new DateTime[array.length()];
+        String[] openingValues;
+        for (int i = 0; i < listOfStrings.length; i++) {
+            openingValues = array.getString(i).split(":");
+            int hours = Integer.valueOf(openingValues[0]);
+            int minutes = Integer.valueOf(openingValues[1]);
+            listOfStrings[i] = DateUtils.getDate(hours, minutes).updateWeekDay(weekDay);
+        }
+        return listOfStrings;
     }
 
     private String[] convertToArray(JSONArray array) throws JSONException {

@@ -801,14 +801,13 @@ public class Restaurant {
         sb1.append("<b>"); sb2.append("<b>");
         sb1.append(DateTime.asWeekDay(weekDayNow)).append(LINE_BREAK);
         sb2.append(getOpeningTimeDescription(weekDayNow, TimeFormat.FORMAT_HH_MM)).append(LINE_BREAK);
-        sb1.append("</b><small>"); sb2.append("</b><small>");
+        sb1.append("</b>"); sb2.append("</b>");
         for (int weekDay : nextWeekDays) {
             sb1.append(DateTime.asWeekDay(weekDay)).append(LINE_BREAK);
             sb2.append(getOpeningTimeDescription(weekDay, TimeFormat.FORMAT_HH_MM)).append(LINE_BREAK);
         }
         sb1.delete(sb1.length() - LINE_BREAK.length(), sb1.length());
         sb2.delete(sb2.length() - LINE_BREAK.length(), sb2.length());
-        sb1.append("</small>"); sb2.append("</small>");
         return new String[] { sb1.toString(), sb2.toString() };
     }
 

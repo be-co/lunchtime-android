@@ -781,4 +781,8 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
     private String getString(@StringRes int resId) {
         return activity.getApplicationContext().getString(resId);
     }
+
+    public void onPostCreate(@Nullable Bundle savedInstanceState) {
+        getView().syncDrawerToggleButton();
+    }
 }

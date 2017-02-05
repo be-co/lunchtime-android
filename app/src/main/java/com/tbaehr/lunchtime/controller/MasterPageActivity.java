@@ -677,6 +677,7 @@
 package com.tbaehr.lunchtime.controller;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 
 import com.tbaehr.lunchtime.presenter.MasterPagePresenter;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
@@ -690,6 +691,12 @@ public class MasterPageActivity extends BaseActivity<IMasterPageViewContainer, M
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         view = new MasterPageViewContainer(this, getSupportFragmentManager());
+    }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        getPresenter().onPostCreate(savedInstanceState);
     }
 
     @Override

@@ -713,6 +713,8 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     @BindView(R.id.drawer_layout)
     DrawerLayout drawer;
 
+    ActionBarDrawerToggle drawerToggleButton;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
@@ -741,16 +743,20 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     @Override
     public void showToolbar(AppCompatActivity activity, NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener) {
         activity.setSupportActionBar(toolbar);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        setupDrawerToggle(activity);
+        navigationView.setNavigationItemSelectedListener(navigationItemSelectedListener);
+    }
+
+    private void setupDrawerToggle(AppCompatActivity activity) {
+        drawerToggleButton = new ActionBarDrawerToggle(
                 activity,
                 drawer,
                 toolbar,
                 R.string.nav_content_desc_drawer_open,
                 R.string.nav_content_desc_drawer_close
         );
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-        navigationView.setNavigationItemSelectedListener(navigationItemSelectedListener);
+        drawer.addDrawerListener(drawerToggleButton);
+        drawerToggleButton.syncState();
     }
 
     @Override
@@ -781,6 +787,11 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public void syncDrawerToggleButton() {
+        drawerToggleButton.syncState();
     }
 }
 

@@ -676,12 +676,16 @@
  */
 package com.tbaehr.lunchtime.model;
 
+import android.content.Context;
+
 import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
+import com.tbaehr.lunchtime.utils.DateTime;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Map;
+
+import static com.tbaehr.lunchtime.utils.DateUtils.getDate;
 
 /**
  * Created by timo.baehr@gmail.com on 27.12.16.
@@ -737,11 +741,15 @@ public class Restaurant {
         return locationDescription;
     }
 
+    private String[] getOpeningTimes(int dayOfWeek) {
+        return openingTimes.get(dayOfWeek);
+    }
+
     private String[] getOpeningTimesForToday() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-        return openingTimes.get(dayOfWeek);
+        return getOpeningTimes(dayOfWeek);
     }
 
     public String getOpeningTimeDescription() {
@@ -750,9 +758,7 @@ public class Restaurant {
             return LunchtimeApplication.getContext().getString(R.string.closed);
         }
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        Date now = calendar.getTime();
+        DateTime now = new DateTime();
 
         String openingTime = dayOpeningTimes[0];
         String[] openingValues = openingTime.split(":");
@@ -775,7 +781,13 @@ public class Restaurant {
         }
     }
 
-    public Date getOpeningDate() {
+    public String getOpeningTimeDescriptionFull() {
+        Context context = LunchtimeApplication.getContext();
+        // TODO: Impl.
+        return "";
+    }
+
+    public DateTime getOpeningDate() {
         String[] dayOpeningTimes = getOpeningTimesForToday();
         if (dayOpeningTimes == null || dayOpeningTimes.length == 0) {
             return null;
@@ -788,7 +800,7 @@ public class Restaurant {
         return getDate(hours, minutes);
     }
 
-    public Date getClosingDate() {
+    public DateTime getClosingDate() {
         String[] dayClosingTimes = getOpeningTimesForToday();
         if (dayClosingTimes == null || dayClosingTimes.length == 0) {
             return null;
@@ -807,20 +819,6 @@ public class Restaurant {
         return hours + ":" + sMinutes;
     }
 
-    /**
-     * Getting a time and returning a Date.
-     *
-     * @param hours
-     * @param minutes
-     * @return Date today with the given time
-     */
-    private Date getDate(int hours, int minutes) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), hours, minutes, 0);
-        return calendar.getTime();
-    }
-
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -836,4 +834,5 @@ public class Restaurant {
     public String[] getPhotoUrls() {
         return photoUrls;
     }
+
 }

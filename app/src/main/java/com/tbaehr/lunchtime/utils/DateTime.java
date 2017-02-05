@@ -690,7 +690,9 @@ import java.util.GregorianCalendar;
  */
 public class DateTime implements Comparable<DateTime> {
 
-    private final long timeInMillis;
+    private static final long DAY_IN_MILLIS = 24 * 60 * 60 * 1000;
+
+    private long timeInMillis;
 
     /**
      * Create a date with the current time.
@@ -840,4 +842,13 @@ public class DateTime implements Comparable<DateTime> {
         return new Date(getMillis());
     }
 
+    public DateTime updateWeekDay(int weekDay) {
+        int currentDayOfWeek = get(Calendar.DAY_OF_WEEK);
+        int diff = weekDay - currentDayOfWeek;
+        if (diff < 0) {
+            diff = 7 + diff;
+        }
+        timeInMillis = timeInMillis + diff * DAY_IN_MILLIS;
+        return this;
+    }
 }

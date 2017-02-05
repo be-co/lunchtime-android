@@ -749,8 +749,8 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
             startTimer();
         }
         restaurant = getRestaurant();
-        Date openingDate = restaurant.getOpeningDate();
-        Date closingDate = restaurant.getClosingDate();
+        DateTime openingDate = restaurant.getOpeningDate();
+        DateTime closingDate = restaurant.getClosingDate();
         if (openingDate != null && closingDate != null) {
             startTimeBasedRefresh(openingDate, closingDate);
         }
@@ -773,17 +773,17 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         };
     }
 
-    private void startTimeBasedRefresh(Date... date) {
+    private void startTimeBasedRefresh(DateTime... date) {
         if (timer == null) {
             timer = new Timer();
         }
-        for (Date d : date) {
+        for (DateTime d : date) {
             timer.schedule(createTimerTask(new Runnable() {
                 @Override
                 public void run() {
                     updateRestaurantData();
                 }
-            }), d);
+            }), d.toDate());
         }
     }
 
@@ -845,10 +845,12 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         restaurant = getRestaurant();
         if (restaurant != null) {
             String shortDescription = restaurant.getShortDescription();
+            String longDescription = restaurant.getLongDescription();
             String location = restaurant.getLocationDescription();
             String openingTimes = restaurant.getOpeningTimeDescription();
+            String openingTimesExpanded = restaurant.getOpeningTimeDescriptionFull();
             String url = restaurant.getUrl();
-            getView().setRestaurantData(this, shortDescription, location, openingTimes, url);
+            getView().setRestaurantData(this, shortDescription, longDescription, location, openingTimes, openingTimesExpanded, url);
         }
     }
 

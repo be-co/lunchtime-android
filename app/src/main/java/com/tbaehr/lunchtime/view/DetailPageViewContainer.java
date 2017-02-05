@@ -738,10 +738,16 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
     TextView restaurantLocation;
 
     @BindView(R.id.restaurant_opening_times)
-    TextView restaurantOpeningTimes;
+    LinearLayout restaurantOpeningTimes;
 
-    @BindView(R.id.restaurant_opening_times_expanded)
-    TextView restaurantOpeningTimesExpanded;
+    @BindView(R.id.restaurant_opening_times_head)
+    TextView restaurantOpeningTimesHead;
+
+    @BindView(R.id.restaurant_opening_times_expanded1)
+    TextView restaurantOpeningTimesExpanded1;
+
+    @BindView(R.id.restaurant_opening_times_expanded2)
+    TextView restaurantOpeningTimesExpanded2;
 
     @BindView(R.id.restaurant_url)
     TextView restaurantUrl;
@@ -803,18 +809,18 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
 
     @Override
     public void expandCollapseOpeningTimes() {
-        boolean expanded = restaurantOpeningTimesExpanded.getVisibility() == View.VISIBLE;
+        boolean expanded = restaurantOpeningTimesExpanded1.getVisibility() == View.VISIBLE;
 
-        Drawable[] drawables = restaurantOpeningTimes.getCompoundDrawables();
-        Drawable left = drawables[0];
         Drawable right;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             right = activity.getDrawable(expanded ? R.drawable.arrow_down : R.drawable.arrow_up);
         } else {
             right = activity.getResources().getDrawable(expanded ? R.drawable.arrow_down : R.drawable.arrow_up);
         }
-        restaurantOpeningTimes.setCompoundDrawablesWithIntrinsicBounds(left, null, right, null);
-        restaurantOpeningTimesExpanded.setVisibility(expanded ? View.GONE : View.VISIBLE);
+        restaurantOpeningTimesHead.setCompoundDrawablesWithIntrinsicBounds(null, null, right, null);
+        restaurantOpeningTimesHead.setVisibility(expanded ? View.VISIBLE : View.GONE);
+        restaurantOpeningTimesExpanded1.setVisibility(expanded ? View.GONE : View.VISIBLE);
+        restaurantOpeningTimesExpanded2.setVisibility(expanded ? View.GONE : View.VISIBLE);
     }
 
     @Override
@@ -891,7 +897,7 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
     }
 
     @Override
-    public void setRestaurantData(ClickListener listener, String shortDescription, String longDescription, String location, String openingTimes, String openingTimesExpanded, String url) {
+    public void setRestaurantData(ClickListener listener, String shortDescription, String longDescription, String location, String openingTimes, String[] openingTimesExpanded, String url) {
         this.clickListener = listener;
         restaurantDescription.setText(shortDescription);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -900,12 +906,14 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
             restaurantDescriptionExpanded.setText(Html.fromHtml(longDescription));
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            restaurantOpeningTimesExpanded.setText(Html.fromHtml(openingTimesExpanded, Html.FROM_HTML_MODE_COMPACT));
+            restaurantOpeningTimesExpanded1.setText(Html.fromHtml(openingTimesExpanded[0], Html.FROM_HTML_MODE_COMPACT));
+            restaurantOpeningTimesExpanded2.setText(Html.fromHtml(openingTimesExpanded[1], Html.FROM_HTML_MODE_COMPACT));
         } else {
-            restaurantOpeningTimesExpanded.setText(Html.fromHtml(openingTimesExpanded));
+            restaurantOpeningTimesExpanded1.setText(Html.fromHtml(openingTimesExpanded[0]));
+            restaurantOpeningTimesExpanded2.setText(Html.fromHtml(openingTimesExpanded[1]));
         }
         restaurantLocation.setText(location);
-        restaurantOpeningTimes.setText(openingTimes);
+        restaurantOpeningTimesHead.setText(openingTimes);
         restaurantUrl.setText(url);
     }
 }

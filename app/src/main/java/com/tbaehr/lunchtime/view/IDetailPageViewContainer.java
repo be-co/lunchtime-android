@@ -709,5 +709,5 @@ public interface IDetailPageViewContainer {
 
     void setSelectedOffer(String title, String prize, String availability, Set<Offer.Ingredient> ingredients);
 
-    void setRestaurantData(ClickListener clickListener, String shortDescription, String longDescription, String location, String openingTimes, String openingTimesExpanded, String url);
+    void setRestaurantData(ClickListener clickListener, String shortDescription, String longDescription, String location, String openingTimes, String[] openingTimesExpanded, String url);
 }

@@ -849,7 +849,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
             String longDescription = restaurant.getLongDescription();
             String location = restaurant.getLocationDescription();
             String openingTimes = restaurant.getOpeningTimeDescriptionForToday();
-            String openingTimesExpanded = restaurant.getOpeningTimeDescriptionFull();
+            String[] openingTimesExpanded = restaurant.getOpeningTimeDescriptionFull();
             String url = restaurant.getUrl();
             getView().setRestaurantData(this, shortDescription, longDescription, location, openingTimes, openingTimesExpanded, url);
         }

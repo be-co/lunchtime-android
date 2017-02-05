@@ -149,21 +149,53 @@
                 android:drawableLeft="@drawable/ic_location"
                 android:text="@string/lunch_time" />
 
-            <TextView
-                style="@style/DetailPageItem"
+            <LinearLayout
                 android:id="@+id/restaurant_opening_times"
-                android:drawableStart="@drawable/ic_time"
-                android:drawableLeft="@drawable/ic_time"
-                android:drawableRight="@drawable/arrow_down"
-                android:drawableEnd="@drawable/arrow_down"
-                android:drawablePadding="@dimen/activity_vertical_margin"
-                android:text="@string/starts" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-            <TextView
-                style="@style/DetailPageItem.Expanded"
-                android:id="@+id/restaurant_opening_times_expanded"
-                android:visibility="gone"
-                android:text="@string/about_lunchtime" />
+                <ImageView
+                    style="@style/DetailPageItem"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_time" />
+
+                <TextView
+                    style="@style/DetailPageItem"
+                    android:id="@+id/restaurant_opening_times_head"
+                    android:paddingStart="0dp"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="@dimen/activity_vertical_margin"
+                    android:paddingEnd="@dimen/card_margin"
+                    android:drawableRight="@drawable/arrow_down"
+                    android:drawableEnd="@drawable/arrow_down"
+                    android:drawablePadding="@dimen/activity_vertical_margin"
+                    android:text="@string/starts" />
+
+                <TextView
+                    style="@style/DetailPageItem"
+                    android:id="@+id/restaurant_opening_times_expanded1"
+                    android:paddingTop="@dimen/activity_horizontal_margin"
+                    android:paddingStart="0dp"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="@dimen/activity_vertical_margin"
+                    android:paddingEnd="@dimen/card_margin"
+                    android:visibility="gone"
+                    android:text="@string/about_lunchtime" />
+
+                <TextView
+                    style="@style/DetailPageItem"
+                    android:id="@+id/restaurant_opening_times_expanded2"
+                    android:paddingTop="@dimen/activity_horizontal_margin"
+                    android:paddingStart="@dimen/activity_vertical_margin"
+                    android:paddingLeft="@dimen/activity_vertical_margin"
+                    android:paddingRight="@dimen/card_margin"
+                    android:paddingEnd="@dimen/card_margin"
+                    android:visibility="gone"
+                    android:text="geschlossen\n\n8:00 - 21:00\n\n8:00 - 21:00\n\n8:00 - 21:00\n\n8:00 - 21:00\n\n8:00 - 21:00" />
+
+            </LinearLayout>
 
             <TextView
                 style="@style/DetailPageItem"

@@ -681,7 +681,6 @@ import android.content.Context;
 import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.utils.DateTime;
-import com.tbaehr.lunchtime.utils.DateUtils;
 
 import java.util.Calendar;
 import java.util.Map;
@@ -751,27 +750,29 @@ public class Restaurant {
 
     public String getOpeningTimeDescriptionForToday() {
         DateTime now = new DateTime();
-        return getOpeningTimeDescription(now.get(Calendar.DAY_OF_WEEK));
+        int weekDay = now.get(Calendar.DAY_OF_WEEK);
+        return getOpeningTimeDescription(weekDay, TimeFormat.FORMAT_OPENS_CLOSES_HH_MM);
     }
 
-    private String getOpeningTimeDescription(int weekDay) {
-        // TODO: Make this more beautiful
-        DateTime[] dayOpeningTimes = getOpeningTimes(weekDay);
-        DateTime openingTime = null;
-        DateTime closingTime = null;
-        if (dayOpeningTimes != null && dayOpeningTimes.length > 0) {
-            // TODO: Handle more than one opening/closing time
-            openingTime = dayOpeningTimes[0];
-            closingTime = dayOpeningTimes[1];
-        }
+    private enum TimeFormat {
+        FORMAT_HH_MM,
+        FORMAT_OPENS_CLOSES_HH_MM;
+    }
 
-        DateTime now = new DateTime();
-        DateTime weekDayTemp = DateUtils.getDate(weekDay, 0, 0);
+    private String getOpeningTimeDescription(int weekDay, TimeFormat timeFormat) {
         Context context = LunchtimeApplication.getContext();
-        if (now.differenceInDays(weekDayTemp) == 0) {
-            if (openingTime == null) {
-                return context.getString(R.string.closed);
-            }
+
+        DateTime[] dayOpeningTimes = getOpeningTimes(weekDay);
+
+        if (dayOpeningTimes == null || dayOpeningTimes.length == 0) {
+            return context.getString(R.string.closed);
+        }
+        // TODO: Handle more than one opening/closing time
+        DateTime openingTime = dayOpeningTimes[0];
+        DateTime closingTime = dayOpeningTimes[1];
+
+        if (timeFormat.equals(TimeFormat.FORMAT_OPENS_CLOSES_HH_MM)) {
+            DateTime now = new DateTime();
             if (now.before(openingTime)) {
                 String sOpens = openingTime.asHourMinute();
                 return context.getString(R.string.opens_at, sOpens);
@@ -781,27 +782,34 @@ public class Restaurant {
             } else {
                 return context.getString(R.string.closed);
             }
-        } else {
-            if (openingTime == null) {
-                return DateTime.asWeekDay(weekDay) + " " + context.getString(R.string.closed);
-            }
-            String sOpens = openingTime.asHourMinute();
-            String sCloses = closingTime.asHourMinute();
-            return DateTime.asWeekDay(weekDay) + " " + sOpens + " - " + sCloses;
         }
+
+        String sOpens = openingTime.asHourMinute();
+        String sCloses = closingTime.asHourMinute();
+        return sOpens + " - " + sCloses;
     }
 
-    public String getOpeningTimeDescriptionFull() {
+    public String[] getOpeningTimeDescriptionFull() {
         final String LINE_BREAK = "<br/><br/>";
         DateTime now = new DateTime();
         int[] nextWeekDays = now.nextWeekDays();
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb1 = new StringBuilder();
+        StringBuilder sb2 = new StringBuilder();
+
+        int weekDayNow = now.get(Calendar.DAY_OF_WEEK);
+        sb1.append("<b>"); sb2.append("<b>");
+        sb1.append(DateTime.asWeekDay(weekDayNow)).append(LINE_BREAK);
+        sb2.append(getOpeningTimeDescription(weekDayNow, TimeFormat.FORMAT_HH_MM)).append(LINE_BREAK);
+        sb1.append("</b><small>"); sb2.append("</b><small>");
         for (int weekDay : nextWeekDays) {
-            sb.append(getOpeningTimeDescription(weekDay)).append(LINE_BREAK);
+            sb1.append(DateTime.asWeekDay(weekDay)).append(LINE_BREAK);
+            sb2.append(getOpeningTimeDescription(weekDay, TimeFormat.FORMAT_HH_MM)).append(LINE_BREAK);
         }
-        sb.delete(sb.length() - LINE_BREAK.length(), sb.length());
-        return sb.toString();
+        sb1.delete(sb1.length() - LINE_BREAK.length(), sb1.length());
+        sb2.delete(sb2.length() - LINE_BREAK.length(), sb2.length());
+        sb1.append("</small>"); sb2.append("</small>");
+        return new String[] { sb1.toString(), sb2.toString() };
     }
 
     public DateTime getOpeningDate() {

@@ -677,7 +677,9 @@
 package com.tbaehr.lunchtime.presenter;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.MenuItem;
@@ -690,6 +692,7 @@ import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -763,6 +766,29 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     public void unbindView() {
         stopTimer();
         super.unbindView();
+    }
+
+    private void downloadImages() {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String[] photoUrls = restaurant.getPhotoUrls();
+                    if (photoUrls != null && photoUrls.length > 0) {
+                        final Drawable drawable = DataProvider.downloadDrawable(photoUrls[0], restaurantId);
+                        System.out.println("Download worked.");
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                getView().setBackgroundDrawable(drawable);
+                            }
+                        });
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private TimerTask createTimerTask(final Runnable runnable) {

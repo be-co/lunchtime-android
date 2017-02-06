@@ -682,7 +682,9 @@ import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.utils.DateTime;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -711,7 +713,7 @@ public class Restaurant {
                       String longDescription,
                       String locationDescription,
                       Map<Integer, DateTime[]> openingTimes,
-                      String phoneNumber, String email, String url, String[] photoUrls) {
+                      String phoneNumber, String email, String url, final String[] photoUrls) {
         this.name = name;
         this.shortDescription = shortDescription;
         this.longDescription = longDescription;
@@ -767,26 +769,54 @@ public class Restaurant {
         if (dayOpeningTimes == null || dayOpeningTimes.length == 0) {
             return context.getString(R.string.closed);
         }
-        // TODO: Handle more than one opening/closing time
-        DateTime openingTime = dayOpeningTimes[0];
-        DateTime closingTime = dayOpeningTimes[1];
+
+        List<DateTime> openingTimes = new ArrayList<>();
+        List<DateTime> closingTimes = new ArrayList<>();
+        for (int i = 0; i < dayOpeningTimes.length; i++) {
+            if (i % 2 == 0) {
+                DateTime openingTime = dayOpeningTimes[i];
+                openingTimes.add(openingTime);
+            } else {
+                DateTime closingTime = dayOpeningTimes[i];
+                closingTimes.add(closingTime);
+            }
+        }
 
         if (timeFormat.equals(TimeFormat.FORMAT_OPENS_CLOSES_HH_MM)) {
             DateTime now = new DateTime();
-            if (now.before(openingTime)) {
-                String sOpens = openingTime.asHourMinute();
+            DateTime opens1 = openingTimes.get(0);
+            DateTime opens2 = openingTimes.size() > 1 ? openingTimes.get(1) : null;
+            DateTime closes1 = closingTimes.get(0);
+            DateTime closes2 = closingTimes.size() > 1 ? closingTimes.get(1) : null;
+            if (opens1 != null && now.before(opens1)) {
+                String sOpens = opens1.asHourMinute();
                 return context.getString(R.string.opens_at, sOpens);
-            } else if (now.before(closingTime)) {
-                String sCloses = closingTime.asHourMinute();
+            } else if (closes1 != null && now.before(closes1)) {
+                String sCloses = closes1.asHourMinute();
+                return context.getString(R.string.closes_at, sCloses);
+            } else if (opens2 != null && now.before(opens2)) {
+                String sOpens = opens2.asHourMinute();
+                return context.getString(R.string.opens_at, sOpens);
+            } else if (closes2 != null && now.before(closes2)) {
+                String sCloses = closes2.asHourMinute();
                 return context.getString(R.string.closes_at, sCloses);
             } else {
                 return context.getString(R.string.closed);
             }
         }
 
-        String sOpens = openingTime.asHourMinute();
-        String sCloses = closingTime.asHourMinute();
-        return sOpens + " - " + sCloses;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < openingTimes.size(); i++) {
+            DateTime openingTime = openingTimes.get(i);
+            DateTime closingTime = closingTimes.get(i);
+            String sOpens = openingTime.asHourMinute();
+            String sCloses = closingTime.asHourMinute();
+            if (sb.length() > 0) {
+                sb.append(context.getString(R.string.and)).append(" ");
+            }
+            sb.append(sOpens).append("-").append(sCloses);
+        }
+        return sb.toString();
     }
 
     public String[] getOpeningTimeDescriptionFull() {

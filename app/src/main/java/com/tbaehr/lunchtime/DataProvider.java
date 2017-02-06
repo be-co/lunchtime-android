@@ -699,12 +699,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -1040,16 +1042,21 @@ public class DataProvider {
     }
 
     // TODO: Use download method
-    private Drawable downloadDrawable(String url) throws IOException {
-        Bitmap x;
+    public static Drawable downloadDrawable(String url, String restaurantName) throws IOException {
+        File imageDirectory = new File("/sdcard/lunchtime/"+restaurantName+"/");
+        imageDirectory.mkdirs();
 
-        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        URLConnection connection = new URL(url).openConnection();
         connection.setRequestProperty("connection", "close");
         connection.connect();
         InputStream input = connection.getInputStream();
-
-        x = BitmapFactory.decodeStream(input);
-        return new BitmapDrawable(LunchtimeApplication.getContext().getResources(), x);
+        Bitmap bitmap = BitmapFactory.decodeStream(input);
+        String[] parts = url.split("/");
+        String imageName = parts[parts.length-1];
+        imageName = imageName.replace(".gif", "");
+        File file = new File("/sdcard/lunchtime/"+restaurantName+"/"+imageName+".jpg");
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(file));
+        return new BitmapDrawable(LunchtimeApplication.getContext().getResources(), bitmap);
     }
 
     private String downloadTextFromServer(String path) {

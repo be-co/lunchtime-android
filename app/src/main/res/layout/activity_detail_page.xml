@@ -136,11 +136,23 @@
                 android:drawableEnd="@drawable/arrow_down"
                 android:text="@string/lunch_time" />
 
-            <TextView
-                style="@style/DetailPageItem.Expanded"
+            <com.bluejamesbond.text.DocumentView
+                xmlns:ext="http://schemas.android.com/apk/res-auto"
+                style="@style/DetailPageItem"
                 android:id="@+id/restaurant_long_description"
                 android:visibility="gone"
-                android:text="@string/about_lunchtime" />
+                ext:documentView_insetPaddingLeft="56dp"
+                ext:documentView_insetPaddingRight="@dimen/activity_horizontal_margin"
+                ext:documentView_insetPaddingTop="@dimen/card_margin"
+                ext:documentView_antialias="true"
+                ext:documentView_cacheConfig="auto_quality"
+                ext:documentView_hyphen="-"
+                ext:documentView_textFormat="formatted"
+                ext:documentView_textSize="12sp"
+                ext:documentView_textColor="@color/grey_text"
+                ext:documentView_textSubPixel="true"
+                ext:documentView_textAlignment="justified"
+                ext:documentView_text="@string/about_lunchtime" />
 
             <TextView
                 style="@style/DetailPageItem"

@@ -26,13 +26,6 @@
         <item name="android:gravity">center_vertical</item>
     </style>
 
-    <style name="DetailPageItem.Expanded">
-        <item name="android:paddingLeft">55dp</item>
-        <item name="android:paddingTop">@dimen/card_margin</item>
-        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Caption</item>
-        <!--<item name="android:paddingRight">@dimen/activity_horizontal_margin</item>-->
-    </style>
-
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

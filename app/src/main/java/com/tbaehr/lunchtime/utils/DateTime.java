@@ -677,6 +677,7 @@
 package com.tbaehr.lunchtime.utils;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
@@ -732,7 +733,7 @@ public class DateTime implements Comparable<DateTime> {
      * the time represented by the argument <code>anotherDate</code>, otherwise
      * value <code>false</code>.
      */
-    public boolean before(DateTime anotherDate) {
+    public boolean before(@NonNull DateTime anotherDate) {
         int comp = compareTo(anotherDate);
         return comp == -1;
     }
@@ -743,7 +744,7 @@ public class DateTime implements Comparable<DateTime> {
      * the time represented by the argument <code>anotherDate</code>, otherwise
      * value <code>false</code>.
      */
-    public boolean after(DateTime anotherDate) {
+    public boolean after(@NonNull DateTime anotherDate) {
         int comp = compareTo(anotherDate);
         return comp == 1;
     }
@@ -758,7 +759,7 @@ public class DateTime implements Comparable<DateTime> {
      * time represented by the argument.
      */
     @Override
-    public int compareTo(DateTime anotherDate) {
+    public int compareTo(@NonNull DateTime anotherDate) {
         long otherDateMillis = anotherDate.getMillis();
         return (timeInMillis > otherDateMillis) ? 1 : (timeInMillis == otherDateMillis) ? 0 : -1;
     }

@@ -10,6 +10,7 @@
 
     <color name="blue">#2196f3</color>
 
+    <color name="grey_text">#737373</color>
     <color name="grey_3">#333333</color>
     <color name="grey_14">#eeeeee</color>
     <color name="grey_14_transparent">#ddeeeeee</color>

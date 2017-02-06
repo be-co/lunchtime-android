@@ -689,6 +689,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bluejamesbond.text.DocumentView;
 import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
@@ -732,7 +733,7 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
     TextView restaurantDescription;
 
     @BindView(R.id.restaurant_long_description)
-    TextView restaurantDescriptionExpanded;
+    DocumentView restaurantDescriptionExpanded;
 
     @BindView(R.id.restaurant_location)
     TextView restaurantLocation;
@@ -900,6 +901,10 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
     public void setRestaurantData(ClickListener listener, String shortDescription, String longDescription, String location, String openingTimes, String[] openingTimesExpanded, String url) {
         this.clickListener = listener;
         restaurantDescription.setText(shortDescription);
+        longDescription = longDescription.replace("<h1>", "<h4>");
+        longDescription = longDescription.replace("<h2>", "<h4>");
+        longDescription = longDescription.replace("</h1>", "</h4>");
+        longDescription = longDescription.replace("</h2>", "</h4>");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             restaurantDescriptionExpanded.setText(Html.fromHtml(longDescription, Html.FROM_HTML_MODE_COMPACT));
         } else {

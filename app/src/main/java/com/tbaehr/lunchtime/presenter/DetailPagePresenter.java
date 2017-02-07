@@ -760,6 +760,8 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         }
 
         updateRestaurantData();
+        // TODO: Wrong place to call the method!
+        downloadImages();
     }
 
     @Override
@@ -773,14 +775,15 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
             @Override
             public void run() {
                 try {
-                    String[] photoUrls = restaurant.getPhotoUrls();
-                    if (photoUrls != null && photoUrls.length > 0) {
-                        final Drawable drawable = DataProvider.downloadDrawable(photoUrls[0], restaurantId);
-                        System.out.println("Download worked.");
+                    final List<Drawable> drawables = DataProvider.downloadDrawables(restaurant);
+                    if (drawables.size() > 0) {
                         activity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                getView().setBackgroundDrawable(drawable);
+                                IDetailPageViewContainer view = getView();
+                                if (view != null) {
+                                    view.setBackgroundDrawable(drawables.get(0));
+                                }
                             }
                         });
                     }

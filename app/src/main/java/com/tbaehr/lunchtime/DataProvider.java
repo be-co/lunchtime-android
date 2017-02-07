@@ -854,7 +854,7 @@ public class DataProvider {
         try {
             String json = loadFromCache(String.format(KEY_RESTAURANT, keyRestaurant));
             if (json != null) {
-                return parseRestaurantFromJson(json);
+                return parseRestaurantFromJson(json, keyRestaurant);
             }
         } catch (JSONException jsonException) {
             Log.e(this.getClass().getCanonicalName(), jsonException.getMessage());
@@ -876,7 +876,7 @@ public class DataProvider {
             jsonRestaurant = downloadTextFromServer(uriRestaurant);
             if (jsonRestaurant != null) {
                 try {
-                    Restaurant restaurant = parseRestaurantFromJson(jsonRestaurant);
+                    Restaurant restaurant = parseRestaurantFromJson(jsonRestaurant, restaurantKey);
                     if (restaurant != null) {
                         storeToCache(String.format(KEY_RESTAURANT, restaurantKey), jsonRestaurant);
                         storeToCache(keyRestaurantUpdated, dateUpdated);
@@ -988,7 +988,7 @@ public class DataProvider {
         return new Offers(restaurantId, restaurantTitle, restaurantDescription, offers);
     }
 
-    private Restaurant parseRestaurantFromJson(@NonNull String json) throws JSONException {
+    private Restaurant parseRestaurantFromJson(@NonNull String json, @NonNull String restaurantId) throws JSONException {
         JSONObject restaurant = new JSONObject(json);
         String name = restaurant.getString("title");
         String shortDescription = restaurant.getString("shortDescription");
@@ -1018,7 +1018,7 @@ public class DataProvider {
         JSONArray photoUrlsObjects = restaurant.getJSONArray("photoUrls");
         String[] photoUrls = convertToArray(photoUrlsObjects);
 
-        Restaurant gehe = new Restaurant(name, shortDescription, longDescription, address,
+        Restaurant gehe = new Restaurant(restaurantId, name, shortDescription, longDescription, address,
                 openingTimes, phoneNumber, email, website, photoUrls);
 
         return gehe;
@@ -1041,22 +1041,50 @@ public class DataProvider {
         editor.putString(key, value).apply();
     }
 
-    // TODO: Use download method
-    public static Drawable downloadDrawable(String url, String restaurantName) throws IOException {
-        File imageDirectory = new File("/sdcard/lunchtime/"+restaurantName+"/");
+    public static List<Drawable> downloadDrawables(Restaurant restaurant) throws IOException {
+        String restaurantId = restaurant.getId();
+        String[] photoUrls = restaurant.getPhotoUrls();
+
+        // path to folder for selected restaurant
+        String imageFolderPath = "/sdcard/lunchtime/"+restaurantId+"/";
+        File imageDirectory = new File(imageFolderPath);
         imageDirectory.mkdirs();
 
-        URLConnection connection = new URL(url).openConnection();
-        connection.setRequestProperty("connection", "close");
-        connection.connect();
-        InputStream input = connection.getInputStream();
-        Bitmap bitmap = BitmapFactory.decodeStream(input);
+        // result list
+        List<Drawable> drawables = new ArrayList<>();
+
+        // try to load images from cache, otherwise download
+        if (photoUrls != null) {
+            for (String url : photoUrls) {
+                String imagePath = imageFolderPath + stripFileName(url);
+                File image = new File(imagePath);
+                Bitmap bitmap;
+                if (!image.exists()) {
+                    URLConnection connection = new URL(url).openConnection();
+                    connection.setRequestProperty("connection", "close");
+                    connection.connect();
+                    InputStream input = connection.getInputStream();
+                    bitmap = BitmapFactory.decodeStream(input);
+                    File file = new File(stripFileName(url));
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(file));
+                } else {
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                    bitmap = BitmapFactory.decodeFile(imagePath, options);
+                }
+                drawables.add(new BitmapDrawable(LunchtimeApplication.getContext().getResources(), bitmap));
+            }
+        }
+
+        return drawables;
+    }
+
+    private static String stripFileName(@NonNull String url) {
         String[] parts = url.split("/");
         String imageName = parts[parts.length-1];
         imageName = imageName.replace(".gif", "");
-        File file = new File("/sdcard/lunchtime/"+restaurantName+"/"+imageName+".jpg");
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(file));
-        return new BitmapDrawable(LunchtimeApplication.getContext().getResources(), bitmap);
+        imageName += ".jpg";
+        return imageName;
     }
 
     private String downloadTextFromServer(String path) {

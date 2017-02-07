@@ -741,10 +741,12 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         for (Offers offers : offersListTemp) {
             offersCountTemp += offers.getOffers().size();
         }
-        offersList = offersListTemp;
-        for (Offers offers : offersList) {
-            offersCount += offers.getOffers().size();
+        if (offersList != null) {
+            for (Offers offers : offersList) {
+                offersCount += offers.getOffers().size();
+            }
         }
+        offersList = offersListTemp;
 
         startTimeBasedRefresh(offersList);
 

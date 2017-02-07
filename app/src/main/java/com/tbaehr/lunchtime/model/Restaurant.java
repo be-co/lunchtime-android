@@ -692,6 +692,8 @@ import java.util.Map;
  */
 public class Restaurant {
 
+    private String id;
+
     private String name;
 
     private String shortDescription, longDescription;
@@ -708,12 +710,15 @@ public class Restaurant {
 
     private String[] photoUrls;
 
-    public Restaurant(String name,
-                      String shortDescription,
-                      String longDescription,
-                      String locationDescription,
-                      Map<Integer, DateTime[]> openingTimes,
-                      String phoneNumber, String email, String url, final String[] photoUrls) {
+    public Restaurant(
+            String id,
+            String name,
+            String shortDescription,
+            String longDescription,
+            String locationDescription,
+            Map<Integer, DateTime[]> openingTimes,
+            String phoneNumber, String email, String url, final String[] photoUrls) {
+        this.id = id;
         this.name = name;
         this.shortDescription = shortDescription;
         this.longDescription = longDescription;
@@ -723,6 +728,10 @@ public class Restaurant {
         this.email = email;
         this.url = url;
         this.photoUrls = photoUrls;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getName() {

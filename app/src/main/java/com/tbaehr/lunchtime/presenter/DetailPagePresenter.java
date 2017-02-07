@@ -749,19 +749,20 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         super.bindView(view);
         getView().setTitle(getRestaurantName());
         updateSelectedOffer();
+        updateRestaurantData();
         if (index != -1) {
             startTimer();
         }
-        restaurant = getRestaurant();
-        DateTime openingDate = restaurant.getOpeningDate();
-        DateTime closingDate = restaurant.getClosingDate();
-        if (openingDate != null && closingDate != null) {
-            startTimeBasedRefresh(openingDate, closingDate);
-        }
+        if (restaurant != null) {
+            DateTime openingDate = restaurant.getOpeningDate();
+            DateTime closingDate = restaurant.getClosingDate();
+            if (openingDate != null && closingDate != null) {
+                startTimeBasedRefresh(openingDate, closingDate);
+            }
 
-        updateRestaurantData();
-        // TODO: Wrong place to call the method!
-        downloadImages();
+            // TODO: Wrong place to call the method!
+            downloadImages();
+        }
     }
 
     @Override

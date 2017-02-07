@@ -1046,7 +1046,8 @@ public class DataProvider {
         String[] photoUrls = restaurant.getPhotoUrls();
 
         // path to folder for selected restaurant
-        String imageFolderPath = "/sdcard/lunchtime/"+restaurantId+"/";
+        Context context = LunchtimeApplication.getContext();
+        String imageFolderPath = context.getFilesDir().getPath() + restaurantId + "/";
         File imageDirectory = new File(imageFolderPath);
         imageDirectory.mkdirs();
 
@@ -1065,8 +1066,7 @@ public class DataProvider {
                     connection.connect();
                     InputStream input = connection.getInputStream();
                     bitmap = BitmapFactory.decodeStream(input);
-                    File file = new File(stripFileName(url));
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(file));
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(image));
                 } else {
                     BitmapFactory.Options options = new BitmapFactory.Options();
                     options.inPreferredConfig = Bitmap.Config.ARGB_8888;

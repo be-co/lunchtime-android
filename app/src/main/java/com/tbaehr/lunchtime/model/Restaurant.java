@@ -838,7 +838,7 @@ public class Restaurant {
 
         int weekDayNow = now.get(Calendar.DAY_OF_WEEK);
         sb1.append("<b>"); sb2.append("<b>");
-        sb1.append(DateTime.asWeekDay(weekDayNow)).append(LINE_BREAK);
+        sb1.append(LunchtimeApplication.getContext().getString(R.string.today)).append(LINE_BREAK);
         sb2.append(getOpeningTimeDescription(weekDayNow, TimeFormat.FORMAT_HH_MM)).append(LINE_BREAK);
         sb1.append("</b>"); sb2.append("</b>");
         for (int weekDay : nextWeekDays) {

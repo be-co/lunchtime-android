@@ -65,7 +65,7 @@
 
     <string name="opens_at">Opens at %1$s</string>
     <string name="closes_at">Closes at %1$s</string>
-    <string name="closed">Closed</string>
+    <string name="closed">Now closed</string>
 
     <string name="available_at">Disponsable in %s$1</string>
     <string name="available_since">Disponsable for %s$1</string>
@@ -84,5 +84,6 @@
     <string name="saturday">Saturday</string>
     <string name="sunday">Sunday</string>
     <string name="and">,</string>
+    <string name="today">Today</string>
 
 </resources>

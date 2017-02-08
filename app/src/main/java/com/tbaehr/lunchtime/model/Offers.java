@@ -676,6 +676,8 @@
  */
 package com.tbaehr.lunchtime.model;
 
+import android.support.annotation.Nullable;
+
 import com.tbaehr.lunchtime.utils.DateTime;
 
 import java.util.HashSet;
@@ -700,6 +702,33 @@ public class Offers {
         this.title = title;
         this.description = description;
         this.offers = offers;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        // equal type?
+        if (obj == null || !(obj instanceof Offers)) {
+            return false;
+        }
+        Offers otherOffers = (Offers) obj;
+
+        // equal size?
+        boolean isEqual = getOffers().size() == otherOffers.getOffers().size();
+        if (!isEqual) {
+            return false;
+        }
+
+        // equal offers?
+        for (int i = 0; i< offers.size(); i++) {
+            Offer offer = getOffer(i);
+            Offer anotherOffer = otherOffers.getOffer(i);
+            isEqual = offer.equals(anotherOffer);
+            if (!isEqual) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public String getRestaurantName() {

@@ -736,21 +736,21 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         dataProvider.syncOffers(this);
 
         List<Offers> offersListTemp = dataProvider.loadOffersFromCache();
-        int offersCountTemp = 0;
-        int offersCount = 0;
-        for (Offers offers : offersListTemp) {
-            offersCountTemp += offers.getOffers().size();
-        }
-        if (offersList != null) {
-            for (Offers offers : offersList) {
-                offersCount += offers.getOffers().size();
+        boolean dataSetChanged = offersList == null || offersListTemp.size() != offersList.size();
+        if (!dataSetChanged) {
+            for (int i = 0; i < offersListTemp.size(); i++) {
+                boolean isEqual = offersListTemp.get(i).equals(offersList.get(i));
+                if (!isEqual) {
+                    dataSetChanged = true;
+                    break;
+                }
             }
         }
+
         offersList = offersListTemp;
 
         startTimeBasedRefresh(offersList);
-
-        if (!view.isInitialized() || offersCountTemp != offersCount) {
+        if (!view.isInitialized() || dataSetChanged) {
             presentOffers(offersList);
         }
     }

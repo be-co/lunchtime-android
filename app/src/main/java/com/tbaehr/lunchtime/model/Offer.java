@@ -787,8 +787,8 @@ public class Offer {
 
         return other.getPrize() == prize
                 //&& other.drawableRes == drawableRes
-                && other.title == title
-                && other.description == description
+                && other.title.equals(title)
+                && other.description.equals(description)
                 && other.startDate.equals(startDate)
                 && other.endDate.equals(endDate);
     }

@@ -764,6 +764,15 @@ public class DateTime implements Comparable<DateTime> {
         return (timeInMillis > otherDateMillis) ? 1 : (timeInMillis == otherDateMillis) ? 0 : -1;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof DateTime)) {
+            return false;
+        }
+        DateTime other = (DateTime) obj;
+        return other.getMillis() == getMillis();
+    }
+
     /**
      * @param anotherDate the <code>DateTime</code> to be compared.
      * @return the value <code>0</code> if the time represented by the argument

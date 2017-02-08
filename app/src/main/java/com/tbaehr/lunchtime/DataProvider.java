@@ -947,7 +947,8 @@ public class DataProvider {
         final String restaurantTitle = restaurantObject.getString("title");
         final String restaurantDescription = restaurantObject.getString("description");
         final JSONArray restaurantOffersArray = restaurantObject.getJSONArray("offers");
-        final List<Offer> offers = new ArrayList<>();
+        final List<Offer> offersNextDays = new ArrayList<>();
+        List<Offer> offersToday = new ArrayList<>();
         for (int offerIndex = 0; offerIndex < restaurantOffersArray.length(); offerIndex++) {
             final JSONObject offerObject = restaurantOffersArray.getJSONObject(offerIndex);
             final String offerTitle = offerObject.getString("title");
@@ -978,14 +979,17 @@ public class DataProvider {
                     ingredients);
             final Offer.ValidationState validationState = offer.getValidationState();
             if (validationState.equals(Offer.ValidationState.NOW_VALID) ||
-                    validationState.equals(Offer.ValidationState.SOON_VALID) ||
+                    validationState.equals(Offer.ValidationState.SOON_VALID)) {
+                offersToday.add(offer);
+            } else if (validationState.equals(Offer.ValidationState.TOMMORROW_VALID) ||
                     (BuildConfig.DEBUG && validationState.equals(Offer.ValidationState.NEXT_DAYS_VALID))) {
-                offers.add(offer);
+                offersNextDays.add(offer);
             } else if (validationState.equals(Offer.ValidationState.INVALID)) {
                 throw new JSONException("Invalid offer " + offer.getTitle() + " for " + restaurantTitle + ": Check date format: " + starts + "," + ends);
             }
         }
-        return new Offers(restaurantId, restaurantTitle, restaurantDescription, offers);
+
+        return new Offers(restaurantId, restaurantTitle, restaurantDescription, offersToday.isEmpty() ? offersNextDays : offersToday);
     }
 
     private Restaurant parseRestaurantFromJson(@NonNull String json, @NonNull String restaurantId) throws JSONException {

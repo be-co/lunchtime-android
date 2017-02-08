@@ -702,11 +702,12 @@ public class Offer {
     }
 
     public enum ValidationState {
-        INVALID,
-        NEXT_DAYS_VALID,
-        SOON_VALID,
+        OUTDATED,
         NOW_VALID,
-        OUTDATED;
+        SOON_VALID,
+        TOMMORROW_VALID,
+        NEXT_DAYS_VALID,
+        INVALID;
     }
 
     public enum Tag {
@@ -864,7 +865,11 @@ public class Offer {
         int dayOfYearStart = startDate.get(Calendar.DAY_OF_YEAR);
 
         if (dayOfYearStart > dayOfYearToday) {
-            return ValidationState.NEXT_DAYS_VALID;
+            if (now.differenceInDays(startDate) > 1) {
+                return ValidationState.NEXT_DAYS_VALID;
+            } else {
+                return ValidationState.TOMMORROW_VALID;
+            }
         } else if (now.before(startDate)) {
             return ValidationState.SOON_VALID;
         } else if (now.after(startDate) && now.before(endDate)) {
@@ -883,6 +888,7 @@ public class Offer {
                 return context.getString(R.string.starts) + " " + startDate.asHourMinute();
             case NOW_VALID:
                 return context.getString(R.string.ends) + " " + endDate.asHourMinute();
+            case TOMMORROW_VALID:
             case NEXT_DAYS_VALID:
                 int dayOfYearStart = startDate.get(Calendar.DAY_OF_YEAR);
                 int todayOfYear = (new DateTime()).get(Calendar.DAY_OF_YEAR);

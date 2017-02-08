@@ -783,7 +783,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
                             public void run() {
                                 IDetailPageViewContainer view = getView();
                                 if (view != null) {
-                                    view.setBackgroundDrawable(drawables.get(0));
+                                    view.setBackgroundDrawables(drawables);
                                 }
                             }
                         });
@@ -858,7 +858,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
             } else {
                 DateTime now = new DateTime();
 
-                if (validationState.equals(Offer.ValidationState.SOON_VALID)) {
+                if (validationState.equals(Offer.ValidationState.SOON_VALID) || validationState.equals(Offer.ValidationState.TOMMORROW_VALID)) {
                     DateTime opens = offer.getStartDate();
                     availability = activity.getString(R.string.available_at, now.differenceAsHourMinute(opens));
                 } else {

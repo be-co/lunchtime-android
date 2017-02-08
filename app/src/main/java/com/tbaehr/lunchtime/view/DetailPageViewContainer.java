@@ -679,6 +679,7 @@ package com.tbaehr.lunchtime.view;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
@@ -695,6 +696,7 @@ import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
 import com.tbaehr.lunchtime.model.Offer;
 
+import java.util.List;
 import java.util.Set;
 
 import butterknife.BindView;
@@ -707,6 +709,10 @@ import static com.tbaehr.lunchtime.view.HorizontalSliderView.INGREDIENTS_PADDING
  * Created by timo.baehr@gmail.com on 26.01.17.
  */
 public class DetailPageViewContainer implements IDetailPageViewContainer {
+
+    private final int FADE_DURATION = 1000;
+
+    private final int IMAGE_DURATION = 5000;
 
     @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbar;
@@ -835,8 +841,19 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
     }
 
     @Override
-    public void setBackgroundDrawable(Drawable drawable) {
-        headerImage.setImageDrawable(drawable);
+    public void setBackgroundDrawables(final List<Drawable> drawables) {
+        if (drawables == null || drawables.size() == 0) {
+            return;
+        }
+        // TODO: Animate all drawables
+        animate(headerImage, drawables.get(drawables.size() - 1));
+    }
+
+    private void animate(final ImageView imageView, final Drawable drawable) {
+        Drawable[] layers = new Drawable[] { headerImage.getDrawable(), drawable };
+        TransitionDrawable transitionDrawable = new TransitionDrawable(layers);
+        imageView.setImageDrawable(transitionDrawable);
+        transitionDrawable.startTransition(FADE_DURATION);
     }
 
     @Override

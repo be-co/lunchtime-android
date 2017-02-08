@@ -989,13 +989,13 @@ public class DataProvider {
     }
 
     private Restaurant parseRestaurantFromJson(@NonNull String json, @NonNull String restaurantId) throws JSONException {
-        JSONObject restaurant = new JSONObject(json);
-        String name = restaurant.getString("title");
-        String shortDescription = restaurant.getString("shortDescription");
-        String longDescription = restaurant.getString("longDescription");
-        String address = restaurant.getString("address");
+        JSONObject restaurantJSON = new JSONObject(json);
+        String name = restaurantJSON.getString("title");
+        String shortDescription = restaurantJSON.getString("shortDescription");
+        String longDescription = restaurantJSON.getString("longDescription");
+        String address = restaurantJSON.getString("address");
 
-        JSONObject openingTimesObject = restaurant.getJSONObject("openingTimes");
+        JSONObject openingTimesObject = restaurantJSON.getJSONObject("openingTimes");
         JSONArray mondayArray = openingTimesObject.getJSONArray("monday");
         JSONArray tuesdayArray = openingTimesObject.getJSONArray("tuesday");
         JSONArray wednesdayArray = openingTimesObject.getJSONArray("wednesday");
@@ -1012,16 +1012,14 @@ public class DataProvider {
         openingTimes.put(Calendar.SATURDAY, convertToDateTimeArray(Calendar.SATURDAY, saturdayArray));
         openingTimes.put(Calendar.SUNDAY, convertToDateTimeArray(Calendar.SUNDAY, sundayArray));
 
-        String phoneNumber = restaurant.getString("phoneNumber");
-        String email = restaurant.getString("email");
-        String website = restaurant.getString("website");
-        JSONArray photoUrlsObjects = restaurant.getJSONArray("photoUrls");
+        String phoneNumber = restaurantJSON.getString("phoneNumber");
+        String email = restaurantJSON.getString("email");
+        String website = restaurantJSON.getString("website");
+        JSONArray photoUrlsObjects = restaurantJSON.getJSONArray("photoUrls");
         String[] photoUrls = convertToArray(photoUrlsObjects);
 
-        Restaurant gehe = new Restaurant(restaurantId, name, shortDescription, longDescription, address,
+        return new Restaurant(restaurantId, name, shortDescription, longDescription, address,
                 openingTimes, phoneNumber, email, website, photoUrls);
-
-        return gehe;
     }
 
     private String loadFromCache(String key) {

@@ -798,7 +798,7 @@ public class DataProvider {
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                if (dataSetChanged) {
+                if (dataSetChanged && callback != null) {
                     callback.onDownloadFinished(null);
                 }
                 super.onPostExecute(aVoid);
@@ -883,7 +883,9 @@ public class DataProvider {
 
         String jsonRestaurant;
         if (downloadDate != null && (cachedDate == null || downloadDate.after(cachedDate))) {
-            callback.onDownloadStarted();
+            if (callback != null) {
+                callback.onDownloadStarted();
+            }
             jsonRestaurant = downloadTextFromServer(uriRestaurant);
             if (jsonRestaurant != null) {
                 try {
@@ -896,7 +898,9 @@ public class DataProvider {
                 } catch (JSONException jsonException) {
                     jsonException.printStackTrace();
                     String message = "Failed to download " + restaurantKey + " updated " + dateUpdated;
-                    callback.onDownloadFailed(message);
+                    if (callback != null) {
+                        callback.onDownloadFailed(message);
+                    }
                 }
             }
         }
@@ -912,7 +916,9 @@ public class DataProvider {
 
         String jsonOffers;
         if (downloadDate != null && (cachedDate == null || downloadDate.after(cachedDate))) {
-            callback.onDownloadStarted();
+            if (callback != null) {
+                callback.onDownloadStarted();
+            }
             jsonOffers = downloadTextFromServer(uriRestaurantOffers);
             if (jsonOffers != null) {
                 try {
@@ -925,7 +931,9 @@ public class DataProvider {
                 } catch (JSONException jsonException) {
                     jsonException.printStackTrace();
                     String message = "Failed to download " + restaurantKey + " updated " + dateUpdated + ". " + jsonException.getMessage();
-                    callback.onDownloadFailed(message);
+                    if (callback != null) {
+                        callback.onDownloadFailed(message);
+                    }
                 }
             }
         }

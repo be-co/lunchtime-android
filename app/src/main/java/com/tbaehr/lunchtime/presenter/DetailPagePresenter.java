@@ -715,6 +715,8 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     private Restaurant restaurant;
 
+    private boolean retryImageSync = true;
+
     private List<Drawable> drawables;
 
     private final int index;
@@ -735,23 +737,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dataProvider.syncRestaurants(this);
-        dataProvider.syncRestaurantImages(restaurant, new LoadJobListener<List<Drawable>>() {
-            @Override
-            public void onDownloadStarted() {
-                // ;
-            }
-
-            @Override
-            public void onDownloadFailed(String message) {
-                // ;
-            }
-
-            @Override
-            public void onDownloadFinished(List<Drawable> drawables) {
-                DetailPagePresenter.this.drawables = drawables;
-                startRestaurantSlideshow();
-            }
-        });
+        syncRestaurantImages();
     }
 
     @Override
@@ -779,12 +765,37 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
                 startTimeBasedRefresh(openingDate, closingDate);
             }
         }
+        syncRestaurantImages();
     }
 
     @Override
     public void unbindView() {
         stopTimer();
         super.unbindView();
+    }
+
+    private void syncRestaurantImages() {
+        if (restaurant != null && retryImageSync) {
+            dataProvider.syncRestaurantImages(restaurant, new LoadJobListener<List<Drawable>>() {
+                @Override
+                public void onDownloadStarted() {
+                    retryImageSync = false;
+                }
+
+                @Override
+                public void onDownloadFailed(String message) {
+                    retryImageSync = true;
+                }
+
+                @Override
+                public void onDownloadFinished(List<Drawable> drawables) {
+                    DetailPagePresenter.this.drawables = drawables;
+                    startRestaurantSlideshow();
+                }
+            });
+        } else {
+            retryImageSync = true;
+        }
     }
 
     private void startRestaurantSlideshow() {
@@ -874,6 +885,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     private void updateRestaurantData() {
         restaurant = getRestaurant();
+        syncRestaurantImages();
         if (restaurant != null) {
             String shortDescription = restaurant.getShortDescription();
             String longDescription = restaurant.getLongDescription();

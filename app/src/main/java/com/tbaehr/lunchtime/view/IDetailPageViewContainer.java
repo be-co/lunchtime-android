@@ -680,7 +680,6 @@ import android.graphics.drawable.Drawable;
 
 import com.tbaehr.lunchtime.model.Offer;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -706,7 +705,7 @@ public interface IDetailPageViewContainer {
 
     void setTitle(String title);
 
-    void setBackgroundDrawables(List<Drawable> drawables);
+    void setBackgroundDrawable(Drawable drawable);
 
     void setSelectedOffer(String title, String prize, String availability, Set<Offer.Ingredient> ingredients);
 

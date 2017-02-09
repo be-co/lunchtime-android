@@ -715,6 +715,8 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     private Restaurant restaurant;
 
+    private List<Drawable> drawables;
+
     private final int index;
 
     private DataProvider dataProvider;
@@ -746,10 +748,8 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
             @Override
             public void onDownloadFinished(List<Drawable> drawables) {
-                IDetailPageViewContainer view = getView();
-                if (view != null) {
-                    view.setBackgroundDrawables(drawables);
-                }
+                DetailPagePresenter.this.drawables = drawables;
+                startRestaurantSlideshow();
             }
         });
     }
@@ -785,6 +785,14 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     public void unbindView() {
         stopTimer();
         super.unbindView();
+    }
+
+    private void startRestaurantSlideshow() {
+        IDetailPageViewContainer view = getView();
+        if (view == null || drawables == null || drawables.size() == 0) {
+            return;
+        }
+        view.setBackgroundDrawable(drawables.get(drawables.size() - 1));
     }
 
     private TimerTask createTimerTask(final Runnable runnable) {

@@ -696,7 +696,6 @@ import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
 import com.tbaehr.lunchtime.model.Offer;
 
-import java.util.List;
 import java.util.Set;
 
 import butterknife.BindView;
@@ -841,12 +840,8 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
     }
 
     @Override
-    public void setBackgroundDrawables(final List<Drawable> drawables) {
-        if (drawables == null || drawables.size() == 0) {
-            return;
-        }
-        // TODO: Animate all drawables
-        animate(headerImage, drawables.get(drawables.size() - 1));
+    public void setBackgroundDrawable(final Drawable drawable) {
+        animate(headerImage, drawable);
     }
 
     private void animate(final ImageView imageView, final Drawable drawable) {

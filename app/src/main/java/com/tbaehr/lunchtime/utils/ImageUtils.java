@@ -63,10 +63,6 @@ public class ImageUtils {
     }
 
     private static String stripFileName(@NonNull String url) {
-        String[] parts = url.split("/");
-        String imageName = parts[parts.length-1];
-        imageName = imageName.replace(".gif", "");
-        imageName += ".jpg";
-        return imageName;
+        return url.replace("http://", "").replace("/","").replace(".gif", "");
     }
 }

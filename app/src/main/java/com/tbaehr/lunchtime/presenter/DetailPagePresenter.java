@@ -709,6 +709,8 @@ import static com.tbaehr.lunchtime.utils.DateTime.SECOND_IN_MILLIS;
  */
 public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewContainer> implements LoadJobListener<List<Restaurant>>, IDetailPageViewContainer.ClickListener {
 
+    private final int IMAGE_DURATION = 8000;
+
     private DetailPageActivity activity;
 
     private String restaurantId;
@@ -718,6 +720,8 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     private boolean retryImageSync = true;
 
     private List<Drawable> drawables;
+
+    private int drawableCounter = 0;
 
     private final int index;
 
@@ -799,11 +803,21 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     }
 
     private void startRestaurantSlideshow() {
-        IDetailPageViewContainer view = getView();
+        final IDetailPageViewContainer view = getView();
         if (view == null || drawables == null || drawables.size() == 0) {
             return;
         }
-        view.setBackgroundDrawable(drawables.get(drawables.size() - 1));
+        view.setBackgroundDrawable(drawables.get(drawableCounter));
+
+        if (drawables.size() > 1) {
+            timer.schedule(createTimerTask(new Runnable() {
+                @Override
+                public void run() {
+                    drawableCounter = drawableCounter < drawables.size() - 1 ? drawableCounter + 1 : 0;
+                    view.setBackgroundDrawable(drawables.get(drawableCounter));
+                }
+            }), IMAGE_DURATION, IMAGE_DURATION);
+        }
     }
 
     private TimerTask createTimerTask(final Runnable runnable) {

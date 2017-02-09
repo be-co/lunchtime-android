@@ -709,9 +709,7 @@ import static com.tbaehr.lunchtime.view.HorizontalSliderView.INGREDIENTS_PADDING
  */
 public class DetailPageViewContainer implements IDetailPageViewContainer {
 
-    private final int FADE_DURATION = 1000;
-
-    private final int IMAGE_DURATION = 5000;
+    private final int FADE_DURATION = 1500;
 
     @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbar;

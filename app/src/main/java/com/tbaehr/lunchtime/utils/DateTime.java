@@ -866,6 +866,10 @@ public class DateTime implements Comparable<DateTime> {
         return nextWeekdays;
     }
 
+    public void updateToNextDay() {
+        timeInMillis = timeInMillis + DAY_IN_MILLIS;
+    }
+
     public DateTime updateWeekDay(int weekDay) {
         int currentDayOfWeek = get(Calendar.DAY_OF_WEEK);
         int diff = weekDay - currentDayOfWeek;

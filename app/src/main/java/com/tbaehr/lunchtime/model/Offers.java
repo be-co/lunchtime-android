@@ -679,6 +679,7 @@ package com.tbaehr.lunchtime.model;
 import android.support.annotation.Nullable;
 
 import com.tbaehr.lunchtime.utils.DateTime;
+import com.tbaehr.lunchtime.utils.DateUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -756,9 +757,16 @@ public class Offers {
      */
     public Set<DateTime> getUiRefreshDates() {
         Set<DateTime> refreshDates = new HashSet<>();
-        for (Offer offer : getOffers()) {
+        List<Offer> offers = getOffers();
+        DateTime midnight = DateUtils.getDate(0, 0);
+        midnight.updateToNextDay();
+        for (Offer offer : offers) {
+            boolean tomorrowValid = offer.getValidationState().equals(Offer.ValidationState.SOON_VALID);
             boolean soonValid = offer.getValidationState().equals(Offer.ValidationState.SOON_VALID);
             boolean nowValid = offer.getValidationState().equals(Offer.ValidationState.NOW_VALID);
+            if (tomorrowValid) {
+                refreshDates.add(midnight);
+            }
             if (soonValid) {
                 refreshDates.add(offer.getStartDate());
             }

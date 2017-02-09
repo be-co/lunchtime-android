@@ -692,6 +692,11 @@ import java.util.Map;
  */
 public class Restaurant {
 
+    private enum TimeFormat {
+        FORMAT_HH_MM,
+        FORMAT_OPENS_CLOSES_HH_MM;
+    }
+
     private String id;
 
     private String name;
@@ -765,18 +770,18 @@ public class Restaurant {
         return getOpeningTimeDescription(weekDay, TimeFormat.FORMAT_OPENS_CLOSES_HH_MM);
     }
 
-    private enum TimeFormat {
-        FORMAT_HH_MM,
-        FORMAT_OPENS_CLOSES_HH_MM;
-    }
-
     private String getOpeningTimeDescription(int weekDay, TimeFormat timeFormat) {
         Context context = LunchtimeApplication.getContext();
+        DateTime now = new DateTime();
 
         DateTime[] dayOpeningTimes = getOpeningTimes(weekDay);
 
         if (dayOpeningTimes == null || dayOpeningTimes.length == 0) {
-            return context.getString(R.string.closed);
+            if (now.get(Calendar.DAY_OF_WEEK) == weekDay) {
+                return context.getString(R.string.now_closed);
+            } else {
+                return context.getString(R.string.closed);
+            }
         }
 
         List<DateTime> openingTimes = new ArrayList<>();
@@ -792,7 +797,6 @@ public class Restaurant {
         }
 
         if (timeFormat.equals(TimeFormat.FORMAT_OPENS_CLOSES_HH_MM)) {
-            DateTime now = new DateTime();
             DateTime opens1 = openingTimes.get(0);
             DateTime opens2 = openingTimes.size() > 1 ? openingTimes.get(1) : null;
             DateTime closes1 = closingTimes.get(0);

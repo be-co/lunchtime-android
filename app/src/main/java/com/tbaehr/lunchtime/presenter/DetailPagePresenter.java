@@ -679,7 +679,6 @@ package com.tbaehr.lunchtime.presenter;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.MenuItem;
@@ -690,9 +689,9 @@ import com.tbaehr.lunchtime.controller.DetailPageActivity;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.utils.DateTime;
+import com.tbaehr.lunchtime.utils.LoadJobListener;
 import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -708,7 +707,7 @@ import static com.tbaehr.lunchtime.utils.DateTime.SECOND_IN_MILLIS;
 /**
  * Created by timo.baehr@gmail.com on 26.01.17.
  */
-public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewContainer> implements DataProvider.LoadJobListener<List<Restaurant>>, IDetailPageViewContainer.ClickListener {
+public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewContainer> implements LoadJobListener<List<Restaurant>>, IDetailPageViewContainer.ClickListener {
 
     private DetailPageActivity activity;
 
@@ -724,15 +723,35 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     public DetailPagePresenter(DetailPageActivity activity) {
         this.activity = activity;
-        this.restaurantId = activity.getIntent().getStringExtra(KEY_RESTAURANT_ID);
-        this.index = activity.getIntent().getIntExtra(KEY_OFFER_INDEX, -1);
         this.dataProvider = new DataProvider();
+        this.index = activity.getIntent().getIntExtra(KEY_OFFER_INDEX, -1);
+        this.restaurantId = activity.getIntent().getStringExtra(KEY_RESTAURANT_ID);
+        restaurant = getRestaurant();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dataProvider.syncRestaurants(this);
+        dataProvider.syncRestaurantImages(restaurant, new LoadJobListener<List<Drawable>>() {
+            @Override
+            public void onDownloadStarted() {
+                // ;
+            }
+
+            @Override
+            public void onDownloadFailed(String message) {
+                // ;
+            }
+
+            @Override
+            public void onDownloadFinished(List<Drawable> drawables) {
+                IDetailPageViewContainer view = getView();
+                if (view != null) {
+                    view.setBackgroundDrawables(drawables);
+                }
+            }
+        });
     }
 
     @Override
@@ -759,9 +778,6 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
             if (openingDate != null && closingDate != null) {
                 startTimeBasedRefresh(openingDate, closingDate);
             }
-
-            // TODO: Wrong place to call the method!
-            downloadImages();
         }
     }
 
@@ -769,30 +785,6 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     public void unbindView() {
         stopTimer();
         super.unbindView();
-    }
-
-    private void downloadImages() {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    final List<Drawable> drawables = DataProvider.downloadDrawables(restaurant);
-                    if (drawables.size() > 0) {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                IDetailPageViewContainer view = getView();
-                                if (view != null) {
-                                    view.setBackgroundDrawables(drawables);
-                                }
-                            }
-                        });
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     private TimerTask createTimerTask(final Runnable runnable) {

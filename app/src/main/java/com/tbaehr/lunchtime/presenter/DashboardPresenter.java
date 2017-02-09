@@ -690,6 +690,7 @@ import com.tbaehr.lunchtime.controller.DetailPageActivity;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Offers;
 import com.tbaehr.lunchtime.utils.DateTime;
+import com.tbaehr.lunchtime.utils.LoadJobListener;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
@@ -706,7 +707,7 @@ import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
 public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
-        implements DataProvider.LoadJobListener<List<Offers>> {
+        implements LoadJobListener<List<Offers>> {
 
     private DataProvider dataProvider;
 

@@ -679,9 +679,6 @@ package com.tbaehr.lunchtime;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -693,20 +690,19 @@ import com.tbaehr.lunchtime.model.Offers;
 import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
+import com.tbaehr.lunchtime.utils.ImageUtils;
+import com.tbaehr.lunchtime.utils.LoadJobListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -737,14 +733,6 @@ public class DataProvider {
     private static final String URI_RESTAURANT = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/restaurant_%s.json";
 
     private static final String URI_OFFER = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/offers_%s.json";
-
-    public interface LoadJobListener<T> {
-        void onDownloadStarted();
-
-        void onDownloadFailed(String message);
-
-        void onDownloadFinished(T downloadedObject);
-    }
 
     public void syncOffers(final LoadJobListener callback) {
         final String uriSync = String.format(URI_NEARBY_RESTAURANTS, "weiterstadt");
@@ -813,6 +801,29 @@ public class DataProvider {
                 if (dataSetChanged) {
                     callback.onDownloadFinished(null);
                 }
+                super.onPostExecute(aVoid);
+            }
+        }.execute();
+    }
+
+    public void syncRestaurantImages(@NonNull final Restaurant restaurant, final LoadJobListener<List<Drawable>> callback) {
+        new AsyncTask<Void, Void, Void>() {
+            private List<Drawable> drawables = new ArrayList<>();
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    drawables = ImageUtils.downloadDrawables(restaurant);
+                } catch (IOException e) {
+                    callback.onDownloadFailed(e.getMessage());
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                callback.onDownloadFinished(drawables);
                 super.onPostExecute(aVoid);
             }
         }.execute();
@@ -1041,52 +1052,6 @@ public class DataProvider {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         editor.putString(key, value).apply();
-    }
-
-    public static List<Drawable> downloadDrawables(Restaurant restaurant) throws IOException {
-        String restaurantId = restaurant.getId();
-        String[] photoUrls = restaurant.getPhotoUrls();
-
-        // path to folder for selected restaurant
-        Context context = LunchtimeApplication.getContext();
-        String imageFolderPath = context.getFilesDir().getPath() + restaurantId + "/";
-        File imageDirectory = new File(imageFolderPath);
-        imageDirectory.mkdirs();
-
-        // result list
-        List<Drawable> drawables = new ArrayList<>();
-
-        // try to load images from cache, otherwise download
-        if (photoUrls != null) {
-            for (String url : photoUrls) {
-                String imagePath = imageFolderPath + stripFileName(url);
-                File image = new File(imagePath);
-                Bitmap bitmap;
-                if (!image.exists()) {
-                    URLConnection connection = new URL(url).openConnection();
-                    connection.setRequestProperty("connection", "close");
-                    connection.connect();
-                    InputStream input = connection.getInputStream();
-                    bitmap = BitmapFactory.decodeStream(input);
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(image));
-                } else {
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                    bitmap = BitmapFactory.decodeFile(imagePath, options);
-                }
-                drawables.add(new BitmapDrawable(LunchtimeApplication.getContext().getResources(), bitmap));
-            }
-        }
-
-        return drawables;
-    }
-
-    private static String stripFileName(@NonNull String url) {
-        String[] parts = url.split("/");
-        String imageName = parts[parts.length-1];
-        imageName = imageName.replace(".gif", "");
-        imageName += ".jpg";
-        return imageName;
     }
 
     private String downloadTextFromServer(String path) {

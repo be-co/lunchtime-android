@@ -11,6 +11,8 @@ import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.model.Restaurant;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,44 +27,45 @@ import java.util.List;
 public class ImageUtils {
 
     public static List<Drawable> downloadDrawables(@NonNull Restaurant restaurant) throws IOException {
-        String restaurantId = restaurant.getId();
+        List<Drawable> drawablesResult = new ArrayList<>();
+
         String[] photoUrls = restaurant.getPhotoUrls();
-
-        // path to folder for selected restaurant
-        Context context = LunchtimeApplication.getContext();
-        String imageFolderPath = context.getFilesDir().getPath() + restaurantId + "/";
-        File imageDirectory = new File(imageFolderPath);
-        imageDirectory.mkdirs();
-
-        // result list
-        List<Drawable> drawables = new ArrayList<>();
-
-        // try to load images from cache, otherwise download
-        if (photoUrls != null) {
+        if (photoUrls != null && photoUrls.length > 0) {
             for (String url : photoUrls) {
-                String imagePath = imageFolderPath + stripFileName(url);
-                File image = new File(imagePath);
+                File image = createImageFile(url);
                 Bitmap bitmap;
                 if (!image.exists()) {
-                    URLConnection connection = new URL(url).openConnection();
-                    connection.setRequestProperty("connection", "close");
-                    connection.connect();
-                    InputStream input = connection.getInputStream();
-                    bitmap = BitmapFactory.decodeStream(input);
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(image));
+                    bitmap = loadBitmapFromServerAndSaveToMemory(url, image);
                 } else {
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                    bitmap = BitmapFactory.decodeFile(imagePath, options);
+                    bitmap = loadBitmapFromMemory(image);
                 }
-                drawables.add(new BitmapDrawable(LunchtimeApplication.getContext().getResources(), bitmap));
+                drawablesResult.add(new BitmapDrawable(LunchtimeApplication.getContext().getResources(), bitmap));
             }
         }
 
-        return drawables;
+        return drawablesResult;
     }
 
-    private static String stripFileName(@NonNull String url) {
-        return url.replace("http://", "").replace("/","").replace(".gif", "");
+    private static Bitmap loadBitmapFromServerAndSaveToMemory(String url, File image) throws IOException {
+        URLConnection connection = new URL(url).openConnection();
+        connection.setRequestProperty("connection", "close");
+        connection.connect();
+        InputStream input = connection.getInputStream();
+        Bitmap bitmap = BitmapFactory.decodeStream(input);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, new FileOutputStream(image));
+        return bitmap;
+    }
+
+    private static Bitmap loadBitmapFromMemory(File image) throws FileNotFoundException {
+        FileInputStream inputStream = new FileInputStream(image);
+        return BitmapFactory.decodeStream(inputStream);
+    }
+
+    private static File createImageFile(@NonNull String url) {
+        Context context = LunchtimeApplication.getContext();
+        File imageDirectory = context.getDir("images", Context.MODE_PRIVATE);
+        imageDirectory.mkdirs();
+        String fileName = url.replace("http://", "").replace("/","").replace(".gif", "");
+        return new File(imageDirectory, fileName);
     }
 }

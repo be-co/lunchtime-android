@@ -729,6 +729,8 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     private Timer timer;
 
+    private TimerTask slideshowTask;
+
     public DetailPagePresenter(DetailPageActivity activity) {
         this.activity = activity;
         this.dataProvider = new DataProvider();
@@ -746,10 +748,13 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     @Override
     public void onDestroy() {
-        dataProvider = null;
         activity = null;
         restaurantId = null;
         restaurant = null;
+        if (drawables != null) drawables.clear();
+        drawables = null;
+        dataProvider = null;
+        slideshowTask = null;
         super.onDestroy();
     }
 
@@ -810,13 +815,15 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         view.setBackgroundDrawable(drawables.get(drawableCounter));
 
         if (drawables.size() > 1) {
-            timer.schedule(createTimerTask(new Runnable() {
+            if (slideshowTask != null) slideshowTask.cancel();
+            slideshowTask = createTimerTask(new Runnable() {
                 @Override
                 public void run() {
                     drawableCounter = drawableCounter < drawables.size() - 1 ? drawableCounter + 1 : 0;
                     view.setBackgroundDrawable(drawables.get(drawableCounter));
                 }
-            }), IMAGE_DURATION, IMAGE_DURATION);
+            });
+            timer.schedule(slideshowTask, IMAGE_DURATION, IMAGE_DURATION);
         }
     }
 

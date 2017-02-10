@@ -701,6 +701,12 @@ public class DetailPageActivity extends BaseActivity<IDetailPageViewContainer, D
     }
 
     @Override
+    protected void onDestroy() {
+        view = null;
+        super.onDestroy();
+    }
+
+    @Override
     public DetailPagePresenter create() {
         return new DetailPagePresenter(this);
     }

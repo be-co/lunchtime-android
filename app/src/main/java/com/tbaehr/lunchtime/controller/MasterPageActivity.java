@@ -677,10 +677,11 @@
 package com.tbaehr.lunchtime.controller;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 
 import com.tbaehr.lunchtime.presenter.MasterPagePresenter;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
-import com.tbaehr.lunchtime.view.MasterPageView;
+import com.tbaehr.lunchtime.view.MasterPageViewContainer;
 
 public class MasterPageActivity extends BaseActivity<IMasterPageViewContainer, MasterPagePresenter> {
 
@@ -689,7 +690,13 @@ public class MasterPageActivity extends BaseActivity<IMasterPageViewContainer, M
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        view = new MasterPageView(this, getSupportFragmentManager());
+        view = new MasterPageViewContainer(this, getSupportFragmentManager());
+    }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        getPresenter().onPostCreate(savedInstanceState);
     }
 
     @Override
@@ -714,4 +721,9 @@ public class MasterPageActivity extends BaseActivity<IMasterPageViewContainer, M
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        view = null;
+        super.onDestroy();
+    }
 }

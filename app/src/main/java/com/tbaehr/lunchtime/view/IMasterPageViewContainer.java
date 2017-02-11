@@ -695,4 +695,6 @@ public interface IMasterPageViewContainer {
     void closeDrawer();
 
     boolean onBackPressed();
+
+    void syncDrawerToggleButton();
 }

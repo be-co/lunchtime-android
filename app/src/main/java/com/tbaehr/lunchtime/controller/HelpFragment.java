@@ -683,11 +683,12 @@ import android.view.ViewGroup;
 
 import com.tbaehr.lunchtime.presenter.HelpPresenter;
 import com.tbaehr.lunchtime.view.HelpViewContainer;
+import com.tbaehr.lunchtime.view.IHelpViewContainer;
 
 /**
  * Created by timo.baehr@gmail.com on 26.12.16.
  */
-public class HelpFragment extends BaseFragment<HelpViewContainer, HelpPresenter> {
+public class HelpFragment extends BaseFragment<IHelpViewContainer, HelpPresenter> {
 
     private HelpViewContainer view;
 

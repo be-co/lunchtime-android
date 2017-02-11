@@ -687,8 +687,8 @@ import android.view.MenuItem;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
 
-import static com.tbaehr.lunchtime.view.MasterPageView.TAG_DASHBOARD_FRAGMENT;
-import static com.tbaehr.lunchtime.view.MasterPageView.TAG_HELP_FRAGMENT;
+import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_DASHBOARD_FRAGMENT;
+import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_HELP_FRAGMENT;
 
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.
@@ -766,11 +766,23 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         return true;
     }
 
+    @Override
+    public void onDestroy() {
+        toolbarTitle = null;
+        activeFragment = null;
+        activity = null;
+        super.onDestroy();
+    }
+
     private String getDashboardTitle() {
         return getString(R.string.lunch_time);
     }
 
     private String getString(@StringRes int resId) {
         return activity.getApplicationContext().getString(resId);
+    }
+
+    public void onPostCreate(@Nullable Bundle savedInstanceState) {
+        getView().syncDrawerToggleButton();
     }
 }

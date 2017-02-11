@@ -674,48 +674,40 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.controller;
+package com.tbaehr.lunchtime.view;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.graphics.drawable.Drawable;
 
-import com.tbaehr.lunchtime.presenter.DashboardPresenter;
-import com.tbaehr.lunchtime.view.DashboardViewContainer;
-import com.tbaehr.lunchtime.view.IDashboardViewContainer;
+import com.tbaehr.lunchtime.model.Offer;
+
+import java.util.Set;
 
 /**
- * Created by timo.baehr@gmail.com on 25.11.16.
+ * Created by timo.baehr@gmail.com on 26.01.17.
  */
-public class DashboardFragment extends BaseFragment<IDashboardViewContainer, DashboardPresenter> {
+public interface IDetailPageViewContainer {
 
-    private DashboardViewContainer viewContainer;
+    interface ClickListener {
+        void onRestaurantShortDescriptionClicked();
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        viewContainer = new DashboardViewContainer(getContext(), inflater, container);
-        return viewContainer.getRootView();
+        void onRestaurantLocationClicked();
+
+        void onRestaurantOpeningTimesClicked();
+
+        void onRestaurantUrlClicked();
     }
 
-    @Override
-    public IDashboardViewContainer getViewLayer() {
-        return viewContainer;
-    }
+    void expandCollapseDescription();
 
-    @Override
-    public Class<? extends DashboardPresenter> getTypeClazz() {
-        return DashboardPresenter.class;
-    }
+    void expandCollapseOpeningTimes();
 
-    @Override
-    public DashboardPresenter create() {
-        return new DashboardPresenter(this);
-    }
+    void onBackPressed();
 
-    @Override
-    public void onDestroy() {
-        viewContainer = null;
-        super.onDestroy();
-    }
+    void setTitle(String title);
+
+    void setBackgroundDrawable(Drawable drawable);
+
+    void setSelectedOffer(String title, String prize, String availability, Set<Offer.Ingredient> ingredients);
+
+    void setRestaurantData(ClickListener clickListener, String shortDescription, String longDescription, String location, String openingTimes, String[] openingTimesExpanded, String url);
 }

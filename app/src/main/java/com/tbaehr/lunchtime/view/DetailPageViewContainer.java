@@ -674,48 +674,262 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.controller;
+package com.tbaehr.lunchtime.view;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.content.Context;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
+import android.os.Build;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
-import com.tbaehr.lunchtime.presenter.DashboardPresenter;
-import com.tbaehr.lunchtime.view.DashboardViewContainer;
-import com.tbaehr.lunchtime.view.IDashboardViewContainer;
+import com.bluejamesbond.text.DocumentView;
+import com.tbaehr.lunchtime.LunchtimeApplication;
+import com.tbaehr.lunchtime.R;
+import com.tbaehr.lunchtime.controller.DetailPageActivity;
+import com.tbaehr.lunchtime.model.Offer;
+
+import java.util.Set;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+import static com.tbaehr.lunchtime.view.HorizontalSliderView.INGREDIENTS_PADDING_IN_PIXELS;
 
 /**
- * Created by timo.baehr@gmail.com on 25.11.16.
+ * Created by timo.baehr@gmail.com on 26.01.17.
  */
-public class DashboardFragment extends BaseFragment<IDashboardViewContainer, DashboardPresenter> {
+public class DetailPageViewContainer implements IDetailPageViewContainer {
 
-    private DashboardViewContainer viewContainer;
+    private final int FADE_DURATION = 1200;
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        viewContainer = new DashboardViewContainer(getContext(), inflater, container);
-        return viewContainer.getRootView();
+    @BindView(R.id.collapsing_toolbar)
+    CollapsingToolbarLayout collapsingToolbar;
+
+    @BindView(R.id.header_image)
+    ImageView headerImage;
+
+    @BindView(R.id.selected_offer_text_view)
+    TextView selectedOfferTextView;
+
+    @BindView(R.id.selected_offer_prize)
+    TextView selectedOfferPrizeTextView;
+
+    @BindView(R.id.selected_offer_availability)
+    TextView selectedOfferAvailability;
+
+    @BindView(R.id.ingredients)
+    LinearLayout ingredientsView;
+
+    @BindView(R.id.selected_offer_layout)
+    LinearLayout selectedOfferLayout;
+
+    @BindView(R.id.restaurant_short_description)
+    TextView restaurantDescription;
+
+    @BindView(R.id.restaurant_long_description)
+    DocumentView restaurantDescriptionExpanded;
+
+    @BindView(R.id.restaurant_location)
+    TextView restaurantLocation;
+
+    @BindView(R.id.restaurant_opening_times)
+    LinearLayout restaurantOpeningTimes;
+
+    @BindView(R.id.restaurant_opening_times_head)
+    TextView restaurantOpeningTimesHead;
+
+    @BindView(R.id.restaurant_opening_times_expanded1)
+    TextView restaurantOpeningTimesExpanded1;
+
+    @BindView(R.id.restaurant_opening_times_expanded2)
+    TextView restaurantOpeningTimesExpanded2;
+
+    @BindView(R.id.restaurant_url)
+    TextView restaurantUrl;
+
+    private ClickListener clickListener;
+
+    private DetailPageActivity activity;
+
+    public DetailPageViewContainer(DetailPageActivity activity) {
+        this.activity = activity;
+        activity.setContentView(R.layout.activity_detail_page);
+        activity.setAsFullScreenActivity();
+        activity.overridePendingTransition(R.anim.slide_in, R.anim.slide_nothing);
+        View rootView = activity.findViewById(R.id.coordinator_layout);
+        ButterKnife.bind(this, rootView);
+
+        configureToolbar();
+    }
+
+    private void configureToolbar() {
+        final Toolbar toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
+        activity.setSupportActionBar(toolbar);
+
+        ActionBar actionBar = activity.getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+        // Make back arrow white or disable it if opened over notification
+        final Drawable backArrow;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            backArrow = activity.getDrawable(R.drawable.abc_ic_ab_back_material);
+        } else {
+            backArrow = activity.getResources().getDrawable(R.drawable.abc_ic_ab_back_material);
+        }
+        int color;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            color = activity.getColor(android.R.color.white);
+        } else {
+            color = activity.getResources().getColor(android.R.color.white);
+        }
+        backArrow.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        activity.getSupportActionBar().setHomeAsUpIndicator(backArrow);
     }
 
     @Override
-    public IDashboardViewContainer getViewLayer() {
-        return viewContainer;
+    public void expandCollapseDescription() {
+        boolean expanded = restaurantDescriptionExpanded.getVisibility() == View.VISIBLE;
+
+        Drawable[] drawables = restaurantDescription.getCompoundDrawables();
+        Drawable left = drawables[0];
+        Drawable right;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            right = activity.getDrawable(expanded ? R.drawable.arrow_down : R.drawable.arrow_up);
+        } else {
+            right = activity.getResources().getDrawable(expanded ? R.drawable.arrow_down : R.drawable.arrow_up);
+        }
+        restaurantDescription.setCompoundDrawablesWithIntrinsicBounds(left, null, right, null);
+        restaurantDescriptionExpanded.setVisibility(expanded ? View.GONE : View.VISIBLE);
     }
 
     @Override
-    public Class<? extends DashboardPresenter> getTypeClazz() {
-        return DashboardPresenter.class;
+    public void expandCollapseOpeningTimes() {
+        boolean expanded = restaurantOpeningTimesExpanded1.getVisibility() == View.VISIBLE;
+
+        Drawable right;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            right = activity.getDrawable(expanded ? R.drawable.arrow_down : R.drawable.arrow_up);
+        } else {
+            right = activity.getResources().getDrawable(expanded ? R.drawable.arrow_down : R.drawable.arrow_up);
+        }
+        restaurantOpeningTimesHead.setCompoundDrawablesWithIntrinsicBounds(null, null, right, null);
+        restaurantOpeningTimesHead.setVisibility(expanded ? View.VISIBLE : View.GONE);
+        restaurantOpeningTimesExpanded1.setVisibility(expanded ? View.GONE : View.VISIBLE);
+        restaurantOpeningTimesExpanded2.setVisibility(expanded ? View.GONE : View.VISIBLE);
     }
 
     @Override
-    public DashboardPresenter create() {
-        return new DashboardPresenter(this);
+    public void onBackPressed() {
+        activity.overridePendingTransition(R.anim.slide_nothing, R.anim.slide_out);
     }
 
     @Override
-    public void onDestroy() {
-        viewContainer = null;
-        super.onDestroy();
+    public void setTitle(String title) {
+        collapsingToolbar.setTitle(title);
+    }
+
+    @Override
+    public void setBackgroundDrawable(final Drawable drawable) {
+        animate(headerImage, drawable);
+    }
+
+    private void animate(final ImageView imageView, final Drawable drawable) {
+        Drawable[] layers = new Drawable[] { headerImage.getDrawable(), drawable };
+        TransitionDrawable transitionDrawable = new TransitionDrawable(layers);
+        imageView.setImageDrawable(transitionDrawable);
+        transitionDrawable.startTransition(FADE_DURATION);
+    }
+
+    @Override
+    public void setSelectedOffer(String title, String prize, String availability, Set<Offer.Ingredient> ingredients) {
+        selectedOfferLayout.setVisibility(View.VISIBLE);
+        selectedOfferTextView.setText(Html.fromHtml(title));
+
+        if (ingredients.isEmpty()) {
+            ingredientsView.setVisibility(View.GONE);
+        } else {
+            ingredientsView.removeAllViews();
+            Context context = LunchtimeApplication.getContext();
+            for (Offer.Ingredient ingredient : ingredients) {
+                ImageView tagView = new ImageView(context);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    tagView.setImageDrawable(context.getDrawable(ingredient.getDrawableResource()));
+                } else {
+                    tagView.setImageDrawable(context.getResources().getDrawable(ingredient.getDrawableResource()));
+                }
+                tagView.setPadding(INGREDIENTS_PADDING_IN_PIXELS, 0, INGREDIENTS_PADDING_IN_PIXELS, 0);
+                ingredientsView.addView(tagView);
+            }
+        }
+
+        selectedOfferPrizeTextView.setText(prize);
+        selectedOfferAvailability.setText(availability);
+    }
+
+    @OnClick(R.id.restaurant_short_description)
+    void onRestaurantShortDescriptionClicked() {
+        if (clickListener == null) {
+            return;
+        }
+        clickListener.onRestaurantShortDescriptionClicked();
+    }
+
+    @OnClick(R.id.restaurant_location)
+    void onRestaurantLocationClicked() {
+        if (clickListener == null) {
+            return;
+        }
+        clickListener.onRestaurantLocationClicked();
+    }
+
+    @OnClick(R.id.restaurant_opening_times)
+    void onRestaurantOpeningTimesClicked() {
+        if (clickListener == null) {
+            return;
+        }
+        clickListener.onRestaurantOpeningTimesClicked();
+    }
+
+    @OnClick(R.id.restaurant_url)
+    void onRestaurantUrlClicked() {
+        if (clickListener == null) {
+            return;
+        }
+        clickListener.onRestaurantUrlClicked();
+    }
+
+    @Override
+    public void setRestaurantData(ClickListener listener, String shortDescription, String longDescription, String location, String openingTimes, String[] openingTimesExpanded, String url) {
+        this.clickListener = listener;
+        restaurantDescription.setText(shortDescription);
+        longDescription = longDescription.replace("<h1>", "<h4>");
+        longDescription = longDescription.replace("<h2>", "<h4>");
+        longDescription = longDescription.replace("</h1>", "</h4>");
+        longDescription = longDescription.replace("</h2>", "</h4>");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            restaurantDescriptionExpanded.setText(Html.fromHtml(longDescription, Html.FROM_HTML_MODE_COMPACT));
+        } else {
+            restaurantDescriptionExpanded.setText(Html.fromHtml(longDescription));
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            restaurantOpeningTimesExpanded1.setText(Html.fromHtml(openingTimesExpanded[0], Html.FROM_HTML_MODE_COMPACT));
+            restaurantOpeningTimesExpanded2.setText(Html.fromHtml(openingTimesExpanded[1], Html.FROM_HTML_MODE_COMPACT));
+        } else {
+            restaurantOpeningTimesExpanded1.setText(Html.fromHtml(openingTimesExpanded[0]));
+            restaurantOpeningTimesExpanded2.setText(Html.fromHtml(openingTimesExpanded[1]));
+        }
+        restaurantLocation.setText(location);
+        restaurantOpeningTimesHead.setText(openingTimes);
+        restaurantUrl.setText(url);
     }
 }
+

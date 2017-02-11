@@ -676,7 +676,11 @@
  */
 package com.tbaehr.lunchtime.model;
 
-import java.util.Date;
+import android.support.annotation.Nullable;
+
+import com.tbaehr.lunchtime.utils.DateTime;
+import com.tbaehr.lunchtime.utils.DateUtils;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -686,16 +690,46 @@ import java.util.Set;
  */
 public class Offers {
 
+    private String restaurantId;
+
     private String title;
 
     private String description;
 
     private List<Offer> offers;
 
-    public Offers(String title, String description, List<Offer> offers) {
+    public Offers(String restaurantId, String title, String description, List<Offer> offers) {
+        this.restaurantId = restaurantId;
         this.title = title;
         this.description = description;
         this.offers = offers;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        // equal type?
+        if (obj == null || !(obj instanceof Offers)) {
+            return false;
+        }
+        Offers otherOffers = (Offers) obj;
+
+        // equal size?
+        boolean isEqual = getOffers().size() == otherOffers.getOffers().size();
+        if (!isEqual) {
+            return false;
+        }
+
+        // equal offers?
+        for (int i = 0; i< offers.size(); i++) {
+            Offer offer = getOffer(i);
+            Offer anotherOffer = otherOffers.getOffer(i);
+            isEqual = offer.equals(anotherOffer);
+            if (!isEqual) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public String getRestaurantName() {
@@ -710,15 +744,29 @@ public class Offers {
         return offers;
     }
 
+    public int getIndex(Offer offer) {
+        return offers.indexOf(offer);
+    }
+
     public boolean isEmpty() {
         return offers.isEmpty();
     }
 
-    public Set<Date> getUiRefreshDates() {
-        Set<Date> refreshDates = new HashSet<>();
-        for (Offer offer : getOffers()) {
+    /**
+     * @return Refresh dates at the same day
+     */
+    public Set<DateTime> getUiRefreshDates() {
+        Set<DateTime> refreshDates = new HashSet<>();
+        List<Offer> offers = getOffers();
+        DateTime midnight = DateUtils.getDate(0, 0);
+        midnight.updateToNextDay();
+        for (Offer offer : offers) {
+            boolean tomorrowValid = offer.getValidationState().equals(Offer.ValidationState.SOON_VALID);
             boolean soonValid = offer.getValidationState().equals(Offer.ValidationState.SOON_VALID);
             boolean nowValid = offer.getValidationState().equals(Offer.ValidationState.NOW_VALID);
+            if (tomorrowValid) {
+                refreshDates.add(midnight);
+            }
             if (soonValid) {
                 refreshDates.add(offer.getStartDate());
             }
@@ -727,5 +775,13 @@ public class Offers {
             }
         }
         return refreshDates;
+    }
+
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    public Offer getOffer(int index) {
+        return offers.get(index);
     }
 }

@@ -674,48 +674,209 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.controller;
+package com.tbaehr.lunchtime.utils;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.content.Context;
+import android.support.annotation.NonNull;
 
-import com.tbaehr.lunchtime.presenter.DashboardPresenter;
-import com.tbaehr.lunchtime.view.DashboardViewContainer;
-import com.tbaehr.lunchtime.view.IDashboardViewContainer;
+import com.tbaehr.lunchtime.LunchtimeApplication;
+import com.tbaehr.lunchtime.R;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
- * Created by timo.baehr@gmail.com on 25.11.16.
+ * Created by timo.baehr@gmail.com on 04.02.17.
  */
-public class DashboardFragment extends BaseFragment<IDashboardViewContainer, DashboardPresenter> {
+public class DateTime implements Comparable<DateTime> {
 
-    private DashboardViewContainer viewContainer;
+    public static final long SECOND_IN_MILLIS = 1000L;
 
+    public static final long DAY_IN_MILLIS = 24 * 60 * 60 * SECOND_IN_MILLIS;
+
+    private long timeInMillis;
+
+    /**
+     * Create a date with the current time.
+     */
+    public DateTime() {
+        timeInMillis = System.currentTimeMillis();
+    }
+
+    /**
+     * Create a date with the time represented by the argument <code>timeInMillis</code>.
+     */
+    public DateTime(long timeInMillis) {
+        this.timeInMillis = timeInMillis;
+    }
+
+    public long getMillis() {
+        return timeInMillis;
+    }
+
+    /**
+     * Returns the value of the given <code>java.util.Calendar</code> field.
+     *
+     * @param field the given <code>java.util.Calendar</code> field.
+     * @return the value for the given <code>java.util.Calendar</code> field.
+     */
+    public int get(int field) {
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTimeInMillis(timeInMillis);
+        return calendar.get(field);
+    }
+
+    /**
+     * @param anotherDate the <code>DateTime</code> to be compared.
+     * @return value <code>true</code> if this <code>DateTime</code> is before
+     * the time represented by the argument <code>anotherDate</code>, otherwise
+     * value <code>false</code>.
+     */
+    public boolean before(@NonNull DateTime anotherDate) {
+        int comp = compareTo(anotherDate);
+        return comp == -1;
+    }
+
+    /**
+     * @param anotherDate the <code>DateTime</code> to be compared.
+     * @return value <code>true</code> if this <code>DateTime</code> is after
+     * the time represented by the argument <code>anotherDate</code>, otherwise
+     * value <code>false</code>.
+     */
+    public boolean after(@NonNull DateTime anotherDate) {
+        int comp = compareTo(anotherDate);
+        return comp == 1;
+    }
+
+    /**
+     * @param anotherDate the <code>DateTime</code> to be compared.
+     * @return the value <code>0</code> if the time represented by the argument
+     * is equal to the time represented by this <code>DateTime</code>; value
+     * <code>-1</code> if the time of this <code>DateTime</code> is before
+     * the time represented by the argument; and value <code>1</code>
+     * if the time of this <code>DateTime</code> is after the
+     * time represented by the argument.
+     */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        viewContainer = new DashboardViewContainer(getContext(), inflater, container);
-        return viewContainer.getRootView();
+    public int compareTo(@NonNull DateTime anotherDate) {
+        long otherDateMillis = anotherDate.getMillis();
+        return (timeInMillis > otherDateMillis) ? 1 : (timeInMillis == otherDateMillis) ? 0 : -1;
     }
 
     @Override
-    public IDashboardViewContainer getViewLayer() {
-        return viewContainer;
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof DateTime)) {
+            return false;
+        }
+        DateTime other = (DateTime) obj;
+        return other.getMillis() == getMillis();
     }
 
-    @Override
-    public Class<? extends DashboardPresenter> getTypeClazz() {
-        return DashboardPresenter.class;
+    /**
+     * @param anotherDate the <code>DateTime</code> to be compared.
+     * @return the value <code>0</code> if the time represented by the argument
+     * is equal to the time represented by this <code>DateTime</code>; a value
+     * less than <code>0</code> if the time of this <code>DateTime</code> is
+     * before the time represented by the argument; and a value greater than
+     * <code>0</code> if the time of this <code>DateTime</code> is after the
+     * time represented by the argument.
+     */
+    public long differenceInMillis(DateTime anotherDate) {
+        long otherDateMillis = anotherDate.getMillis();
+        return timeInMillis - otherDateMillis;
     }
 
-    @Override
-    public DashboardPresenter create() {
-        return new DashboardPresenter(this);
+    /**
+     * @param anotherDate the <code>DateTime</code> to be compared.
+     * @return the difference in days, regardless of the hours between both.
+     */
+    public int differenceInDays(DateTime anotherDate) {
+        int day = get(Calendar.DAY_OF_YEAR);
+        int otherDay = anotherDate.get(Calendar.DAY_OF_YEAR);
+        return Math.abs(day - otherDay);
     }
 
-    @Override
-    public void onDestroy() {
-        viewContainer = null;
-        super.onDestroy();
+    public String differenceAsHourMinute(DateTime anotherDate) {
+        long differenceInMillis = differenceInMillis(anotherDate);
+        int differenceInMinutes = Math.abs((int) differenceInMillis / 1000 / 60);
+
+        int hours = differenceInMinutes / 60;
+        int minutes = differenceInMinutes - (hours * 60);
+
+        Context context = LunchtimeApplication.getContext();
+        StringBuilder sb = new StringBuilder("");
+        if (hours > 0) {
+            sb.append(hours).append(" ");
+            if (hours > 1) {
+                sb.append(context.getString(R.string.hours));
+            } else {
+                sb.append(context.getString(R.string.hour));
+            }
+            sb.append(", ");
+        }
+        sb.append(minutes).append(" ");
+        if (minutes > 1 || minutes == 0) {
+            sb.append(context.getString(R.string.minutes));
+        } else {
+            sb.append(context.getString(R.string.minute));
+        }
+
+        return sb.toString();
+    }
+
+    public String asHourMinute() {
+        int hours = get(Calendar.HOUR_OF_DAY);
+        int minutes = get(Calendar.MINUTE);
+        String sMinutes = minutes < 10 ? "0" + minutes : String.valueOf(minutes);
+
+        StringBuilder sb = new StringBuilder("");
+        sb.append(hours).append(":").append(sMinutes);
+        return sb.toString();
+    }
+
+    public static String asWeekDay(int weekDay) {
+        Context context = LunchtimeApplication.getContext();
+        switch (weekDay) {
+            case Calendar.MONDAY: return context.getString(R.string.monday);
+            case Calendar.TUESDAY: return context.getString(R.string.tuesday);
+            case Calendar.WEDNESDAY: return context.getString(R.string.wednesday);
+            case Calendar.THURSDAY: return context.getString(R.string.thursday);
+            case Calendar.FRIDAY: return context.getString(R.string.friday);
+            case Calendar.SATURDAY: return context.getString(R.string.saturday);
+            case Calendar.SUNDAY: return context.getString(R.string.sunday);
+            default:
+                throw new RuntimeException("Weekday not found");
+        }
+    }
+
+    public Date toDate() {
+        return new Date(getMillis());
+    }
+
+    public int[] nextWeekDays() {
+        int[] nextWeekdays = new int[6];
+        int currentWeekDay = get(Calendar.DAY_OF_WEEK);
+        for (int i = 0; i < nextWeekdays.length; i++) {
+            nextWeekdays[i] = currentWeekDay + 1 + i;
+            if (nextWeekdays[i] > 7) {
+                nextWeekdays[i] = nextWeekdays[i] - 7;
+            }
+        }
+        return nextWeekdays;
+    }
+
+    public void updateToNextDay() {
+        timeInMillis = timeInMillis + DAY_IN_MILLIS;
+    }
+
+    public DateTime updateWeekDay(int weekDay) {
+        int currentDayOfWeek = get(Calendar.DAY_OF_WEEK);
+        int diff = weekDay - currentDayOfWeek;
+        if (diff < 0) {
+            diff = 7 + diff;
+        }
+        timeInMillis = timeInMillis + diff * DAY_IN_MILLIS;
+        return this;
     }
 }

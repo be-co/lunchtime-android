@@ -690,6 +690,18 @@ public class LunchtimeApplication extends Application {
         instance = this;
     }
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        /*if (BuildConfig.DEBUG) {
+            if (LeakCanary.isInAnalyzerProcess(this)) {
+                return;
+            }
+            LeakCanary.install(this);
+        }*/
+    }
+
     public static Context getContext() {
         return instance.getApplicationContext();
     }

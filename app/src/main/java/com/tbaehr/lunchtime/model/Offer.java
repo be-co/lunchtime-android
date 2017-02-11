@@ -679,11 +679,12 @@ package com.tbaehr.lunchtime.model;
 import android.content.Context;
 import android.support.annotation.DrawableRes;
 
+import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
+import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -701,11 +702,12 @@ public class Offer {
     }
 
     public enum ValidationState {
-        INVALID,
-        NEXT_DAYS_VALID,
-        SOON_VALID,
+        OUTDATED,
         NOW_VALID,
-        OUTDATED;
+        SOON_VALID,
+        TOMMORROW_VALID,
+        NEXT_DAYS_VALID,
+        INVALID;
     }
 
     public enum Tag {
@@ -735,13 +737,15 @@ public class Offer {
         }
     }
 
+    private String restaurantId;
+
     private String title;
 
     private String description;
 
     private int prize;
 
-    private Date startDate, endDate;
+    private DateTime startDate, endDate;
 
     private Category category;
 
@@ -750,11 +754,13 @@ public class Offer {
     //@DrawableRes
     //private int drawableRes;
 
-    public Offer(//@DrawableRes int drawableRes,
+    public Offer(String restaurantId,
+                 //@DrawableRes int drawableRes,
                  String title, String description, int prize,
                  String starts, String ends,
                  Category category, Set<Ingredient> ingredients) {
         //this.drawableRes = drawableRes;
+        this.restaurantId = restaurantId;
         this.title = title;
         this.description = description;
         this.prize = prize;
@@ -766,10 +772,11 @@ public class Offer {
         this.ingredients = ingredients;
     }
 
-    public Offer(String title, String description, int prize,
+    public Offer(String restaurantId,
+                 String title, String description, int prize,
                  String starts, String ends,
                  Category category) {
-        this(title, description, prize, starts, ends, category, null);
+        this(restaurantId, title, description, prize, starts, ends, category, new HashSet<Ingredient>());
     }
 
     @Override
@@ -781,8 +788,8 @@ public class Offer {
 
         return other.getPrize() == prize
                 //&& other.drawableRes == drawableRes
-                && other.title == title
-                && other.description == description
+                && other.title.equals(title)
+                && other.description.equals(description)
                 && other.startDate.equals(startDate)
                 && other.endDate.equals(endDate);
     }
@@ -794,11 +801,15 @@ public class Offer {
                 title.hashCode();
     }
 
-    public Date getStartDate() {
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    public DateTime getStartDate() {
         return startDate;
     }
 
-    public Date getEndDate() {
+    public DateTime getEndDate() {
         return endDate;
     }
 
@@ -822,14 +833,6 @@ public class Offer {
         // TODO: Fetch currency
         String prize = String.format("%d,%s€", euros, cents == 0 ? "00" : cents);
         return prize;
-    }
-
-    public static String formatMinutes(int timeInMinutes) {
-        int hours = timeInMinutes / 60;
-        int minutes = timeInMinutes - hours * 60;
-        String sMinutes = String.valueOf(minutes);
-        sMinutes = sMinutes.length() == 2 ? sMinutes : "0" + sMinutes;
-        return hours + ":" + sMinutes;
     }
 
     /*public int getDrawableRes() {
@@ -857,16 +860,16 @@ public class Offer {
             return ValidationState.INVALID;
         }
 
-        Date now = new Date(System.currentTimeMillis());
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(now);
-        int dayOfYearToday = calendar.get(Calendar.DAY_OF_YEAR);
-
-        calendar.setTime(startDate);
-        int dayOfYearStart = calendar.get(Calendar.DAY_OF_YEAR);
+        DateTime now = new DateTime();
+        int dayOfYearToday = now.get(Calendar.DAY_OF_YEAR);
+        int dayOfYearStart = startDate.get(Calendar.DAY_OF_YEAR);
 
         if (dayOfYearStart > dayOfYearToday) {
-            return ValidationState.NEXT_DAYS_VALID;
+            if (now.differenceInDays(startDate) > 1) {
+                return ValidationState.NEXT_DAYS_VALID;
+            } else {
+                return ValidationState.TOMMORROW_VALID;
+            }
         } else if (now.before(startDate)) {
             return ValidationState.SOON_VALID;
         } else if (now.after(startDate) && now.before(endDate)) {
@@ -876,20 +879,26 @@ public class Offer {
         }
     }
 
-    public String getOpeningTimeShortDescription(Context context) {
-        Calendar calendar = Calendar.getInstance();
+    public String getOpeningTimeShortDescription() {
         ValidationState validationState = getValidationState();
-        int currentTimeInMinutes;
+        Context context = LunchtimeApplication.getContext();
 
         switch (validationState) {
             case SOON_VALID:
-                calendar.setTimeInMillis(startDate.getTime());
-                currentTimeInMinutes = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
-                return context.getString(R.string.starts) + " " + formatMinutes(currentTimeInMinutes);
+                return context.getString(R.string.starts) + " " + startDate.asHourMinute();
             case NOW_VALID:
-                calendar.setTimeInMillis(endDate.getTime());
-                currentTimeInMinutes = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
-                return context.getString(R.string.ends) + " " + formatMinutes(currentTimeInMinutes);
+                return context.getString(R.string.ends) + " " + endDate.asHourMinute();
+            case TOMMORROW_VALID:
+            case NEXT_DAYS_VALID:
+                int dayOfYearStart = startDate.get(Calendar.DAY_OF_YEAR);
+                int todayOfYear = (new DateTime()).get(Calendar.DAY_OF_YEAR);
+
+                if (dayOfYearStart - todayOfYear == 1) {
+                    return context.getString(R.string.tomorrow);
+                } else {
+                    int weekDay = startDate.get(Calendar.DAY_OF_WEEK);
+                    return DateTime.asWeekDay(weekDay);
+                }
             default:
             case OUTDATED:
                 return context.getString(R.string.expired);

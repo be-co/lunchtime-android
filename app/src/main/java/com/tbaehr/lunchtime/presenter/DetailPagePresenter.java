@@ -674,158 +674,311 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.view;
+package com.tbaehr.lunchtime.presenter;
 
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.view.MenuItem;
 
+import com.tbaehr.lunchtime.DataProvider;
 import com.tbaehr.lunchtime.R;
-import com.tbaehr.lunchtime.controller.DashboardFragment;
-import com.tbaehr.lunchtime.controller.HelpFragment;
-import com.tbaehr.lunchtime.controller.MasterPageActivity;
+import com.tbaehr.lunchtime.controller.DetailPageActivity;
+import com.tbaehr.lunchtime.model.Offer;
+import com.tbaehr.lunchtime.model.Restaurant;
+import com.tbaehr.lunchtime.utils.DateTime;
+import com.tbaehr.lunchtime.utils.LoadJobListener;
+import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import static com.tbaehr.lunchtime.view.MasterPageView.TAG_DASHBOARD_FRAGMENT;
-import static com.tbaehr.lunchtime.view.MasterPageView.TAG_HELP_FRAGMENT;
+import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_OFFER_INDEX;
+import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_ID;
+import static com.tbaehr.lunchtime.utils.DateTime.SECOND_IN_MILLIS;
 
 /**
- * Created by timo.baehr@gmail.com on 31.12.16.
+ * Created by timo.baehr@gmail.com on 26.01.17.
  */
-public class MasterPageView implements IMasterPageViewContainer {
+public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewContainer> implements LoadJobListener<List<Restaurant>>, IDetailPageViewContainer.ClickListener {
 
-    public static final String TAG_DASHBOARD_FRAGMENT = DashboardFragment.class.getCanonicalName();
+    private final int IMAGE_DURATION = 8000;
 
-    public static final String TAG_HELP_FRAGMENT = HelpFragment.class.getCanonicalName();
+    private DetailPageActivity activity;
 
-    @BindView(R.id.drawer_layout)
-    DrawerLayout drawer;
+    private String restaurantId;
 
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
+    private Restaurant restaurant;
 
-    @BindView(R.id.nav_view)
-    NavigationView navigationView;
+    private boolean retryImageSync = true;
 
-    @BindView(R.id.nested_scroll_view)
-    NestedScrollView nestedScrollView;
+    private List<Drawable> drawables;
 
-    @BindView(R.id.app_bar_layout)
-    AppBarLayout appBarLayout;
+    private int drawableCounter = 0;
 
-    @BindView(R.id.collapsing_toolbar)
-    CollapsingToolbarLayout collapsingToolbar;
+    private final int index;
 
-    private FragmentHolder fragmentHolder;
+    private DataProvider dataProvider;
 
-    public MasterPageView(MasterPageActivity activity, FragmentManager fragmentManager) {
-        activity.setContentView(R.layout.activity_master_page);
-        activity.setAsFullScreenActivity();
-        View rootView = activity.findViewById(R.id.drawer_layout);
-        ButterKnife.bind(this, rootView);
-        fragmentHolder = new FragmentHolder(fragmentManager);
+    private Timer timer;
+
+    private TimerTask slideshowTask;
+
+    public DetailPagePresenter(DetailPageActivity activity) {
+        this.activity = activity;
+        this.dataProvider = new DataProvider();
+        this.index = activity.getIntent().getIntExtra(KEY_OFFER_INDEX, -1);
+        this.restaurantId = activity.getIntent().getStringExtra(KEY_RESTAURANT_ID);
+        restaurant = getRestaurant();
     }
 
     @Override
-    public void showToolbar(AppCompatActivity activity, NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener) {
-        activity.setSupportActionBar(toolbar);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                activity,
-                drawer,
-                toolbar,
-                R.string.nav_content_desc_drawer_open,
-                R.string.nav_content_desc_drawer_close
-        );
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-        navigationView.setNavigationItemSelectedListener(navigationItemSelectedListener);
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        dataProvider.syncRestaurants(this);
+        timer = new Timer();
+        syncRestaurantImages();
     }
 
     @Override
-    public void setToolbarTitle(String title) {
-        collapsingToolbar.setTitle(title);
+    public void onDestroy() {
+        activity = null;
+        restaurantId = null;
+        restaurant = null;
+        if (drawables != null) drawables.clear();
+        drawables = null;
+        dataProvider = null;
+        slideshowTask = null;
+        super.onDestroy();
     }
 
     @Override
-    public void showDashboardFragment() {
-        fragmentHolder.showDashboardFragment();
+    public void bindView(IDetailPageViewContainer view) {
+        super.bindView(view);
+        getView().setTitle(getRestaurantName());
+        updateSelectedOffer();
+        updateRestaurantData();
+        if (index != -1) {
+            startTimer();
+        }
+        if (restaurant != null) {
+            DateTime openingDate = restaurant.getOpeningDate();
+            DateTime closingDate = restaurant.getClosingDate();
+            if (openingDate != null && closingDate != null) {
+                startTimeBasedRefresh(openingDate, closingDate);
+            }
+        }
+        syncRestaurantImages();
     }
 
     @Override
-    public void showHelpFragment() {
-        fragmentHolder.showHelpFragment();
+    public void unbindView() {
+        stopTimer();
+        super.unbindView();
     }
 
-    @Override
-    public void closeDrawer() {
-        drawer.closeDrawer(GravityCompat.START);
-    }
+    private void syncRestaurantImages() {
+        if (restaurant != null && retryImageSync) {
+            dataProvider.syncRestaurantImages(restaurant, new LoadJobListener<List<Drawable>>() {
+                @Override
+                public void onDownloadStarted() {
+                    retryImageSync = false;
+                }
 
-    @Override
-    public boolean onBackPressed() {
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-            return true;
+                @Override
+                public void onDownloadFailed(String message) {
+                    retryImageSync = true;
+                }
+
+                @Override
+                public void onDownloadFinished(List<Drawable> drawables) {
+                    DetailPagePresenter.this.drawables = drawables;
+                    startRestaurantSlideshow();
+                }
+            });
         } else {
-            return false;
-        }
-    }
-}
-
-class FragmentHolder {
-
-    private DashboardFragment dashboard;
-    private HelpFragment help;
-
-    private Fragment previousFragment, activeFragment;
-
-    private FragmentManager fragmentManager;
-
-    FragmentHolder(FragmentManager fragmentManager) {
-        this.fragmentManager = fragmentManager;
-
-        // Add 'dashboard' page
-        dashboard = (DashboardFragment) fragmentManager.findFragmentByTag(TAG_DASHBOARD_FRAGMENT);
-        if (dashboard == null) {
-            dashboard = new DashboardFragment();
-        }
-
-        // Add 'help' page
-        help = (HelpFragment) fragmentManager.findFragmentByTag(TAG_HELP_FRAGMENT);
-        if (help == null) {
-            help = new HelpFragment();
+            retryImageSync = true;
         }
     }
 
-    void showDashboardFragment() {
-        previousFragment = activeFragment;
-        activeFragment = dashboard;
-        showFragment();
-    }
-
-    void showHelpFragment() {
-        previousFragment = activeFragment;
-        activeFragment = help;
-        showFragment();
-    }
-
-    private void showFragment() {
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        if (previousFragment != null) {
-            transaction.remove(previousFragment);
+    private void startRestaurantSlideshow() {
+        final IDetailPageViewContainer view = getView();
+        if (view == null || drawables == null || drawables.size() == 0) {
+            return;
         }
-        transaction.replace(R.id.fragment_container, activeFragment, activeFragment.getClass().getCanonicalName()).commit();
+        view.setBackgroundDrawable(drawables.get(drawableCounter));
+
+        if (drawables.size() > 1) {
+            if (slideshowTask != null) slideshowTask.cancel();
+            slideshowTask = createTimerTask(new Runnable() {
+                @Override
+                public void run() {
+                    drawableCounter = drawableCounter < drawables.size() - 1 ? drawableCounter + 1 : 0;
+                    view.setBackgroundDrawable(drawables.get(drawableCounter));
+                }
+            });
+            timer.schedule(slideshowTask, IMAGE_DURATION, IMAGE_DURATION);
+        }
+    }
+
+    private TimerTask createTimerTask(final Runnable runnable) {
+        return new TimerTask() {
+            @Override
+            public void run() {
+                activity.runOnUiThread(runnable);
+            }
+        };
+    }
+
+    private void startTimeBasedRefresh(DateTime... date) {
+        for (DateTime d : date) {
+            timer.schedule(createTimerTask(new Runnable() {
+                @Override
+                public void run() {
+                    updateRestaurantData();
+                }
+            }), d.toDate());
+        }
+    }
+
+    private void startTimer() {
+        if (timer == null) {
+            timer = new Timer();
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), 0);
+        Date now = calendar.getTime();
+        timer.schedule(createTimerTask(new Runnable() {
+            @Override
+            public void run() {
+                updateSelectedOffer();
+            }
+        }), now, SECOND_IN_MILLIS);
+    }
+
+    private void stopTimer() {
+        if (timer != null) {
+            timer.cancel();
+        }
+        timer = null;
+    }
+
+    private void updateSelectedOffer() {
+        IDetailPageViewContainer view = getView();
+        if (index != -1 && view != null) {
+            Offer offer = getSelectedOffer();
+            String title = "<b>" + offer.getTitle() + "</b>" + " " + offer.getDescription();
+            String prize = Offer.formatPrize(offer.getPrize());
+
+            Offer.ValidationState validationState = offer.getValidationState();
+            String availability;
+            if (validationState.equals(Offer.ValidationState.OUTDATED)
+                    || validationState.equals(Offer.ValidationState.NEXT_DAYS_VALID)
+                    || validationState.equals(Offer.ValidationState.INVALID)) {
+                availability = offer.getOpeningTimeShortDescription();
+            } else {
+                DateTime now = new DateTime();
+
+                if (validationState.equals(Offer.ValidationState.SOON_VALID) || validationState.equals(Offer.ValidationState.TOMMORROW_VALID)) {
+                    DateTime opens = offer.getStartDate();
+                    availability = activity.getString(R.string.available_at, now.differenceAsHourMinute(opens));
+                } else {
+                    DateTime closes = offer.getEndDate();
+                    availability = activity.getString(R.string.available_since, now.differenceAsHourMinute(closes));
+                }
+            }
+
+            Set<Offer.Ingredient> ingredients = offer.getIngredients();
+            view.setSelectedOffer(title, prize, availability, ingredients);
+        }
+    }
+
+    private void updateRestaurantData() {
+        restaurant = getRestaurant();
+        syncRestaurantImages();
+        if (restaurant != null) {
+            String shortDescription = restaurant.getShortDescription();
+            String longDescription = restaurant.getLongDescription();
+            String location = restaurant.getLocationDescription();
+            String openingTimes = restaurant.getOpeningTimeDescriptionForToday();
+            String[] openingTimesExpanded = restaurant.getOpeningTimeDescriptionFull();
+            String url = restaurant.getUrl();
+            getView().setRestaurantData(this, shortDescription, longDescription, location, openingTimes, openingTimesExpanded, url);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    public void onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+        }
+    }
+
+    public void onBackPressed() {
+        activity.finish();
+        getView().onBackPressed();
+    }
+
+    private Restaurant getRestaurant() {
+        return dataProvider.loadRestaurantFromCache(restaurantId);
+    }
+
+    private String getRestaurantName() {
+        return dataProvider.loadOffersFromCache(restaurantId).getRestaurantName();
+    }
+
+    private Offer getSelectedOffer() {
+        return dataProvider.loadOffersFromCache(restaurantId).getOffer(index);
+    }
+
+    @Override
+    public void onDownloadStarted() {
+        // ;
+    }
+
+    @Override
+    public void onDownloadFailed(String message) {
+        // TODO: User feedback
+    }
+
+    @Override
+    public void onDownloadFinished(List<Restaurant> downloadedObject) {
+        updateRestaurantData();
+    }
+
+    @Override
+    public void onRestaurantShortDescriptionClicked() {
+        getView().expandCollapseDescription();
+    }
+
+    @Override
+    public void onRestaurantLocationClicked() {
+        String uri = String.format(Locale.ENGLISH, "geo:0,0?q=%s$1", restaurant.getLocationDescription());
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+        activity.startActivity(intent);
+    }
+
+    @Override
+    public void onRestaurantOpeningTimesClicked() {
+        getView().expandCollapseOpeningTimes();
+    }
+
+    @Override
+    public void onRestaurantUrlClicked() {
+        activity.openUrl(Uri.parse(restaurant.getUrl()));
     }
 }

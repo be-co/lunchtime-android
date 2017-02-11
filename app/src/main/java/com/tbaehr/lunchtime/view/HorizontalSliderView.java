@@ -702,7 +702,7 @@ import static com.tbaehr.lunchtime.model.Offer.formatPrize;
  */
 public class HorizontalSliderView extends LinearLayout {
 
-    private static final int INGREDIENTS_PADDING_IN_PIXELS = 4;
+    static final int INGREDIENTS_PADDING_IN_PIXELS = 4;
 
     private static final int MAX_ITEM_WIDTH = 150;
 
@@ -843,7 +843,7 @@ public class HorizontalSliderView extends LinearLayout {
         prizeView.setText(formatPrize(offer.getPrize()));
 
         TextView openingTimeView = (TextView) itemView.findViewById(R.id.availability);
-        openingTimeView.setText(offer.getOpeningTimeShortDescription(context));
+        openingTimeView.setText(offer.getOpeningTimeShortDescription());
 
         LinearLayout ingredients = (LinearLayout) itemView.findViewById(R.id.ingredients);
         for (Offer.Ingredient ingredient : offer.getIngredients()) {

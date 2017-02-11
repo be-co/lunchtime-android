@@ -674,48 +674,169 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.controller;
+package com.tbaehr.lunchtime.view;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.NestedScrollView;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.ViewGroup;
 
-import com.tbaehr.lunchtime.presenter.DashboardPresenter;
-import com.tbaehr.lunchtime.view.DashboardViewContainer;
-import com.tbaehr.lunchtime.view.IDashboardViewContainer;
+import com.tbaehr.lunchtime.R;
+import com.tbaehr.lunchtime.controller.DashboardFragment;
+import com.tbaehr.lunchtime.controller.HelpFragment;
+import com.tbaehr.lunchtime.controller.MasterPageActivity;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_DASHBOARD_FRAGMENT;
+import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_HELP_FRAGMENT;
 
 /**
- * Created by timo.baehr@gmail.com on 25.11.16.
+ * Created by timo.baehr@gmail.com on 31.12.16.
  */
-public class DashboardFragment extends BaseFragment<IDashboardViewContainer, DashboardPresenter> {
+public class MasterPageViewContainer implements IMasterPageViewContainer {
 
-    private DashboardViewContainer viewContainer;
+    public static final String TAG_DASHBOARD_FRAGMENT = DashboardFragment.class.getCanonicalName();
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        viewContainer = new DashboardViewContainer(getContext(), inflater, container);
-        return viewContainer.getRootView();
+    public static final String TAG_HELP_FRAGMENT = HelpFragment.class.getCanonicalName();
+
+    @BindView(R.id.drawer_layout)
+    DrawerLayout drawer;
+
+    ActionBarDrawerToggle drawerToggleButton;
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
+    @BindView(R.id.nav_view)
+    NavigationView navigationView;
+
+    @BindView(R.id.nested_scroll_view)
+    NestedScrollView nestedScrollView;
+
+    @BindView(R.id.app_bar_layout)
+    AppBarLayout appBarLayout;
+
+    @BindView(R.id.collapsing_toolbar)
+    CollapsingToolbarLayout collapsingToolbar;
+
+    private FragmentHolder fragmentHolder;
+
+    public MasterPageViewContainer(MasterPageActivity activity, FragmentManager fragmentManager) {
+        activity.setContentView(R.layout.activity_master_page);
+        activity.setAsFullScreenActivity();
+        View rootView = activity.findViewById(R.id.drawer_layout);
+        ButterKnife.bind(this, rootView);
+        fragmentHolder = new FragmentHolder(fragmentManager);
     }
 
     @Override
-    public IDashboardViewContainer getViewLayer() {
-        return viewContainer;
+    public void showToolbar(AppCompatActivity activity, NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener) {
+        activity.setSupportActionBar(toolbar);
+        setupDrawerToggle(activity);
+        navigationView.setNavigationItemSelectedListener(navigationItemSelectedListener);
+    }
+
+    private void setupDrawerToggle(AppCompatActivity activity) {
+        drawerToggleButton = new ActionBarDrawerToggle(
+                activity,
+                drawer,
+                toolbar,
+                R.string.nav_content_desc_drawer_open,
+                R.string.nav_content_desc_drawer_close
+        );
+        drawer.addDrawerListener(drawerToggleButton);
+        drawerToggleButton.syncState();
     }
 
     @Override
-    public Class<? extends DashboardPresenter> getTypeClazz() {
-        return DashboardPresenter.class;
+    public void setToolbarTitle(String title) {
+        collapsingToolbar.setTitle(title);
     }
 
     @Override
-    public DashboardPresenter create() {
-        return new DashboardPresenter(this);
+    public void showDashboardFragment() {
+        fragmentHolder.showDashboardFragment();
     }
 
     @Override
-    public void onDestroy() {
-        viewContainer = null;
-        super.onDestroy();
+    public void showHelpFragment() {
+        fragmentHolder.showHelpFragment();
+    }
+
+    @Override
+    public void closeDrawer() {
+        drawer.closeDrawer(GravityCompat.START);
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void syncDrawerToggleButton() {
+        drawerToggleButton.syncState();
+    }
+}
+
+class FragmentHolder {
+
+    private DashboardFragment dashboard;
+    private HelpFragment help;
+
+    private Fragment previousFragment, activeFragment;
+
+    private FragmentManager fragmentManager;
+
+    FragmentHolder(FragmentManager fragmentManager) {
+        this.fragmentManager = fragmentManager;
+
+        // Add 'dashboard' page
+        dashboard = (DashboardFragment) fragmentManager.findFragmentByTag(TAG_DASHBOARD_FRAGMENT);
+        if (dashboard == null) {
+            dashboard = new DashboardFragment();
+        }
+
+        // Add 'help' page
+        help = (HelpFragment) fragmentManager.findFragmentByTag(TAG_HELP_FRAGMENT);
+        if (help == null) {
+            help = new HelpFragment();
+        }
+    }
+
+    void showDashboardFragment() {
+        previousFragment = activeFragment;
+        activeFragment = dashboard;
+        showFragment();
+    }
+
+    void showHelpFragment() {
+        previousFragment = activeFragment;
+        activeFragment = help;
+        showFragment();
+    }
+
+    private void showFragment() {
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        if (previousFragment != null) {
+            transaction.remove(previousFragment);
+        }
+        transaction.replace(R.id.fragment_container, activeFragment, activeFragment.getClass().getCanonicalName()).commit();
     }
 }

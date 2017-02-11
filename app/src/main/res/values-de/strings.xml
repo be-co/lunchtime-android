@@ -1,17 +1,6 @@
 <resources>
     <string name="app_name">Lunchtime</string>
 
-    <string name="agb"><b>Allgemeine Nutzungsbedingungen\nder Lunchtime-Software und Haftungsausschluss</b>
-        \n\nDie nachfolgenden <i>Allgemeinen Nutzungsbedingungen</i> gelten für die Nutzung der
-        nativen Applikation <i>Lunchtime</i> für Android, iOS und Windows Universal sowie der
-        zugehörigen Web-App im Browser sowie der Desktop-Applikation <i>Lunchtime</i> für Apple OSX,
-        Linux und Windows nebst indirekter Nutzung der Datenspeicherung auf von <i>Lunchtime</i>
-        verwendeten Servern (zusammen die „Lunchtime-Software“).
-        \n\nWillkommen auf der grünen Wiese. Die AGBs sind noch in Bearbeitung.
-    </string>
-    <string name="agb_accept">Wenn Du fortsetzt, akzeptierst Du damit die vollständigen <![CDATA[<a href="">Nutzungsbedingungen</a>]]>.</string> <!-- Wenn Du fortsetzt, akzeptierst Du damit die vollständigen -->
-    <string name="agb_terms_of_use">Nutzungsbedingungen</string>
-
     <!-- 1:1 translations -->
     <string name="_cancel">@android:string/cancel</string>
     <string name="_no">@android:string/no</string>
@@ -54,7 +43,7 @@
     </string>
 
     <string name="help_legal_headline">Rechtliches</string>
-    <string name="help_legal_terms_of_use">Nutzungsbedingungen &#38; Haftungsausschluss</string>
+    <string name="help_legal_terms_of_use">Allgemeine Geschäftsbedingungen</string>
 
     <string name="help_feedback_headline">Deine Meinung</string>
     <string name="help_feedback_playstore">Bewerte uns</string>
@@ -67,5 +56,32 @@
         \nTimo Bähr
         \n\n<b>Pflege der Angebote</b>
         \nIman Naghashian, Timo Bähr
+        \n\n<b>Rechtliches</b>
+        \nIman Naghashian
     </string>
+    <string name="your_choice">Deine Wahl</string>
+
+    <string name="opens_at">Öffnet um %1$s Uhr</string>
+    <string name="closes_at">Schließt um %1$s Uhr</string>
+    <string name="closed">geschlossen</string>
+    <string name="now_closed">Jetzt geschlossen</string>
+
+    <string name="available_at">Verfügbar in %1$s</string>
+    <string name="available_since">Noch %1$s</string>
+
+    <string name="hour">Stunde</string>
+    <string name="hours">Stunden</string>
+    <string name="minute">Minute</string>
+    <string name="minutes">Minuten</string>
+
+    <string name="tomorrow">Morgen</string>
+    <string name="monday">Montag</string>
+    <string name="tuesday">Dienstag</string>
+    <string name="wednesday">Mittwoch</string>
+    <string name="thursday">Donnerstag</string>
+    <string name="friday">Freitag</string>
+    <string name="saturday">Samstag</string>
+    <string name="sunday">Sonntag</string>
+    <string name="and">,</string>
+    <string name="today">Heute</string>
 </resources>

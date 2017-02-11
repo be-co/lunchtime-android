@@ -686,12 +686,12 @@ import com.tbaehr.lunchtime.BuildConfig;
 import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.BaseFragment;
-import com.tbaehr.lunchtime.view.HelpViewContainer;
+import com.tbaehr.lunchtime.view.IHelpViewContainer;
 
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
-public class HelpPresenter extends BasePresenter<HelpViewContainer> {
+public class HelpPresenter extends BasePresenter<IHelpViewContainer> {
 
     private static final String URI_GOOGLE_PLUS = "https://plus.google.com/u/0/communities/115383591691417596235";
     private static final String URI_PLAY_STORE = "https://play.google.com/store/apps/details?id=com.tbaehr.lunchtime";
@@ -703,7 +703,7 @@ public class HelpPresenter extends BasePresenter<HelpViewContainer> {
     }
 
     @Override
-    public void bindView(HelpViewContainer view) {
+    public void bindView(IHelpViewContainer view) {
         super.bindView(view);
         String debug = BuildConfig.DEBUG ? "-debug" : "";
         String versionName = LunchtimeApplication.getContext().getString(R.string.help_about_version, BuildConfig.VERSION_NAME);
@@ -718,7 +718,7 @@ public class HelpPresenter extends BasePresenter<HelpViewContainer> {
     }
 
     private void setClickListeners() {
-        HelpViewContainer view = getView();
+        IHelpViewContainer view = getView();
         view.setOnGooglePlusCardClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -743,6 +743,12 @@ public class HelpPresenter extends BasePresenter<HelpViewContainer> {
                 onAboutTeamClicked();
             }
         });
+        view.setOnAboutVersionClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onAboutVersionClicked();
+            }
+        });
 
     }
 
@@ -764,6 +770,18 @@ public class HelpPresenter extends BasePresenter<HelpViewContainer> {
 
     private void onGooglePlusLinkClicked() {
         fragment.openUrl(Uri.parse(URI_GOOGLE_PLUS));
+    }
+
+    private void onAboutVersionClicked() {
+        new AlertDialog.Builder(fragment.getActivity())
+                .setTitle(R.string.changelog_header)
+                .setMessage(R.string.changelog)
+                .setPositiveButton(R.string._close, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .show();
     }
 
     private void onAboutTeamClicked() {

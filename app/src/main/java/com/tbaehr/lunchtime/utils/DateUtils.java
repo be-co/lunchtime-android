@@ -679,6 +679,7 @@ package com.tbaehr.lunchtime.utils;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -691,18 +692,48 @@ public class DateUtils {
      */
     private static final String DATE_FORMAT = "MMM dd yyyy HH:mm:ss 'GMT'Z";
 
-    public static Date createDateFromString(String date) {
+    public static DateTime createDateFromString(String date) {
         if (date == null) {
             return null;
         }
 
         DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
         try {
-            return dateFormat.parse(date);
+            Date dateTemp = dateFormat.parse(date);
+            return new DateTime(dateTemp.getTime());
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
         return null;
+    }
+
+    /**
+     * Getting a time and returning a Date.
+     *
+     * @param weekDay
+     * @param hours
+     * @param minutes
+     * @return Date today with the given time
+     */
+    public static DateTime getDate(int weekDay, int hours, int minutes) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), hours, minutes, 0);
+        return new DateTime(calendar.getTimeInMillis()).updateWeekDay(weekDay);
+    }
+
+    /**
+     * Getting a time and returning a Date.
+     *
+     * @param hours
+     * @param minutes
+     * @return Date today with the given time
+     */
+    public static DateTime getDate(int hours, int minutes) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), hours, minutes, 0);
+        return new DateTime(calendar.getTimeInMillis());
     }
 }

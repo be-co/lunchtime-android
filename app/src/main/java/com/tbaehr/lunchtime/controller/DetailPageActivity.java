@@ -674,152 +674,62 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime;
+package com.tbaehr.lunchtime.controller;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.tbaehr.lunchtime.controller.DashboardFragment;
-import com.tbaehr.lunchtime.controller.HelpFragment;
+import com.tbaehr.lunchtime.presenter.DetailPagePresenter;
+import com.tbaehr.lunchtime.view.DetailPageViewContainer;
+import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
+/**
+ * Created by timo.baehr@gmail.com on 26.01.17.
+ */
+public class DetailPageActivity extends BaseActivity<IDetailPageViewContainer, DetailPagePresenter> {
 
-public class MasterPageActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    public final static String KEY_RESTAURANT_ID = "key_restaurant";
 
-    private Unbinder butterKnife;
+    public final static String KEY_OFFER_INDEX = "offer_index";
 
-    @BindView(R.id.drawer_layout)
-    DrawerLayout viewContainer;
-
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-
-    @BindView(R.id.nav_view)
-    NavigationView navigationView;
-
-    private FragmentHolder fragmentHolder;
+    private IDetailPageViewContainer view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_master_page);
-        butterKnife = ButterKnife.bind(this);
-
-        initActionBar();
-        fragmentHolder = new FragmentHolder(this, savedInstanceState);
-    }
-
-    private void initActionBar() {
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(R.string.app_name);
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, viewContainer, toolbar, R.string.nav_content_desc_drawer_open, R.string.nav_content_desc_drawer_close);
-        viewContainer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        navigationView.setNavigationItemSelectedListener(this);
+        view = new DetailPageViewContainer(this);
     }
 
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.nav_dashboard:
-                fragmentHolder.showDashboardFragment();
-                break;
-            case R.id.nav_help:
-                fragmentHolder.showHelpFragment();
-                break;
-        }
+    protected void onDestroy() {
+        view = null;
+        super.onDestroy();
+    }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+    @Override
+    public DetailPagePresenter create() {
+        return new DetailPagePresenter(this);
+    }
+
+    @Override
+    public Class<? extends DetailPagePresenter> getTypeClazz() {
+        return DetailPagePresenter.class;
+    }
+
+    @Override
+    public IDetailPageViewContainer getViewLayer() {
+        return view;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        getPresenter().onOptionsItemSelected(item);
         return true;
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        butterKnife.unbind();
-    }
-}
-
-
-class FragmentHolder {
-
-    private DashboardFragment dashboard;
-    private HelpFragment help;
-
-    private static final String TAG_DASHBOARD = "dashboard";
-    private static final String TAG_HELP = "help";
-
-    private Fragment previousFragment, activeFragment;
-
-    private AppCompatActivity context;
-
-    FragmentHolder(AppCompatActivity context, Bundle savedInstance) {
-        this.context = context;
-
-        // Add 'dashboard' page
-        dashboard = (DashboardFragment) context.getSupportFragmentManager().findFragmentByTag(TAG_DASHBOARD);
-        if (dashboard == null) {
-            dashboard = new DashboardFragment();
-        }
-
-        // Add 'help' page
-        help = (HelpFragment) context.getSupportFragmentManager().findFragmentByTag(TAG_HELP);
-        if (help == null) {
-            help = new HelpFragment();
-        }
-
-        // Default: Show 'dashboard' page
-        if (savedInstance == null) {
-            showDashboardFragment();
-        }
-    }
-
-    void showDashboardFragment() {
-        context.getSupportActionBar().setTitle(R.string.app_name);
-        previousFragment = activeFragment;
-        activeFragment = dashboard;
-        showFragment(TAG_DASHBOARD);
-    }
-
-    void showHelpFragment() {
-        context.getSupportActionBar().setTitle(R.string.nav_item_help);
-        previousFragment = activeFragment;
-        activeFragment = help;
-        showFragment(TAG_HELP);
-    }
-
-    private void showFragment(String activeFragmentTag) {
-        FragmentManager fragmentManager = context.getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        if (previousFragment != null) {
-            transaction.remove(previousFragment);
-        }
-        transaction.replace(R.id.fragment_container, activeFragment, activeFragmentTag).commit();
+        super.onBackPressed();
+        getPresenter().onBackPressed();
     }
 }

@@ -676,7 +676,8 @@
  */
 package com.tbaehr.lunchtime.presenter;
 
-import android.support.design.widget.Snackbar;
+import android.app.Activity;
+import android.content.Intent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -685,32 +686,48 @@ import com.tbaehr.lunchtime.DataProvider;
 import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DashboardFragment;
+import com.tbaehr.lunchtime.controller.DetailPageActivity;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Offers;
+import com.tbaehr.lunchtime.utils.DateTime;
+import com.tbaehr.lunchtime.utils.LoadJobListener;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_OFFER_INDEX;
+import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_ID;
+
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
 public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
-        implements DataProvider.LoadJobListener<List<Offers>> {
+        implements LoadJobListener<List<Offers>> {
 
     private DataProvider dataProvider;
 
-    private DashboardFragment dashboardFragment;
+    private Activity activity;
 
     private Timer timer;
 
+    List<Offers> offersList;
+
     public DashboardPresenter(DashboardFragment fragment) {
-        this.dashboardFragment = fragment;
+        this.activity = fragment.getActivity();
+    }
+
+    @Override
+    public void onDestroy() {
+        dataProvider = null;
+        activity = null;
+        timer = null;
+        offersList = null;
+        super.onDestroy();
     }
 
     @Override
@@ -719,10 +736,22 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         dataProvider = new DataProvider();
         dataProvider.syncOffers(this);
 
-        List<Offers> offersList = dataProvider.loadOffersFromCache();
-        startTimeBasedRefresh(offersList);
+        List<Offers> offersListTemp = dataProvider.loadOffersFromCache();
+        boolean dataSetChanged = offersList == null || offersListTemp.size() != offersList.size();
+        if (!dataSetChanged) {
+            for (int i = 0; i < offersListTemp.size(); i++) {
+                boolean isEqual = offersListTemp.get(i).equals(offersList.get(i));
+                if (!isEqual) {
+                    dataSetChanged = true;
+                    break;
+                }
+            }
+        }
 
-        if (!view.isInitialized()) {
+        offersList = offersListTemp;
+
+        startTimeBasedRefresh(offersList);
+        if (!view.isInitialized() || dataSetChanged) {
             presentOffers(offersList);
         }
     }
@@ -733,20 +762,25 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         super.unbindView();
     }
 
+    private void restartTimeBasedRefresh(List<Offers> offersList) {
+        stopTimeBasedRefresh();
+        startTimeBasedRefresh(offersList);
+    }
+
     private void startTimeBasedRefresh(List<Offers> offersList) {
-        Set<Date> refreshDates = new HashSet<>();
+        Set<DateTime> refreshDates = new HashSet<>();
         for (Offers offers : offersList) {
             refreshDates.addAll(offers.getUiRefreshDates());
         }
         startTimers(refreshDates);
     }
 
-    private void startTimers(Set<Date> dates) {
+    private void startTimers(Set<DateTime> dates) {
         if (timer == null) {
             timer = new Timer();
         }
-        for (Date date : dates) {
-            timer.schedule(createTimerTask(), date);
+        for (DateTime date : dates) {
+            timer.schedule(createTimerTask(), date.toDate());
         }
     }
 
@@ -754,7 +788,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         return new TimerTask() {
             @Override
             public void run() {
-                dashboardFragment.runOnUiThread(new Runnable() {
+                activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         presentOffers(dataProvider.loadOffersFromCache());
@@ -766,11 +800,12 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
     private void stopTimeBasedRefresh() {
         timer.cancel();
+        timer = null;
     }
 
     @Override
     public void onDownloadStarted() {
-        dashboardFragment.runOnUiThread(new Runnable() {
+        activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 getView().clearOffers();
@@ -782,7 +817,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
     @Override
     public void onDownloadFailed(final String message) {
-        dashboardFragment.runOnUiThread(new Runnable() {
+        activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 presentOffers(dataProvider.loadOffersFromCache());
@@ -792,7 +827,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     }
 
     @Override
-    public void onNewOffersDownloaded(List<Offers> offersList) {
+    public void onDownloadFinished(List<Offers> offersList) {
         IDashboardViewContainer view = getView();
         if (view == null) {
             return;
@@ -810,12 +845,11 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         view.hideNoOffersView();
         view.clearOffers();
 
-        for (Offers nearbyOffers : offersList) {
-            HorizontalSliderView.OnSliderItemClickListener onSliderItemClickListener = new HorizontalSliderView.OnSliderItemClickListener() {
+        for (final Offers nearbyOffers : offersList) {
+            final HorizontalSliderView.OnSliderItemClickListener onSliderItemClickListener = new HorizontalSliderView.OnSliderItemClickListener() {
                 @Override
                 public void onSliderItemClick(Offer offer, View view) {
-                    // TODO: Add action on item clicks
-                    Snackbar.make(view, R.string.excellentChoice, Snackbar.LENGTH_SHORT).show();
+                    openDetailPage(offer.getRestaurantId(), nearbyOffers.getIndex(offer));
                 }
             };
             if (nearbyOffers.isEmpty()) {
@@ -824,10 +858,11 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
             foundOffers = true;
 
-            HorizontalSliderView.OnSliderHeaderClickListener headerClickListener = new HorizontalSliderView.OnSliderHeaderClickListener() {
+            final String restaurantId = nearbyOffers.getRestaurantId();
+            final HorizontalSliderView.OnSliderHeaderClickListener headerClickListener = new HorizontalSliderView.OnSliderHeaderClickListener() {
                 @Override
                 public void onSliderHeaderClick() {
-                    // TODO: Add action on header clicks
+                    openDetailPage(restaurantId, -1);
                 }
             };
             view.addOffers(
@@ -839,16 +874,27 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
             );
         }
 
+        restartTimeBasedRefresh(offersList);
+
         if (!foundOffers) {
-            int[] noOffersMessages = new int[] {
+            final int[] noOffersMessages = new int[] {
                     R.string.no_offers_today1,
                     R.string.no_offers_today2,
                     R.string.no_offers_today3,
                     R.string.no_offers_today4,
                     R.string.no_offers_today5
             };
-            int randomNumber = (int) (Math.random() * 5);
+            final int randomNumber = (int) (Math.random() * 5);
             view.enableNoOffersView(noOffersMessages[randomNumber]);
         }
+    }
+
+    private void openDetailPage(String restaurantId, int index) {
+        Intent openFetchOrderActivityIntent = new Intent(activity, DetailPageActivity.class);
+        openFetchOrderActivityIntent.putExtra(KEY_RESTAURANT_ID, restaurantId);
+        if (index != -1) {
+            openFetchOrderActivityIntent.putExtra(KEY_OFFER_INDEX, index);
+        }
+        activity.startActivity(openFetchOrderActivityIntent);
     }
 }

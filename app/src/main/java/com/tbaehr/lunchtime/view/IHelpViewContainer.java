@@ -693,6 +693,8 @@ public interface IHelpViewContainer {
 
     void setOnTermsOfUsageClickListener(View.OnClickListener onTermsOfUsageClickListener);
 
+    void setOnAboutVersionClickListener(View.OnClickListener onAboutTeamClickListener);
+
     void setOnAboutTeamClickListener(View.OnClickListener onAboutTeamClickListener);
 
     void removeOnClickListeners();

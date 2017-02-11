@@ -679,8 +679,6 @@ package com.tbaehr.lunchtime;
 import android.app.Application;
 import android.content.Context;
 
-import com.squareup.leakcanary.LeakCanary;
-
 /**
  * Created by timo.baehr@gmail.com on 07.01.17.
  */
@@ -696,12 +694,12 @@ public class LunchtimeApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        if (BuildConfig.DEBUG) {
+        /*if (BuildConfig.DEBUG) {
             if (LeakCanary.isInAnalyzerProcess(this)) {
                 return;
             }
             LeakCanary.install(this);
-        }
+        }*/
     }
 
     public static Context getContext() {

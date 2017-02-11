@@ -740,6 +740,11 @@ public class HelpViewContainer implements IHelpViewContainer {
     }
 
     @Override
+    public void setOnAboutVersionClickListener(View.OnClickListener onAboutTeamClickListener) {
+        mHelpAbout1.setOnClickListener(onAboutTeamClickListener);
+    }
+
+    @Override
     public void setOnAboutTeamClickListener(View.OnClickListener onAboutTeamClickListener) {
         mHelpAbout2.setOnClickListener(onAboutTeamClickListener);
     }

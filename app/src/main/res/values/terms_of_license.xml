@@ -1,0 +1,5 @@
+<resources>
+    <string name="agb">Terms of use\n of the Lunchtime software and exclusion of liability claims</string>
+    <string name="agb_accept">With proceeding you accept the full <![CDATA[<a href="">terms of use</a>]]>.</string>
+    <string name="agb_terms_of_use">Terms of use</string>
+</resources>

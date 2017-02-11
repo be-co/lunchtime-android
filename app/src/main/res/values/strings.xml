@@ -1,10 +1,6 @@
 <resources>
     <string name="app_name">Lunchtime</string>
 
-    <string name="agb">Terms of use\n of the Lunchtime software and exclusion of liability claims</string>
-    <string name="agb_accept">With proceeding you accept the full <![CDATA[<a href="">terms of use</a>]]>.</string>
-    <string name="agb_terms_of_use">Terms of use</string>
-
     <!-- 1:1 translations -->
     <string name="_cancel">@android:string/cancel</string>
     <string name="_no">@android:string/no</string>
@@ -56,9 +52,11 @@
     <string name="help_about_version">Version %1$s</string>
     <string name="help_about_team">About the team</string>
     <string name="help_about_team_content"><b>Coding of Android App</b>
-        /nTimo Bähr
-        /n/n<b>Updating Offers</b>
-        /nIman Naghashian, Timo Bähr
+        \nTimo Bähr
+        \n\n<b>Updating Offers</b>
+        \nIman Naghashian, Timo Bähr
+        \n\n<b>Law</b>
+        \nIman Naghashian
     </string>
 
     <string name="your_choice">Your choice</string>

@@ -1,17 +1,6 @@
 <resources>
     <string name="app_name">Lunchtime</string>
 
-    <string name="agb"><b>Allgemeine Nutzungsbedingungen\nder Lunchtime-Software und Haftungsausschluss</b>
-        \n\nDie nachfolgenden <i>Allgemeinen Nutzungsbedingungen</i> gelten für die Nutzung der
-        nativen Applikation <i>Lunchtime</i> für Android, iOS und Windows Universal sowie der
-        zugehörigen Web-App im Browser sowie der Desktop-Applikation <i>Lunchtime</i> für Apple OSX,
-        Linux und Windows nebst indirekter Nutzung der Datenspeicherung auf von <i>Lunchtime</i>
-        verwendeten Servern (zusammen die „Lunchtime-Software“).
-        \n\nWillkommen auf der grünen Wiese. Die AGBs sind noch in Bearbeitung.
-    </string>
-    <string name="agb_accept">Wenn Du fortsetzt, akzeptierst Du damit die vollständigen <![CDATA[<a href="">Nutzungsbedingungen</a>]]>.</string> <!-- Wenn Du fortsetzt, akzeptierst Du damit die vollständigen -->
-    <string name="agb_terms_of_use">Nutzungsbedingungen</string>
-
     <!-- 1:1 translations -->
     <string name="_cancel">@android:string/cancel</string>
     <string name="_no">@android:string/no</string>
@@ -67,6 +56,8 @@
         \nTimo Bähr
         \n\n<b>Pflege der Angebote</b>
         \nIman Naghashian, Timo Bähr
+        \n\n<b>Rechtliches</b>
+        \nIman Naghashian
     </string>
     <string name="your_choice">Deine Wahl</string>
 

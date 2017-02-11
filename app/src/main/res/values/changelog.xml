@@ -1,0 +1,19 @@
+<resources>
+    <string name="changelog_header">Changelog</string>
+    <string name="changelog"><b>2017.02.11 Alpha (v10)</b>
+        \n&#8226;  Detail page: Download of Restaurant images and slideshow
+        \n&#8226;  Detail page: Restaurant descriptions and opening times can be expanded
+        \n&#8226;  Help page: Showing changelog at click on version
+        \n&#8226;  Hilfeseite: Inserted terms of usage
+        \n&#8226;  Fix: Detail page now working for Huawei P8
+        \n\n<b>2017.02.04 Alpha (v9)</b>
+        \n&#8226;  Detail-Seite: GoogleMaps, HereMaps, DB Navigator und Co geöffnet werden
+        \n&#8226;  Detail-Seite: Die Webseite des Restaurants geöffnet werden
+        \n&#8226;  Improved auto recognition of incredients
+        \n&#8226;  Improved RAM usage
+        \n&#8226;  Support for Android build-in backups
+        \n&#8226;  Fix for detail page: Updating times after UI restart
+        \n&#8226;  Fix: detail page can be opened after rotation
+    </string>
+
+</resources>

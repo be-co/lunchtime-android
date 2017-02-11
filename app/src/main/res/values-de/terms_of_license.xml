@@ -1,0 +1,12 @@
+<resources>
+    <string name="agb"><b>Allgemeine Nutzungsbedingungen\nder Lunchtime-Software und Haftungsausschluss</b>
+        \n\nDie nachfolgenden <i>Allgemeinen Nutzungsbedingungen</i> gelten für die Nutzung der
+        nativen Applikation <i>Lunchtime</i> für Android, iOS und Windows Universal sowie der
+        zugehörigen Web-App im Browser sowie der Desktop-Applikation <i>Lunchtime</i> für Apple OSX,
+        Linux und Windows nebst indirekter Nutzung der Datenspeicherung auf von <i>Lunchtime</i>
+        verwendeten Servern (zusammen die „Lunchtime-Software“).
+        \n\nWillkommen auf der grünen Wiese. Die AGBs sind noch in Bearbeitung.
+    </string>
+    <string name="agb_accept">Wenn Du fortsetzt, akzeptierst Du damit die vollständigen <![CDATA[<a href="">Nutzungsbedingungen</a>]]>.</string> <!-- Wenn Du fortsetzt, akzeptierst Du damit die vollständigen -->
+    <string name="agb_terms_of_use">Nutzungsbedingungen</string>
+</resources>

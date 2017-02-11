@@ -1,0 +1,52 @@
+<resources>
+    <string name="changelog_header">Versionshistorie</string>
+    <string name="changelog"><b>2017.02.11 Alpha (v10)</b>
+        \n&#8226;  In Detailseite: Download von Restaurant-Bildern und Slideshow
+        \n&#8226;  In Detailseite: Restaurantbeschreibungen und Öffnungszeiten lassen sich aufklappen
+        \n&#8226;  In Hilfeseite: Anzeige eines Changelog bei Klick auf Version
+        \n&#8226;  In Hilfeseite: Allgemeine Geschäftsbedingungen eingefügt
+        \n&#8226;  Fehlerkorrektur: Detailseite funktioniert für Huawei P8
+        \n\n<b>2017.02.04 Alpha (v9)</b>
+        \n&#8226;  In Detail-Seite: GoogleMaps, HereMaps, DB Navigator und Co geöffnet werden
+        \n&#8226;  In Detail-Seite: Die Webseite des Restaurants geöffnet werden
+        \n&#8226;  Auto-Erkennung von Inhaltsstoffen optimiert
+        \n&#8226;  Unterstützung für das in Android eingebaute Backup
+        \n&#8226;  Fehlerkorrektur: Zeitanzeige in Detail-Seite für Restaurants korrigiert
+        \n&#8226;  Fehlerkorrektur: Crash bei Öffnen der Detail-Seite nach Drehung behoben
+        \n\n<b>2017.01.29 Alpha (v8)</b>
+        \n&#8226;  Detail-Seite für Restaurants aktiviert
+        \n&#8226;  In Detail-Seite wird Restzeit angezeigt (anstelle Uhrzeit)
+        \n&#8226;  Speicheroptimierungen (~70% weniger Last) führen zu besserer Performance
+        \n&#8226;  Fehlerkorrektur: Ruckeln bei Scrollen oder Öffnen der NavBar auf Galaxy S5/S6 beseitigt
+        \n&#8226;  Auto-Erkennung von Inhaltsstoffen optimiert
+        \n&#8226;  Fehlerkorrektur: Probleme mit dem Auto-Ausklappen/Zusammenklappen beseitigt
+        \n\n<b>2017.01.22 Alpha (v7)</b>
+        \n&#8226;  CallapsingToolbar wird automatisch zusammengeklappt/auseinander geklappt bei Wechsel zwischen Seiten
+        \n&#8226;  "Hilfe"-Seite: Versionsnummer wird in "Hilfe"-Seite angezeigt. Google Plus Community, PlayStore lässt sich nun über "Hilfe"-Seite öffnen.
+        \n&#8226;  Auto-Erkennung von Inhaltsstoffen optimiert
+        \n&#8226;  Fehlerkorrektur: Die Angebote werden nun alle auf einmal heruntergeladen (anstatt verzögert)
+        \n\n<b>2017.01.14 Alpha (v6)</b>
+        \n&#8226;  Angebote werden künftig vom Server heruntergeladen (Grund für Berechtigung INTERNET)
+        \n&#8226;  Ladebalken während des Downloads von Angeboten
+        \n\n<b>2017.01.12 Alpha (v5)</b>
+        \n&#8226;  Fehlerkorrektur: Schöneres Layout für größere Displays, wie Galaxy S7.
+        \n&#8226;  Grüne Überschriften für Angebote
+        \n&#8226;  Auto-Erkennung der Inhaltsstoffe optimiert
+        \n\n<b>2017.01.09 Alpha (v4)</b>
+        \n&#8226;  Restaurants erscheinen nicht mehr doppelt nach Bildschirm an/aus
+        \n\n<b>2017.01.08 Alpha (v3)</b>
+        \n&#8226;  Abgelaufene Angebote werden nicht ausgeblendet
+        \n&#8226;  Benutzermeldung: "Keine Angebote verfügbar…"
+        \n&#8226;  Auto-Erkennung der Inhaltsstoffe optimiert
+        \n&#8226;  Code: Umstellung auf das MVP-Pattern
+        \n&#8226;  JSON-Dateien für den Import von Angeboten und Restaurants als Vorstufe zur REST-Schnittstelle
+        \n\n<b>2017.01.06 Alpha (v2)</b>
+        \n&#8226;  Kurzbeschreibung jedes Restaurants eingefügt
+        \n&#8226;  Beschreibung wird ausgeblendet falls nicht im Datensatz vorhanden
+        \n&#8226;  Auto-Erkennung der Inhaltsstoffe optimiert
+        \n&#8226;  Restaurants ohne Angebote werden ausgeblendet
+        \n\n<b>2017.01.02 Alpha (v1)</b>
+        \n&#8226;  Übersichtsseite mit Mittagsangeboten des Tages
+    </string>
+
+</resources>

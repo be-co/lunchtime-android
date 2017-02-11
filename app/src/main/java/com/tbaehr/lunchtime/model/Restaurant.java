@@ -767,17 +767,17 @@ public class Restaurant {
     public String getOpeningTimeDescriptionForToday() {
         DateTime now = new DateTime();
         int weekDay = now.get(Calendar.DAY_OF_WEEK);
-        return getOpeningTimeDescription(weekDay, TimeFormat.FORMAT_OPENS_CLOSES_HH_MM);
+        return getOpeningTimeDescription(weekDay, true, TimeFormat.FORMAT_OPENS_CLOSES_HH_MM);
     }
 
-    private String getOpeningTimeDescription(int weekDay, TimeFormat timeFormat) {
+    private String getOpeningTimeDescription(int weekDay, boolean considerIsToday, TimeFormat timeFormat) {
         Context context = LunchtimeApplication.getContext();
         DateTime now = new DateTime();
 
         DateTime[] dayOpeningTimes = getOpeningTimes(weekDay);
 
         if (dayOpeningTimes == null || dayOpeningTimes.length == 0) {
-            if (now.get(Calendar.DAY_OF_WEEK) == weekDay) {
+            if (considerIsToday) {
                 return context.getString(R.string.now_closed);
             } else {
                 return context.getString(R.string.closed);
@@ -843,11 +843,11 @@ public class Restaurant {
         int weekDayNow = now.get(Calendar.DAY_OF_WEEK);
         sb1.append("<b>"); sb2.append("<b>");
         sb1.append(LunchtimeApplication.getContext().getString(R.string.today)).append(LINE_BREAK);
-        sb2.append(getOpeningTimeDescription(weekDayNow, TimeFormat.FORMAT_HH_MM)).append(LINE_BREAK);
+        sb2.append(getOpeningTimeDescription(weekDayNow, false, TimeFormat.FORMAT_HH_MM)).append(LINE_BREAK);
         sb1.append("</b>"); sb2.append("</b>");
         for (int weekDay : nextWeekDays) {
             sb1.append(DateTime.asWeekDay(weekDay)).append(LINE_BREAK);
-            sb2.append(getOpeningTimeDescription(weekDay, TimeFormat.FORMAT_HH_MM)).append(LINE_BREAK);
+            sb2.append(getOpeningTimeDescription(weekDay, false, TimeFormat.FORMAT_HH_MM)).append(LINE_BREAK);
         }
         sb1.delete(sb1.length() - LINE_BREAK.length(), sb1.length());
         sb2.delete(sb2.length() - LINE_BREAK.length(), sb2.length());

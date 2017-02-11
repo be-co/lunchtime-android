@@ -1,21 +1,21 @@
 <resources>
     <string name="changelog_header">Versionshistorie</string>
     <string name="changelog"><b>2017.02.11 Alpha (v10)</b>
-        \n&#8226;  In Detailseite: Download von Restaurant-Bildern und Slideshow
-        \n&#8226;  In Detailseite: Restaurantbeschreibungen und Öffnungszeiten lassen sich aufklappen
-        \n&#8226;  In Hilfeseite: Anzeige eines Changelog bei Klick auf Version
-        \n&#8226;  In Hilfeseite: Allgemeine Geschäftsbedingungen eingefügt
+        \n&#8226;  Dashboard: Anzeige der Angebote vom nächsten Tag, falls heute nichts mehr verfügbar ist.
+        \n&#8226;  Detailseite: Download von Restaurant-Bildern und Slideshow,
+                   Restaurantbeschreibungen und Öffnungszeiten lassen sich aufklappen
+        \n&#8226;  Hilfeseite: Anzeige eines Changelog bei Klick auf Version,
+                   Allgemeine Geschäftsbedingungen eingefügt
         \n&#8226;  Fehlerkorrektur: Detailseite funktioniert für Huawei P8
         \n\n<b>2017.02.04 Alpha (v9)</b>
-        \n&#8226;  In Detail-Seite: GoogleMaps, HereMaps, DB Navigator und Co geöffnet werden
-        \n&#8226;  In Detail-Seite: Die Webseite des Restaurants geöffnet werden
+        \n&#8226;  Detail-Seite: GoogleMaps, HereMaps, DB Navigator und Co geöffnet werden,
+                   Webseite des Restaurants geöffnet werden
         \n&#8226;  Auto-Erkennung von Inhaltsstoffen optimiert
         \n&#8226;  Unterstützung für das in Android eingebaute Backup
         \n&#8226;  Fehlerkorrektur: Zeitanzeige in Detail-Seite für Restaurants korrigiert
         \n&#8226;  Fehlerkorrektur: Crash bei Öffnen der Detail-Seite nach Drehung behoben
         \n\n<b>2017.01.29 Alpha (v8)</b>
-        \n&#8226;  Detail-Seite für Restaurants aktiviert
-        \n&#8226;  In Detail-Seite wird Restzeit angezeigt (anstelle Uhrzeit)
+        \n&#8226;  Detail-Seite für Restaurants aktiviert, Anzeige der Restzeit
         \n&#8226;  Speicheroptimierungen (~70% weniger Last) führen zu besserer Performance
         \n&#8226;  Fehlerkorrektur: Ruckeln bei Scrollen oder Öffnen der NavBar auf Galaxy S5/S6 beseitigt
         \n&#8226;  Auto-Erkennung von Inhaltsstoffen optimiert

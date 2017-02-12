@@ -838,6 +838,9 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     }
 
     private void startTimeBasedRefresh(DateTime... date) {
+        if (timer == null) {
+            timer = new Timer();
+        }
         for (DateTime d : date) {
             timer.schedule(createTimerTask(new Runnable() {
                 @Override

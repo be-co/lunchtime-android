@@ -1,6 +1,8 @@
 <resources>
     <string name="changelog_header">Versionshistorie</string>
-    <string name="changelog"><b>2017.02.11 Alpha (v10)</b>
+    <string name="changelog"><b>2017.02.12 Alpha (v11)</b>
+        \n&#8226;  Fehlerkorrektur: Verbesserung der Stabilität, Beheben von Crashes nach Rotation des Geräts
+        <b>2017.02.11 Alpha (v10)</b>
         \n&#8226;  Dashboard: Anzeige der Angebote vom nächsten Tag, falls heute nichts mehr verfügbar ist.
         \n&#8226;  Detailseite: Download von Restaurant-Bildern und Slideshow,
                    Restaurantbeschreibungen und Öffnungszeiten lassen sich aufklappen

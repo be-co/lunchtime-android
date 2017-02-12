@@ -742,8 +742,8 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dataProvider.syncRestaurants(this);
         timer = new Timer();
+        dataProvider.syncRestaurants(this);
         syncRestaurantImages();
     }
 
@@ -824,6 +824,9 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
                     view.setBackgroundDrawable(drawables.get(drawableCounter));
                 }
             });
+            if (timer == null) {
+                timer = new Timer();
+            }
             timer.schedule(slideshowTask, IMAGE_DURATION, IMAGE_DURATION);
         }
     }

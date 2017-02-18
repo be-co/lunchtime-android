@@ -728,13 +728,15 @@ public class DataProvider {
 
     private static final String KEY_RESTAURANT_UPDATED = "restaurant_updated_%s";
 
-    private static final String URI_NEARBY_RESTAURANTS = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/nearby_restaurants_%s.json";
+    private static final String BASE_URI = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/";
 
-    private static final String URI_RESTAURANT = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/restaurant_%s.json";
+    private static final String URI_NEARBY_RESTAURANTS = BASE_URI + "nearby_restaurants_%s.json";
 
-    private static final String URI_OFFER = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/offers_%s.json";
+    private static final String URI_RESTAURANT = BASE_URI + "restaurant_%s.json";
 
-    public void syncOffers(final LoadJobListener callback) {
+    private static final String URI_OFFER = BASE_URI + "offers_%s.json";
+
+    public void syncNearbyOffers(final LoadJobListener callback) {
         final String uriSync = String.format(URI_NEARBY_RESTAURANTS, "weiterstadt");
         final String keySync = String.format(KEY_NEARBY_OFFERS, "weiterstadt");
 
@@ -771,7 +773,7 @@ public class DataProvider {
         }.execute();
     }
 
-    public void syncRestaurants(final LoadJobListener callback) {
+    public void syncRestaurant(final LoadJobListener callback, final String restaurantId) {
         final String uriSync = String.format(URI_NEARBY_RESTAURANTS, "weiterstadt");
         final String keySync = String.format(KEY_NEARBY_OFFERS, "weiterstadt");
 
@@ -788,9 +790,7 @@ public class DataProvider {
                     storeToCache(keySync, jsonDownloaded);
                     Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurantKeys(jsonDownloaded);
                     Map<String, String> nearbyRestaurantKeys = nearbyKeys.first;
-                    for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
-                        dataSetChanged = updateRestaurant(restaurantKey, nearbyRestaurantKeys.get(restaurantKey), callback) || dataSetChanged;
-                    }
+                    dataSetChanged = updateRestaurant(restaurantId, nearbyRestaurantKeys.get(restaurantId), callback) || dataSetChanged;
                 }
 
                 return null;
@@ -810,12 +810,21 @@ public class DataProvider {
         new AsyncTask<Void, Void, Void>() {
             private List<Drawable> drawables = new ArrayList<>();
 
+            private boolean failed;
+
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    drawables = ImageUtils.downloadDrawables(restaurant);
+                    String[] imageUrls = restaurant.getPhotoUrls();
+                    if (imageUrls != null) {
+                        drawables = ImageUtils.downloadDrawables(imageUrls);
+                    } else {
+                        callback.onDownloadFailed("No images defined for restaurant " + restaurant.getId());
+                        failed = true;
+                    }
                 } catch (IOException e) {
                     callback.onDownloadFailed(e.getMessage());
+                    failed = true;
                     e.printStackTrace();
                 }
                 return null;
@@ -823,7 +832,9 @@ public class DataProvider {
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                callback.onDownloadFinished(drawables);
+                if (!failed) {
+                    callback.onDownloadFinished(drawables);
+                }
                 super.onPostExecute(aVoid);
             }
         }.execute();

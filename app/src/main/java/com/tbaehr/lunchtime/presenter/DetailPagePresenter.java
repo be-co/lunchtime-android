@@ -743,7 +743,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         timer = new Timer();
-        dataProvider.syncRestaurants(this);
+        dataProvider.syncRestaurant(this, restaurantId);
         syncRestaurantImages();
     }
 

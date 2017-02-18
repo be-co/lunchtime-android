@@ -8,7 +8,6 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 
 import com.tbaehr.lunchtime.LunchtimeApplication;
-import com.tbaehr.lunchtime.model.Restaurant;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,12 +25,11 @@ import java.util.List;
  */
 public class ImageUtils {
 
-    public static List<Drawable> downloadDrawables(@NonNull Restaurant restaurant) throws IOException {
+    public static List<Drawable> downloadDrawables(@NonNull String[] imageUrls) throws IOException {
         List<Drawable> drawablesResult = new ArrayList<>();
 
-        String[] photoUrls = restaurant.getPhotoUrls();
-        if (photoUrls != null && photoUrls.length > 0) {
-            for (String url : photoUrls) {
+        if (imageUrls.length > 0) {
+            for (String url : imageUrls) {
                 File image = createImageFile(url);
                 Bitmap bitmap;
                 if (!image.exists()) {

@@ -7,8 +7,8 @@ android {
         applicationId "com.tbaehr.lunchtime"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 10
-        versionName "2017.02.11"
+        versionCode 11
+        versionName "2017.02.18"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

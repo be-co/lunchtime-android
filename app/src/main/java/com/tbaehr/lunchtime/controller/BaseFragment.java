@@ -676,9 +676,6 @@
  */
 package com.tbaehr.lunchtime.controller;
 
-import android.content.Intent;
-import android.net.Uri;
-
 import com.propaneapps.tomorrow.base.BasePresenterFragment;
 import com.propaneapps.tomorrow.common.FactoryWithType;
 import com.propaneapps.tomorrow.presenter.Presenter;
@@ -710,14 +707,5 @@ public abstract class BaseFragment<V, P extends Presenter<V>> extends BasePresen
     public void onDestroy() {
         presenter = null;
         super.onDestroy();
-    }
-
-    /**
-     * Create an intent with a given action and for a given data url.
-     *
-     * @param uri The Intent data URI.
-     */
-    public void openUrl(Uri uri) {
-        startActivity(new Intent(Intent.ACTION_VIEW, uri));
     }
 }

@@ -710,6 +710,6 @@ public class HelpFragment extends BaseFragment<IHelpViewContainer, HelpPresenter
 
     @Override
     public HelpPresenter create() {
-        return new HelpPresenter(this);
+        return new HelpPresenter((BaseActivity) getActivity());
     }
 }

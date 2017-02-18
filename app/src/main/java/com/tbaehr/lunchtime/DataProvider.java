@@ -728,13 +728,15 @@ public class DataProvider {
 
     private static final String KEY_RESTAURANT_UPDATED = "restaurant_updated_%s";
 
-    private static final String URI_NEARBY_RESTAURANTS = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/nearby_restaurants_%s.json";
+    private static final String BASE_URI = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/";
 
-    private static final String URI_RESTAURANT = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/restaurant_%s.json";
+    private static final String URI_NEARBY_RESTAURANTS = BASE_URI + "nearby_restaurants_%s.json";
 
-    private static final String URI_OFFER = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/offers_%s.json";
+    private static final String URI_RESTAURANT = BASE_URI + "restaurant_%s.json";
 
-    public void syncOffers(final LoadJobListener callback) {
+    private static final String URI_OFFER = BASE_URI + "offers_%s.json";
+
+    public void syncNearbyOffers(final LoadJobListener callback) {
         final String uriSync = String.format(URI_NEARBY_RESTAURANTS, "weiterstadt");
         final String keySync = String.format(KEY_NEARBY_OFFERS, "weiterstadt");
 
@@ -771,7 +773,7 @@ public class DataProvider {
         }.execute();
     }
 
-    public void syncRestaurants(final LoadJobListener callback) {
+    public void syncRestaurant(final LoadJobListener callback, final String restaurantId) {
         final String uriSync = String.format(URI_NEARBY_RESTAURANTS, "weiterstadt");
         final String keySync = String.format(KEY_NEARBY_OFFERS, "weiterstadt");
 
@@ -788,9 +790,7 @@ public class DataProvider {
                     storeToCache(keySync, jsonDownloaded);
                     Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurantKeys(jsonDownloaded);
                     Map<String, String> nearbyRestaurantKeys = nearbyKeys.first;
-                    for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
-                        dataSetChanged = updateRestaurant(restaurantKey, nearbyRestaurantKeys.get(restaurantKey), callback) || dataSetChanged;
-                    }
+                    dataSetChanged = updateRestaurant(restaurantId, nearbyRestaurantKeys.get(restaurantId), callback) || dataSetChanged;
                 }
 
                 return null;
@@ -810,12 +810,21 @@ public class DataProvider {
         new AsyncTask<Void, Void, Void>() {
             private List<Drawable> drawables = new ArrayList<>();
 
+            private boolean failed;
+
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    drawables = ImageUtils.downloadDrawables(restaurant);
+                    String[] imageUrls = restaurant.getPhotoUrls();
+                    if (imageUrls != null) {
+                        drawables = ImageUtils.downloadDrawables(imageUrls);
+                    } else {
+                        callback.onDownloadFailed("No images defined for restaurant " + restaurant.getId());
+                        failed = true;
+                    }
                 } catch (IOException e) {
                     callback.onDownloadFailed(e.getMessage());
+                    failed = true;
                     e.printStackTrace();
                 }
                 return null;
@@ -823,7 +832,9 @@ public class DataProvider {
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                callback.onDownloadFinished(drawables);
+                if (!failed) {
+                    callback.onDownloadFinished(drawables);
+                }
                 super.onPostExecute(aVoid);
             }
         }.execute();
@@ -1141,12 +1152,8 @@ public class DataProvider {
     }
 
     private void autoSearchForIngredients(Set<Offer.Ingredient> ingredientList, String title) {
-        if (contains(title, "Wildbraten", "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
-            if (title.contains("Carne")) {
-                if (!title.contains("vom Rind")) {
-                    ingredientList.add(Offer.Ingredient.PORK);
-                }
-            } else {
+        if (contains(title, "schinken", "Cevapcici", "Lasagne", "Wildbraten", "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
+            if (!title.contains("vom Rind") && !title.contains("vegetarisch")) {
                 ingredientList.add(Offer.Ingredient.PORK);
             }
         }
@@ -1156,10 +1163,10 @@ public class DataProvider {
         if (contains(title, "Coq", "Gans", "Geflügel", "Hähnchen", "Huhn", "Hühner", "Pute", "Truthahn")) {
             ingredientList.add(Offer.Ingredient.CHICKEN);
         }
-        if (contains(title, "Rigatoni", "Pasta", "Futtuccine", "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
+        if (contains(title, "Lasagne", "Rigatoni", "Pasta", "Futtuccine", "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
             ingredientList.add(Offer.Ingredient.GLUTEN);
         }
-        if (contains(title, "quark", "schmarrn", "Parmesan", "Käse", "käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand", "Frischkaese", "Kochkaese", "Frischkäse", "Kochkäs")) {
+        if (contains(title, "Mozzarella", "Feta", "Lasagne", "quark", "schmarrn", "Parmesan", "Käse", "käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand", "Frischkaese", "Kochkaese", "Frischkäse", "Kochkäs")) {
             ingredientList.add(Offer.Ingredient.LACTOSE);
         }
         if (contains(title, "Wolfsbarsch", "Kabeljau", "Schlemmerfilet", "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {

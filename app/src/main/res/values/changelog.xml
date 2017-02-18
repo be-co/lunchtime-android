@@ -1,6 +1,9 @@
 <resources>
     <string name="changelog_header">Changelog</string>
-    <string name="changelog"><b>2017.02.11 Alpha (v10)</b>
+    <string name="changelog"><b>2017.02.18 Alpha (v11)</b>
+        \n•  Fix: Improved layout for tablets
+        \n•  Fix: Improved stability (Resolved crashed after opening links, rotation, …)
+        <b>2017.02.11 Alpha (v10)</b>
         \n&#8226;  Dashboard: Iff no offers for today, show offers of next day
         \n&#8226;  Detail page: Download of Restaurant images and slideshow,
                    Restaurant descriptions and opening times can be expanded

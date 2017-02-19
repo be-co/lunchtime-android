@@ -681,6 +681,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by timo.baehr@gmail.com on 14.01.17.
@@ -697,7 +698,7 @@ public class DateUtils {
             return null;
         }
 
-        DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH);
         try {
             Date dateTemp = dateFormat.parse(date);
             return new DateTime(dateTemp.getTime());

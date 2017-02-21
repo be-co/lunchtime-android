@@ -1,6 +1,10 @@
 <resources>
     <string name="changelog_header">Versionshistorie</string>
-    <string name="changelog"><b>2017.02.18 Alpha (v11)</b>
+    <string name="changelog"><b>2017.02.25 Alpha (v12)</b>
+        \n•  Dashboard: Auswahl des Standorts möglich - Darmstadt und Weiterstadt
+        \n•  Dashboard: Karten-Layout anstelle grauer Box
+        \n•  Fehlerkorrektur: Stabilität für Geräte kleiner Android 6 Nougat verbessert
+        <b>2017.02.18 Alpha (v11)</b>
         \n•  Fehlerkorrektur: Optische Verbesserungen für Tablets (Layoutänderungen)
         \n•  Fehlerkorrektur: Stabilitätsverbesserungen (Verhindern von Crashes nach Öffnen von Links, Rotation des Geräts, …)
         <b>2017.02.11 Alpha (v10)</b>

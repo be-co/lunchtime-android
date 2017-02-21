@@ -676,6 +676,8 @@
  */
 package com.tbaehr.lunchtime.view;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
@@ -773,8 +775,21 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     }
 
     @Override
-    public void openLocationPicker() {
-        // TODO: Open location picker view
+    public void openLocationPicker(final CharSequence[] options, int checkedItemIndex, DialogInterface.OnClickListener onClickListener) {
+        new AlertDialog.Builder(activity)
+                .setTitle(R.string.choose_location)
+                .setSingleChoiceItems(options, checkedItemIndex, onClickListener)
+                .setPositiveButton(R.string._close, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .show();
+    }
+
+    @Override
+    public void refreshDashboardFragment() {
+        fragmentHolder.refreshDashboardFragment();
     }
 
     @Override
@@ -831,6 +846,10 @@ class FragmentHolder {
         if (help == null) {
             help = new HelpFragment();
         }
+    }
+
+    void refreshDashboardFragment() {
+        dashboard.refresh();
     }
 
     void showDashboardFragment() {

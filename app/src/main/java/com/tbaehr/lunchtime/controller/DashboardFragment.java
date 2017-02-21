@@ -690,7 +690,7 @@ import com.tbaehr.lunchtime.view.IDashboardViewContainer;
  */
 public class DashboardFragment extends BaseFragment<IDashboardViewContainer, DashboardPresenter> {
 
-    private DashboardViewContainer viewContainer;
+    private IDashboardViewContainer viewContainer;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -717,5 +717,9 @@ public class DashboardFragment extends BaseFragment<IDashboardViewContainer, Das
     public void onDestroy() {
         viewContainer = null;
         super.onDestroy();
+    }
+
+    public void refresh() {
+        getPresenter().refreshOffers();
     }
 }

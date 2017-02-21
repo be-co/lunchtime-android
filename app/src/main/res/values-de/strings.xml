@@ -84,4 +84,6 @@
     <string name="sunday">Sonntag</string>
     <string name="and">,</string>
     <string name="today">Heute</string>
+
+    <string name="choose_location">Standortauswahl</string>
 </resources>

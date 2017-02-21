@@ -736,24 +736,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         dataProvider = new DataProvider();
         dataProvider.syncNearbyOffers(this);
 
-        List<Offers> offersListTemp = dataProvider.loadOffersFromCache();
-        boolean dataSetChanged = offersList == null || offersListTemp.size() != offersList.size();
-        if (!dataSetChanged) {
-            for (int i = 0; i < offersListTemp.size(); i++) {
-                boolean isEqual = offersListTemp.get(i).equals(offersList.get(i));
-                if (!isEqual) {
-                    dataSetChanged = true;
-                    break;
-                }
-            }
-        }
-
-        offersList = offersListTemp;
-
-        startTimeBasedRefresh(offersList);
-        if (!view.isInitialized() || dataSetChanged) {
-            presentOffers(offersList);
-        }
+        refreshOffers();
     }
 
     @Override
@@ -896,5 +879,27 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
             openFetchOrderActivityIntent.putExtra(KEY_OFFER_INDEX, index);
         }
         activity.startActivity(openFetchOrderActivityIntent);
+    }
+
+    public void refreshOffers() {
+        List<Offers> offersListTemp = dataProvider.loadOffersFromCache();
+        boolean dataSetChanged = offersList == null || offersListTemp.size() != offersList.size();
+        if (!dataSetChanged) {
+            for (int i = 0; i < offersListTemp.size(); i++) {
+                boolean isEqual = offersListTemp.get(i).equals(offersList.get(i));
+                if (!isEqual) {
+                    dataSetChanged = true;
+                    break;
+                }
+            }
+        }
+
+        offersList = offersListTemp;
+
+        startTimeBasedRefresh(offersList);
+        IDashboardViewContainer view = getView();
+        if (view != null && (!view.isInitialized() || dataSetChanged)) {
+            presentOffers(offersList);
+        }
     }
 }

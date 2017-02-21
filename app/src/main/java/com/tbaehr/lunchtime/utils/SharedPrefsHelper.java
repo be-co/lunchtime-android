@@ -674,141 +674,50 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.presenter;
+package com.tbaehr.lunchtime.utils;
 
-import android.content.DialogInterface;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.design.widget.NavigationView;
-import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
-import android.view.View;
+import android.content.Context;
+import android.content.SharedPreferences;
 
-import com.tbaehr.lunchtime.R;
-import com.tbaehr.lunchtime.utils.LocationHelper;
-import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
+import com.tbaehr.lunchtime.LunchtimeApplication;
 
-import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_DASHBOARD_FRAGMENT;
-import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_HELP_FRAGMENT;
+import static android.content.Context.MODE_PRIVATE;
 
 /**
- * Created by timo.baehr@gmail.com on 31.12.16.
+ * Created by timo.baehr@gmail.com on 21.02.17.
  */
-public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewContainer>
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class SharedPrefsHelper {
 
-    private final static String KEY_TOOLBAR_TITLE = "toolbarTitle";
+    private static final String KEY_STORAGE = "cache";
 
-    private final static String KEY_ACTIVE_FRAGMENT = "activeFragment";
+    public static String getString(String key) {
+        Context context = LunchtimeApplication.getContext();
+        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
 
-    private String toolbarTitle;
-
-    private String activeFragment;
-
-    private AppCompatActivity activity;
-
-    public MasterPagePresenter(AppCompatActivity activity) {
-        this.activity = activity;
+        return sharedPreferences.getString(key, null);
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public static int getInt(String key, int defaultValue) {
+        Context context = LunchtimeApplication.getContext();
+        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
 
-        if (savedInstanceState == null) {
-            toolbarTitle = getDashboardTitle();
-            activeFragment = TAG_DASHBOARD_FRAGMENT;
-        } else {
-            toolbarTitle = savedInstanceState.getString(KEY_TOOLBAR_TITLE);
-            activeFragment = savedInstanceState.getString(KEY_ACTIVE_FRAGMENT);
-        }
+        return sharedPreferences.getInt(key, defaultValue);
     }
 
-    @Override
-    public void bindView(final IMasterPageViewContainer view) {
-        super.bindView(view);
-        view.showToolbar(activity, this);
-        view.setToolbarTitle(toolbarTitle);
+    public static void putInt(String key, int value) {
+        Context context = LunchtimeApplication.getContext();
+        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        if (activeFragment.equals(TAG_DASHBOARD_FRAGMENT)) {
-            view.showDashboardFragment();
-            view.setOnTitleClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View clickedView) {
-                    view.openLocationPicker(LocationHelper.getLocations(), LocationHelper.getSelectedLocationIndex(), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int selectedItemIndex) {
-                            LocationHelper.setSelectedLocationIndex(selectedItemIndex);
-                            view.setToolbarTitle(LocationHelper.getSelectedLocation());
-                            view.refreshDashboardFragment();
-                            dialogInterface.dismiss();
-                        }
-                    });
-                }
-            });
-        } else if (activeFragment.equals(TAG_HELP_FRAGMENT)) {
-            view.showHelpFragment();
-        }
+        editor.putInt(key, value).apply();
     }
 
-    @Override
-    public void unbindView() {
-        IMasterPageViewContainer view = getView();
-        if (view != null) {
-            view.setOnTitleClickListener(null);
-        }
-        super.unbindView();
+    public static void putString(String key, String value) {
+        Context context = LunchtimeApplication.getContext();
+        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString(key, value).apply();
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putString(KEY_TOOLBAR_TITLE, toolbarTitle);
-        outState.putString(KEY_ACTIVE_FRAGMENT, activeFragment);
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        // TODO: Check visitor pattern for a MVP improvement
-        switch (item.getItemId()) {
-            case R.id.nav_dashboard:
-                toolbarTitle = getDashboardTitle();
-                activeFragment = TAG_DASHBOARD_FRAGMENT;
-                getView().setToolbarTitle(toolbarTitle);
-                getView().showDashboardFragment();
-                break;
-            case R.id.nav_help:
-                toolbarTitle = getString(R.string.nav_item_help);
-                activeFragment = TAG_HELP_FRAGMENT;
-                getView().setToolbarTitle(toolbarTitle);
-                getView().showHelpFragment();
-                break;
-        }
-
-        getView().closeDrawer();
-
-        return true;
-    }
-
-    @Override
-    public void onDestroy() {
-        toolbarTitle = null;
-        activeFragment = null;
-        activity = null;
-        super.onDestroy();
-    }
-
-    private String getDashboardTitle() {
-        return LocationHelper.getSelectedLocation();
-    }
-
-    private String getString(@StringRes int resId) {
-        return activity.getApplicationContext().getString(resId);
-    }
-
-    public void onPostCreate(@Nullable Bundle savedInstanceState) {
-        getView().syncDrawerToggleButton();
-    }
 }

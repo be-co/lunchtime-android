@@ -676,6 +676,7 @@
  */
 package com.tbaehr.lunchtime.view;
 
+import android.content.DialogInterface;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -701,5 +702,7 @@ public interface IMasterPageViewContainer {
 
     void syncDrawerToggleButton();
 
-    void openLocationPicker();
+    void openLocationPicker(CharSequence[] options, int checkedItemIndex, DialogInterface.OnClickListener onClickListener);
+
+    void refreshDashboardFragment();
 }

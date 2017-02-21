@@ -771,24 +771,29 @@ public class HorizontalSliderView extends LinearLayout {
             return;
         }
 
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        int width = (int) (displaymetrics.widthPixels / MIN_ITEM_NUMBER * displaymetrics.density);
+        if (width > MAX_ITEM_WIDTH * displaymetrics.density) {
+            width = (int) (MAX_ITEM_WIDTH * displaymetrics.density);
+        }
+
         for (Offer offer : offers) {
             View offerView = createItemView(context, offer);
-            sliderViewContainer.addView(offerView);
+            LinearLayout.LayoutParams layoutParams = new LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT);
+            int margin = (int) getResources().getDimension(R.dimen.card_margin);
+            layoutParams.setMargins(margin, margin, 0, margin);
+            sliderViewContainer.addView(offerView, layoutParams);
         }
         sliderViewContainer.post(new Runnable() {
             @Override
             public void run() {
                 int titleMaxLines = 1;
-                int descriptionMaxLines = 1;
                 for (int viewIndex = 0; viewIndex < sliderViewContainer.getChildCount(); viewIndex++) {
                     View offerView = sliderViewContainer.getChildAt(viewIndex);
                     TextView titleView = (TextView) offerView.findViewById(R.id.title);
                     if (titleView.getLineCount() > titleMaxLines) {
                         titleMaxLines = titleView.getLineCount();
-                    }
-                    TextView descriptionView = (TextView) offerView.findViewById(R.id.description);
-                    if (descriptionView.getLineCount() > descriptionMaxLines) {
-                        descriptionMaxLines = descriptionView.getLineCount();
                     }
                 }
                 for (int viewIndex = 0; viewIndex < sliderViewContainer.getChildCount(); viewIndex++) {
@@ -796,13 +801,6 @@ public class HorizontalSliderView extends LinearLayout {
                     TextView titleView = (TextView) offerView.findViewById(R.id.title);
                     titleView.setMinLines(titleMaxLines);
                     titleView.refreshDrawableState();
-
-                    TextView descriptionView = (TextView) offerView.findViewById(R.id.description);
-                    descriptionView.setMinLines(descriptionMaxLines);
-                    if (descriptionMaxLines > 0) {
-                        descriptionView.setVisibility(View.VISIBLE);
-                    }
-                    descriptionView.refreshDrawableState();
                 }
             }
         });
@@ -811,14 +809,6 @@ public class HorizontalSliderView extends LinearLayout {
 
     private View createItemView(Context context, final Offer offer) {
         View itemView = inflate(context, R.layout.offer_view, null);
-
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int width = (int) (displaymetrics.widthPixels / MIN_ITEM_NUMBER * displaymetrics.density);
-        if (width > MAX_ITEM_WIDTH * displaymetrics.density) {
-            width = (int) (MAX_ITEM_WIDTH * displaymetrics.density);
-        }
-        itemView.setLayoutParams(new LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT));
 
         /*ImageView imageView = (ImageView) itemView.findViewById(R.id.imageView);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -830,14 +820,14 @@ public class HorizontalSliderView extends LinearLayout {
         TextView titleView = (TextView) itemView.findViewById(R.id.title);
         titleView.setText(offer.getTitle());
 
-        TextView descriptionView = (TextView) itemView.findViewById(R.id.description);
+        /*TextView descriptionView = (TextView) itemView.findViewById(R.id.description);
         String description = offer.getDescription();
         if (description.length() > 0) {
             descriptionView.setText(description);
         } else {
             descriptionView.setText("");
             descriptionView.setVisibility(View.GONE);
-        }
+        }*/
 
         TextView prizeView = (TextView) itemView.findViewById(R.id.prize);
         prizeView.setText(formatPrize(offer.getPrize()));

@@ -10,6 +10,7 @@ android {
         versionCode 11
         versionName "2017.02.18"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {

@@ -678,6 +678,7 @@ package com.tbaehr.lunchtime.view;
 
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.
@@ -688,6 +689,8 @@ public interface IMasterPageViewContainer {
 
     void setToolbarTitle(String title);
 
+    void setOnTitleClickListener(View.OnClickListener onClickListener);
+
     void showDashboardFragment();
 
     void showHelpFragment();
@@ -697,4 +700,6 @@ public interface IMasterPageViewContainer {
     boolean onBackPressed();
 
     void syncDrawerToggleButton();
+
+    void openLocationPicker();
 }

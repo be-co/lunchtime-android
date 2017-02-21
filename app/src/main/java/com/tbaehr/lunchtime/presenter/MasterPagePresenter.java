@@ -683,6 +683,7 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
@@ -724,16 +725,31 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
     }
 
     @Override
-    public void bindView(IMasterPageViewContainer view) {
+    public void bindView(final IMasterPageViewContainer view) {
         super.bindView(view);
         view.showToolbar(activity, this);
         view.setToolbarTitle(toolbarTitle);
 
         if (activeFragment.equals(TAG_DASHBOARD_FRAGMENT)) {
             view.showDashboardFragment();
+            view.setOnTitleClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View clickedView) {
+                    view.openLocationPicker();
+                }
+            });
         } else if (activeFragment.equals(TAG_HELP_FRAGMENT)) {
             view.showHelpFragment();
         }
+    }
+
+    @Override
+    public void unbindView() {
+        IMasterPageViewContainer view = getView();
+        if (view != null) {
+            view.setOnTitleClickListener(null);
+        }
+        super.unbindView();
     }
 
     @Override
@@ -775,7 +791,8 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
     }
 
     private String getDashboardTitle() {
-        return getString(R.string.lunch_time);
+        // TODO: Get selected location
+        return "Weiterstadt";
     }
 
     private String getString(@StringRes int resId) {

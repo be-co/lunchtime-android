@@ -732,7 +732,10 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
 
     private FragmentHolder fragmentHolder;
 
+    private MasterPageActivity activity;
+
     public MasterPageViewContainer(MasterPageActivity activity, FragmentManager fragmentManager) {
+        this.activity = activity;
         activity.setContentView(R.layout.activity_master_page);
         activity.setAsFullScreenActivity();
         View rootView = activity.findViewById(R.id.drawer_layout);
@@ -741,7 +744,7 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     }
 
     @Override
-    public void showToolbar(AppCompatActivity activity, NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener) {
+    public void showToolbar(final AppCompatActivity activity, NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener) {
         activity.setSupportActionBar(toolbar);
         setupDrawerToggle(activity);
         navigationView.setNavigationItemSelectedListener(navigationItemSelectedListener);
@@ -761,7 +764,17 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
 
     @Override
     public void setToolbarTitle(String title) {
-        collapsingToolbar.setTitle(title);
+        activity.setTitle(title);
+    }
+
+    @Override
+    public void setOnTitleClickListener(View.OnClickListener onClickListener) {
+        toolbar.setOnClickListener(onClickListener);
+    }
+
+    @Override
+    public void openLocationPicker() {
+        // TODO: Open location picker view
     }
 
     @Override

@@ -676,6 +676,8 @@
  */
 package com.tbaehr.lunchtime.presenter;
 
+import android.support.annotation.NonNull;
+
 import com.propaneapps.tomorrow.presenter.BasePresenter;
 
 /**
@@ -688,6 +690,10 @@ public class CustomBasePresenter<V> extends BasePresenter<V> {
     }
 
     public void onResume() {
+        //;
+    }
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull int[] grantResults) {
         //;
     }
 

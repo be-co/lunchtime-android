@@ -134,7 +134,7 @@
                 android:drawableLeft="@drawable/ic_text"
                 android:drawableRight="@drawable/arrow_down"
                 android:drawableEnd="@drawable/arrow_down"
-                android:text="@string/lunch_time" />
+                android:text="@string/_loading" />
 
             <com.bluejamesbond.text.DocumentView
                 xmlns:ext="http://schemas.android.com/apk/res-auto"
@@ -159,7 +159,7 @@
                 android:id="@+id/restaurant_location"
                 android:drawableStart="@drawable/ic_location"
                 android:drawableLeft="@drawable/ic_location"
-                android:text="@string/lunch_time" />
+                android:text="@string/_loading" />
 
             <LinearLayout
                 android:id="@+id/restaurant_opening_times"
@@ -183,7 +183,7 @@
                     android:drawableRight="@drawable/arrow_down"
                     android:drawableEnd="@drawable/arrow_down"
                     android:drawablePadding="@dimen/activity_vertical_margin"
-                    android:text="@string/starts" />
+                    android:text="@string/_loading" />
 
                 <TextView
                     style="@style/DetailPageItem"
@@ -211,10 +211,31 @@
 
             <TextView
                 style="@style/DetailPageItem"
+                android:id="@+id/restaurant_paying"
+                android:drawableStart="@drawable/ic_money"
+                android:drawableLeft="@drawable/ic_money"
+                android:text="@string/_loading" />
+
+            <TextView
+                style="@style/DetailPageItem"
+                android:id="@+id/restaurant_parking"
+                android:drawableStart="@drawable/ic_parking"
+                android:drawableLeft="@drawable/ic_parking"
+                android:text="@string/_loading" />
+
+            <TextView
+                style="@style/DetailPageItem"
                 android:id="@+id/restaurant_url"
                 android:drawableStart="@drawable/ic_webpage"
                 android:drawableLeft="@drawable/ic_webpage"
-                android:text="@string/app_name" />
+                android:text="@string/_loading" />
+
+            <TextView
+                style="@style/DetailPageItem"
+                android:id="@+id/restaurant_phone"
+                android:drawableStart="@drawable/ic_phone"
+                android:drawableLeft="@drawable/ic_phone"
+                android:text="@string/_loading" />
 
         </LinearLayout>
 

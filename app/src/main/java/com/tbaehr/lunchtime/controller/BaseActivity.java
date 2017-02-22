@@ -681,6 +681,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -745,6 +746,12 @@ implements FactoryWithType<P> {
      */
     public void openUrl(Uri uri) {
         startActivity(new Intent(Intent.ACTION_VIEW, uri));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        getPresenter().onRequestPermissionsResult(requestCode, grantResults);
     }
 
     public void setAsFullScreenActivity() {

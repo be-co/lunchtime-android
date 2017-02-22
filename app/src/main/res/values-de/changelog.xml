@@ -1,6 +1,8 @@
 <resources>
     <string name="changelog_header">Versionshistorie</string>
-    <string name="changelog"><b>2017.02.25 Alpha (v12)</b>
+    <string name="changelog"><b>2017.02.22 (v12)</b>
+        \n•  Berechtigung \"Telefonanrufe\" hinzugefügt, erlaubt es Restaurants anzurufen
+        \n•  Detailseite: Erweiterung um Parkmöglichkeiten, Bezahlmittel, Telefonnummer
         \n•  Dashboard: Auswahl des Standorts möglich - Darmstadt und Weiterstadt
         \n•  Dashboard: Karten-Layout anstelle grauer Box
         \n•  Fehlerkorrektur: Stabilität für Geräte kleiner Android 6 Nougat verbessert

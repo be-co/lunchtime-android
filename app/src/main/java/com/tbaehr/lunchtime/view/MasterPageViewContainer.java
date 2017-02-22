@@ -687,6 +687,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -766,7 +767,12 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
 
     @Override
     public void setToolbarTitle(String title) {
-        activity.setTitle(title);
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(title);
+        } else {
+            activity.setTitle(title);
+        }
     }
 
     @Override

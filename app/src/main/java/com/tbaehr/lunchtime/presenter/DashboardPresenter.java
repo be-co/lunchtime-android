@@ -734,8 +734,6 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     public void bindView(IDashboardViewContainer view) {
         super.bindView(view);
         dataProvider = new DataProvider();
-        dataProvider.syncNearbyOffers(this);
-
         refreshOffers();
     }
 
@@ -882,6 +880,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     }
 
     public void refreshOffers() {
+        dataProvider.syncNearbyOffers(this);
         List<Offers> offersListTemp = dataProvider.loadOffersFromCache();
         boolean dataSetChanged = offersList == null || offersListTemp.size() != offersList.size();
         if (!dataSetChanged) {

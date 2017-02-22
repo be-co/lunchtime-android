@@ -676,11 +676,16 @@
  */
 package com.tbaehr.lunchtime.presenter;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.view.MenuItem;
 
 import com.tbaehr.lunchtime.DataProvider;
@@ -709,7 +714,9 @@ import static com.tbaehr.lunchtime.utils.DateTime.SECOND_IN_MILLIS;
  */
 public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewContainer> implements LoadJobListener<List<Restaurant>>, IDetailPageViewContainer.ClickListener {
 
-    private final int IMAGE_DURATION = 8000;
+    private static final int PERMISSION_REQUEST_CODE = 42;
+
+    private static final int IMAGE_DURATION = 8000;
 
     private DetailPageActivity activity;
 
@@ -917,8 +924,11 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
             String location = restaurant.getLocationDescription();
             String openingTimes = restaurant.getOpeningTimeDescriptionForToday();
             String[] openingTimesExpanded = restaurant.getOpeningTimeDescriptionFull();
-            String url = restaurant.getUrl();
-            getView().setRestaurantData(this, shortDescription, longDescription, location, openingTimes, openingTimesExpanded, url);
+            String parking = restaurant.getParkingInformation();
+            String paymentMethods = restaurant.getPaymentMethods();
+            String phone = restaurant.getPhoneNumber();
+            String url = restaurant.getUrl().replace("http://www.", "");
+            getView().setRestaurantData(this, shortDescription, longDescription, location, openingTimes, parking, paymentMethods, openingTimesExpanded, phone, url);
         }
     }
 
@@ -986,5 +996,32 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     @Override
     public void onRestaurantUrlClicked() {
         activity.openUrl(Uri.parse(restaurant.getUrl()));
+    }
+
+    @Override
+    public void onRestaurantPhoneNumberClicked() {
+        String uri = String.format(Locale.ENGLISH, "tel:%s$1", restaurant.getPhoneNumber());
+        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(uri));
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                activity.requestPermissions(new String[] { Manifest.permission.CALL_PHONE }, PERMISSION_REQUEST_CODE);
+            }
+            return;
+        }
+        activity.startActivity(intent);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull int[] grantResults) {
+        if (requestCode != PERMISSION_REQUEST_CODE) {
+            return;
+        }
+
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            onRestaurantPhoneNumberClicked();
+        } else {
+            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", restaurant.getPhoneNumber(), null));
+            activity.startActivity(intent);
+        }
     }
 }

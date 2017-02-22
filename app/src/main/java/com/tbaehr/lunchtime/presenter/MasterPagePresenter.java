@@ -733,23 +733,9 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         view.setToolbarTitle(toolbarTitle);
 
         if (activeFragment.equals(TAG_DASHBOARD_FRAGMENT)) {
-            view.showDashboardFragment();
-            view.setOnTitleClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View clickedView) {
-                    view.openLocationPicker(LocationHelper.getLocations(), LocationHelper.getSelectedLocationIndex(), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int selectedItemIndex) {
-                            LocationHelper.setSelectedLocationIndex(selectedItemIndex);
-                            view.setToolbarTitle(LocationHelper.getSelectedLocation());
-                            view.refreshDashboardFragment();
-                            dialogInterface.dismiss();
-                        }
-                    });
-                }
-            });
+            presentDashboard();
         } else if (activeFragment.equals(TAG_HELP_FRAGMENT)) {
-            view.showHelpFragment();
+            presentHelpPage();
         }
     }
 
@@ -774,22 +760,49 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         // TODO: Check visitor pattern for a MVP improvement
         switch (item.getItemId()) {
             case R.id.nav_dashboard:
-                toolbarTitle = getDashboardTitle();
-                activeFragment = TAG_DASHBOARD_FRAGMENT;
-                getView().setToolbarTitle(toolbarTitle);
-                getView().showDashboardFragment();
+                presentDashboard();
                 break;
             case R.id.nav_help:
-                toolbarTitle = getString(R.string.nav_item_help);
-                activeFragment = TAG_HELP_FRAGMENT;
-                getView().setToolbarTitle(toolbarTitle);
-                getView().showHelpFragment();
+                presentHelpPage();
                 break;
         }
-
         getView().closeDrawer();
 
         return true;
+    }
+
+    private void presentDashboard() {
+        activeFragment = TAG_DASHBOARD_FRAGMENT;
+
+        final IMasterPageViewContainer view = getView();
+        toolbarTitle = getDashboardTitle();
+        view.setToolbarTitle(toolbarTitle);
+        view.setOnTitleClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View clickedView) {
+                view.openLocationPicker(LocationHelper.getLocations(), LocationHelper.getSelectedLocationIndex(), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int selectedItemIndex) {
+                        LocationHelper.setSelectedLocationIndex(selectedItemIndex);
+                        toolbarTitle = LocationHelper.getSelectedLocation();
+                        view.setToolbarTitle(toolbarTitle);
+                        view.refreshDashboardFragment();
+                        dialogInterface.dismiss();
+                    }
+                });
+            }
+        });
+        view.showDashboardFragment();
+    }
+
+    private void presentHelpPage() {
+        activeFragment = TAG_HELP_FRAGMENT;
+
+        IMasterPageViewContainer view = getView();
+        toolbarTitle = getString(R.string.nav_item_help);
+        view.setToolbarTitle(toolbarTitle);
+        view.setOnTitleClickListener(null);
+        view.showHelpFragment();
     }
 
     @Override

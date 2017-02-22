@@ -737,6 +737,7 @@ public class DataProvider {
     private static final String URI_OFFER = BASE_URI + "offers_%s.json";
 
     public void syncNearbyOffers(final LoadJobListener callback) {
+        // TODO: Sync max. 1/min
         final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
         final String uriSync = String.format(URI_NEARBY_RESTAURANTS, locationId);
         final String keySync = String.format(KEY_NEARBY_OFFERS, locationId);

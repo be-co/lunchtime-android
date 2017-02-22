@@ -10,6 +10,7 @@
     <string name="_close">Schließen</string>
     <string name="_accept">Zustimmen</string>
     <string name="_decline">Ablehnen</string>
+    <string name="_loading">Lädt…</string>
 
     <string name="nav_content_desc_drawer_open">Navigationsbar öffnen</string>
     <string name="nav_content_desc_drawer_close">Navigationsbar schließen</string>

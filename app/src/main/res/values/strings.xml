@@ -10,6 +10,7 @@
     <string name="_close">Close</string>
     <string name="_accept">Accept</string>
     <string name="_decline">Decline</string>
+    <string name="_loading">Loading…</string>
 
     <string name="nav_content_desc_drawer_open">Open navigation drawer</string>
     <string name="nav_content_desc_drawer_close">Close navigation drawer</string>

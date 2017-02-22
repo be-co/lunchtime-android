@@ -211,9 +211,30 @@
 
             <TextView
                 style="@style/DetailPageItem"
+                android:id="@+id/restaurant_paying"
+                android:drawableStart="@drawable/ic_money"
+                android:drawableLeft="@drawable/ic_money"
+                android:text="@string/app_name" />
+
+            <TextView
+                style="@style/DetailPageItem"
+                android:id="@+id/restaurant_parking"
+                android:drawableStart="@drawable/ic_parking"
+                android:drawableLeft="@drawable/ic_parking"
+                android:text="@string/app_name" />
+
+            <TextView
+                style="@style/DetailPageItem"
                 android:id="@+id/restaurant_url"
                 android:drawableStart="@drawable/ic_webpage"
                 android:drawableLeft="@drawable/ic_webpage"
+                android:text="@string/app_name" />
+
+            <TextView
+                style="@style/DetailPageItem"
+                android:id="@+id/restaurant_phone"
+                android:drawableStart="@drawable/ic_phone"
+                android:drawableLeft="@drawable/ic_phone"
                 android:text="@string/app_name" />
 
         </LinearLayout>

@@ -707,6 +707,10 @@ public class Restaurant {
 
     private Map<Integer, DateTime[]> openingTimes;
 
+    private String parking;
+
+    private String paying;
+
     private String phoneNumber;
 
     private String email;
@@ -722,6 +726,8 @@ public class Restaurant {
             String longDescription,
             String locationDescription,
             Map<Integer, DateTime[]> openingTimes,
+            String parking,
+            String paying,
             String phoneNumber, String email, String url, final String[] photoUrls) {
         this.id = id;
         this.name = name;
@@ -729,6 +735,8 @@ public class Restaurant {
         this.longDescription = longDescription;
         this.locationDescription = locationDescription;
         this.openingTimes = openingTimes;
+        this.parking = parking;
+        this.paying = paying;
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.url = url;
@@ -868,6 +876,14 @@ public class Restaurant {
             return null;
         }
         return dayClosingTimes[1];
+    }
+
+    public String getParkingInformation() {
+        return parking;
+    }
+
+    public String getPaymentMethods() {
+        return paying;
     }
 
     public String getPhoneNumber() {

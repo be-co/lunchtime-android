@@ -1049,6 +1049,14 @@ public class DataProvider {
         openingTimes.put(Calendar.SATURDAY, convertToDateTimeArray(Calendar.SATURDAY, saturdayArray));
         openingTimes.put(Calendar.SUNDAY, convertToDateTimeArray(Calendar.SUNDAY, sundayArray));
 
+        String parking = restaurantJSON.getString("parking");
+        JSONArray payingArray = restaurantJSON.getJSONArray("paying");
+        String paying = "";
+        for (int i = 0; i < payingArray.length(); i++) {
+            paying += i == 0 ? "" : ", ";
+            paying += payingArray.getString(i);
+        }
+
         String phoneNumber = restaurantJSON.getString("phoneNumber");
         String email = restaurantJSON.getString("email");
         String website = restaurantJSON.getString("website");
@@ -1056,7 +1064,7 @@ public class DataProvider {
         String[] photoUrls = convertToArray(photoUrlsObjects);
 
         return new Restaurant(restaurantId, name, shortDescription, longDescription, address,
-                openingTimes, phoneNumber, email, website, photoUrls);
+                openingTimes, parking, paying, phoneNumber, email, website, photoUrls);
     }
 
     private String downloadTextFromServer(String path) {
@@ -1138,7 +1146,7 @@ public class DataProvider {
     }
 
     private void autoSearchForIngredients(Set<Offer.Ingredient> ingredientList, String title) {
-        if (contains(title, "schinken", "Cevapcici", "Lasagne", "Wildbraten", "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
+        if (contains(title, "Mettenden", "Mettwurst", "schinken", "Cevapcici", "Lasagne", "Wildbraten", "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
             if (!title.contains("vom Rind") && !title.contains("vegetarisch")) {
                 ingredientList.add(Offer.Ingredient.PORK);
             }
@@ -1158,7 +1166,7 @@ public class DataProvider {
         if (contains(title, "Wolfsbarsch", "Kabeljau", "Schlemmerfilet", "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {
             ingredientList.add(Offer.Ingredient.FISH);
         }
-        if (contains(title, " Ei", "Ei ", "Eier", "eier", "Spiegelei", "Majonese", "Eierknöpfle", "Tagliatelle", "Spaghetti", "Spätzle", "Nudel", "nudel")) {
+        if (contains(title, "Omelett", " Ei", "Ei ", "Eier", "eier", "Spiegelei", "Majonese", "Eierknöpfle", "Tagliatelle", "Spaghetti", "Spätzle", "Nudel", "nudel")) {
             ingredientList.add(Offer.Ingredient.EGG);
         }
     }

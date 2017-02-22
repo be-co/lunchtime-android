@@ -680,10 +680,12 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Spanned;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -754,6 +756,15 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
 
     @BindView(R.id.restaurant_url)
     TextView restaurantUrl;
+
+    @BindView(R.id.restaurant_parking)
+    TextView restaurantParking;
+
+    @BindView(R.id.restaurant_paying)
+    TextView restaurantPaymentMethods;
+
+    @BindView(R.id.restaurant_phone)
+    TextView restaurantPhone;
 
     private ClickListener clickListener;
 
@@ -902,8 +913,27 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
         clickListener.onRestaurantUrlClicked();
     }
 
+    @OnClick(R.id.restaurant_phone)
+    void onRestaurantPhoneNumberClicked() {
+        if (clickListener == null) {
+            return;
+        }
+        clickListener.onRestaurantPhoneNumberClicked();
+    }
+
     @Override
-    public void setRestaurantData(ClickListener listener, String shortDescription, String longDescription, String location, String openingTimes, String[] openingTimesExpanded, String url) {
+    public void setRestaurantData(
+            ClickListener listener,
+            String shortDescription,
+            String longDescription,
+            String location,
+            String openingTimes,
+            @Nullable String parking,
+            @Nullable String paymentMethods,
+            String[] openingTimesExpanded,
+            @Nullable String phone,
+            @Nullable String url)
+    {
         this.clickListener = listener;
         restaurantDescription.setText(shortDescription);
         longDescription = longDescription.replace("<h1>", "<h4>");
@@ -924,7 +954,36 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
         }
         restaurantLocation.setText(location);
         restaurantOpeningTimesHead.setText(openingTimes);
-        restaurantUrl.setText(url);
+
+        if (parking != null) {
+            restaurantParking.setText(parking);
+        } else {
+            restaurantParking.setVisibility(View.GONE);
+        }
+
+        if (paymentMethods != null && !paymentMethods.equals("")) {
+            restaurantPaymentMethods.setText(paymentMethods);
+        } else {
+            restaurantPaymentMethods.setVisibility(View.GONE);
+        }
+
+        if (phone != null) {
+            restaurantPhone.setText(phone);
+        } else {
+            restaurantPhone.setVisibility(View.GONE);
+        }
+
+        if (url != null) {
+            Spanned urlSpanned;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                urlSpanned = Html.fromHtml("<i>" + url + "</i>", Html.FROM_HTML_MODE_LEGACY);
+            } else {
+                urlSpanned = Html.fromHtml("<i>" + url + "</i>");
+            }
+            restaurantUrl.setText(urlSpanned);
+        } else {
+            restaurantUrl.setVisibility(View.GONE);
+        }
     }
 }
 

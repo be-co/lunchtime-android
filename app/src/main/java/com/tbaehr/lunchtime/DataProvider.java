@@ -676,8 +676,6 @@
  */
 package com.tbaehr.lunchtime;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -692,6 +690,7 @@ import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
 import com.tbaehr.lunchtime.utils.ImageUtils;
 import com.tbaehr.lunchtime.utils.LoadJobListener;
+import com.tbaehr.lunchtime.utils.LocationHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -711,7 +710,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static android.content.Context.MODE_PRIVATE;
+import static com.tbaehr.lunchtime.utils.SharedPrefsHelper.getString;
+import static com.tbaehr.lunchtime.utils.SharedPrefsHelper.putString;
 
 /**
  * Created by timo.baehr@gmail.com on 27.12.16.
@@ -737,8 +737,9 @@ public class DataProvider {
     private static final String URI_OFFER = BASE_URI + "offers_%s.json";
 
     public void syncNearbyOffers(final LoadJobListener callback) {
-        final String uriSync = String.format(URI_NEARBY_RESTAURANTS, "weiterstadt");
-        final String keySync = String.format(KEY_NEARBY_OFFERS, "weiterstadt");
+        final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
+        final String uriSync = String.format(URI_NEARBY_RESTAURANTS, locationId);
+        final String keySync = String.format(KEY_NEARBY_OFFERS, locationId);
 
         new AsyncTask<Void, Void, Void>() {
             private boolean dataSetChanged = false;
@@ -750,7 +751,7 @@ public class DataProvider {
 
                 // Server answered with json -> save to cache and update offers
                 if (jsonDownloaded != null) {
-                    storeToCache(keySync, jsonDownloaded);
+                    putString(keySync, jsonDownloaded);
                     Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurantKeys(jsonDownloaded);
                     Map<String, String> nearbyRestaurantKeys = nearbyKeys.second;
                     for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
@@ -774,8 +775,9 @@ public class DataProvider {
     }
 
     public void syncRestaurant(final LoadJobListener callback, final String restaurantId) {
-        final String uriSync = String.format(URI_NEARBY_RESTAURANTS, "weiterstadt");
-        final String keySync = String.format(KEY_NEARBY_OFFERS, "weiterstadt");
+        final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
+        final String uriSync = String.format(URI_NEARBY_RESTAURANTS, locationId);
+        final String keySync = String.format(KEY_NEARBY_OFFERS, locationId);
 
         new AsyncTask<Void, Void, Void>() {
             private boolean dataSetChanged = false;
@@ -787,7 +789,7 @@ public class DataProvider {
 
                 // Server answered with json -> save to cache and update offers
                 if (jsonDownloaded != null) {
-                    storeToCache(keySync, jsonDownloaded);
+                    putString(keySync, jsonDownloaded);
                     Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurantKeys(jsonDownloaded);
                     Map<String, String> nearbyRestaurantKeys = nearbyKeys.first;
                     dataSetChanged = updateRestaurant(restaurantId, nearbyRestaurantKeys.get(restaurantId), callback) || dataSetChanged;
@@ -841,9 +843,10 @@ public class DataProvider {
     }
 
     public List<Offers> loadOffersFromCache() {
-        final String keySync = String.format(KEY_NEARBY_OFFERS, "weiterstadt");
+        final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
+        final String keySync = String.format(KEY_NEARBY_OFFERS, locationId);
         List<Offers> offersList = new ArrayList<>();
-        String jsonNearbyRestaurantsCached = loadFromCache(keySync);
+        String jsonNearbyRestaurantsCached = getString(keySync);
         if (jsonNearbyRestaurantsCached != null) {
             Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurantKeys(jsonNearbyRestaurantsCached);
             Map<String, String> nearbyRestaurantKeys = nearbyKeys.second;
@@ -859,7 +862,7 @@ public class DataProvider {
 
     public Offers loadOffersFromCache(@NonNull String restaurantKey) {
         final String keyRestaurant = String.format(KEY_OFFER, restaurantKey);
-        String jsonOffers = loadFromCache(keyRestaurant);
+        String jsonOffers = getString(keyRestaurant);
 
         if (jsonOffers != null) {
             try {
@@ -874,7 +877,7 @@ public class DataProvider {
 
     public Restaurant loadRestaurantFromCache(@NonNull String keyRestaurant) {
         try {
-            String json = loadFromCache(String.format(KEY_RESTAURANT, keyRestaurant));
+            String json = getString(String.format(KEY_RESTAURANT, keyRestaurant));
             if (json != null) {
                 return parseRestaurantFromJson(json, keyRestaurant);
             }
@@ -889,7 +892,7 @@ public class DataProvider {
         final String uriRestaurant = String.format(URI_RESTAURANT, restaurantKey);
         final String keyRestaurantUpdated = String.format(KEY_RESTAURANT_UPDATED, restaurantKey);
 
-        DateTime cachedDate = DateUtils.createDateFromString(loadFromCache(keyRestaurantUpdated));
+        DateTime cachedDate = DateUtils.createDateFromString(getString(keyRestaurantUpdated));
         DateTime downloadDate = DateUtils.createDateFromString(dateUpdated);
 
         String jsonRestaurant;
@@ -902,8 +905,8 @@ public class DataProvider {
                 try {
                     Restaurant restaurant = parseRestaurantFromJson(jsonRestaurant, restaurantKey);
                     if (restaurant != null) {
-                        storeToCache(String.format(KEY_RESTAURANT, restaurantKey), jsonRestaurant);
-                        storeToCache(keyRestaurantUpdated, dateUpdated);
+                        putString(String.format(KEY_RESTAURANT, restaurantKey), jsonRestaurant);
+                        putString(keyRestaurantUpdated, dateUpdated);
                         return true;
                     }
                 } catch (JSONException jsonException) {
@@ -922,7 +925,7 @@ public class DataProvider {
         final String uriRestaurantOffers = String.format(URI_OFFER, restaurantKey);
         final String keyOfferUpdated = String.format(KEY_OFFER_UPDATED, restaurantKey);
 
-        DateTime cachedDate = DateUtils.createDateFromString(loadFromCache(keyOfferUpdated));
+        DateTime cachedDate = DateUtils.createDateFromString(getString(keyOfferUpdated));
         DateTime downloadDate = DateUtils.createDateFromString(dateUpdated);
 
         String jsonOffers;
@@ -935,8 +938,8 @@ public class DataProvider {
                 try {
                     Offers offers = parseOffersFromJson(jsonOffers);
                     if (offers != null) {
-                        storeToCache(String.format(KEY_OFFER, restaurantKey), jsonOffers);
-                        storeToCache(keyOfferUpdated, dateUpdated);
+                        putString(String.format(KEY_OFFER, restaurantKey), jsonOffers);
+                        putString(keyOfferUpdated, dateUpdated);
                         return true;
                     }
                 } catch (JSONException jsonException) {
@@ -1054,23 +1057,6 @@ public class DataProvider {
 
         return new Restaurant(restaurantId, name, shortDescription, longDescription, address,
                 openingTimes, phoneNumber, email, website, photoUrls);
-    }
-
-    private String loadFromCache(String key) {
-        Context context = LunchtimeApplication.getContext();
-        String name = "cache";
-        SharedPreferences sharedPreferences = context.getSharedPreferences(name, MODE_PRIVATE);
-
-        return sharedPreferences.getString(key, null);
-    }
-
-    private void storeToCache(String key, String value) {
-        Context context = LunchtimeApplication.getContext();
-        String name = "cache";
-        SharedPreferences sharedPreferences = context.getSharedPreferences(name, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putString(key, value).apply();
     }
 
     private String downloadTextFromServer(String path) {

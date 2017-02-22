@@ -676,6 +676,8 @@
  */
 package com.tbaehr.lunchtime.view;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
@@ -732,7 +734,10 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
 
     private FragmentHolder fragmentHolder;
 
+    private MasterPageActivity activity;
+
     public MasterPageViewContainer(MasterPageActivity activity, FragmentManager fragmentManager) {
+        this.activity = activity;
         activity.setContentView(R.layout.activity_master_page);
         activity.setAsFullScreenActivity();
         View rootView = activity.findViewById(R.id.drawer_layout);
@@ -741,7 +746,7 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     }
 
     @Override
-    public void showToolbar(AppCompatActivity activity, NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener) {
+    public void showToolbar(final AppCompatActivity activity, NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener) {
         activity.setSupportActionBar(toolbar);
         setupDrawerToggle(activity);
         navigationView.setNavigationItemSelectedListener(navigationItemSelectedListener);
@@ -761,7 +766,30 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
 
     @Override
     public void setToolbarTitle(String title) {
-        collapsingToolbar.setTitle(title);
+        activity.setTitle(title);
+    }
+
+    @Override
+    public void setOnTitleClickListener(View.OnClickListener onClickListener) {
+        toolbar.setOnClickListener(onClickListener);
+    }
+
+    @Override
+    public void openLocationPicker(final CharSequence[] options, int checkedItemIndex, DialogInterface.OnClickListener onClickListener) {
+        new AlertDialog.Builder(activity)
+                .setTitle(R.string.choose_location)
+                .setSingleChoiceItems(options, checkedItemIndex, onClickListener)
+                .setPositiveButton(R.string._close, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .show();
+    }
+
+    @Override
+    public void refreshDashboardFragment() {
+        fragmentHolder.refreshDashboardFragment();
     }
 
     @Override
@@ -818,6 +846,10 @@ class FragmentHolder {
         if (help == null) {
             help = new HelpFragment();
         }
+    }
+
+    void refreshDashboardFragment() {
+        dashboard.refresh();
     }
 
     void showDashboardFragment() {

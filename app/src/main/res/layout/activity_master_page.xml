@@ -27,9 +27,7 @@
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
                 app:contentScrim="?attr/colorPrimary"
-                app:expandedTitleMarginEnd="@dimen/activity_horizontal_margin"
-                app:expandedTitleMarginStart="@dimen/activity_horizontal_margin"
-                app:expandedTitleTextAppearance="@style/AppTheme.ExpandedTitle"
+                app:titleEnabled="false"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
                 <ImageView

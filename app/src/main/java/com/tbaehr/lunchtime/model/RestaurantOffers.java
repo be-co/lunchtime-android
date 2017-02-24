@@ -688,7 +688,7 @@ import java.util.Set;
 /**
  * Created by timo.baehr@gmail.com on 08.01.17.
  */
-public class Offers {
+public class RestaurantOffers {
 
     private String restaurantId;
 
@@ -698,7 +698,7 @@ public class Offers {
 
     private List<Offer> offers;
 
-    public Offers(String restaurantId, String title, String description, List<Offer> offers) {
+    public RestaurantOffers(String restaurantId, String title, String description, List<Offer> offers) {
         this.restaurantId = restaurantId;
         this.title = title;
         this.description = description;
@@ -708,10 +708,10 @@ public class Offers {
     @Override
     public boolean equals(@Nullable Object obj) {
         // equal type?
-        if (obj == null || !(obj instanceof Offers)) {
+        if (obj == null || !(obj instanceof RestaurantOffers)) {
             return false;
         }
-        Offers otherOffers = (Offers) obj;
+        RestaurantOffers otherOffers = (RestaurantOffers) obj;
 
         // equal size?
         boolean isEqual = getOffers().size() == otherOffers.getOffers().size();

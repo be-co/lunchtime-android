@@ -674,231 +674,130 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.presenter;
+package com.tbaehr.lunchtime.model.parsing;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.view.View;
-import android.widget.Toast;
-
-import com.propaneapps.tomorrow.presenter.BasePresenter;
-import com.tbaehr.lunchtime.DataProvider;
-import com.tbaehr.lunchtime.LunchtimeApplication;
-import com.tbaehr.lunchtime.R;
-import com.tbaehr.lunchtime.controller.DashboardFragment;
-import com.tbaehr.lunchtime.controller.DetailPageActivity;
-import com.tbaehr.lunchtime.model.Offer;
-import com.tbaehr.lunchtime.model.RestaurantOffers;
+import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.utils.DateTime;
-import com.tbaehr.lunchtime.utils.LoadJobListener;
-import com.tbaehr.lunchtime.view.HorizontalSliderView;
-import com.tbaehr.lunchtime.view.IDashboardViewContainer;
+import com.tbaehr.lunchtime.utils.DateUtils;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_OFFER_INDEX;
-import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_ID;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Created by timo.baehr@gmail.com on 31.12.16.
+ * Created by timo.baehr@gmail.com on 24.02.17.
  */
-public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
-        implements LoadJobListener<List<RestaurantOffers>> {
+public class ParseRestaurant implements ParseJson<Restaurant> {
 
-    private DataProvider dataProvider;
+    private final String restaurantId;
 
-    private Activity activity;
+    private static ParseRestaurant instance;
 
-    private Timer timer;
+    public static ParseRestaurant getInstance(String restaurantId) {
+        if (instance == null) {
+            instance = new ParseRestaurant(restaurantId);
+        }
+        return instance;
+    }
 
-    List<RestaurantOffers> restaurantOffersList;
-
-    public DashboardPresenter(DashboardFragment fragment) {
-        this.activity = fragment.getActivity();
+    private ParseRestaurant(String restaurantId) {
+        this.restaurantId = restaurantId;
     }
 
     @Override
-    public void onDestroy() {
-        dataProvider = null;
-        activity = null;
-        timer = null;
-        restaurantOffersList = null;
-        super.onDestroy();
-    }
+    public Restaurant parse(String jsonText) throws JSONException {
+        JSONObject restaurantJSON = new JSONObject(jsonText);
+        String name = restaurantJSON.getString("title");
+        String shortDescription = restaurantJSON.getString("shortDescription");
+        String longDescription = restaurantJSON.getString("longDescription");
+        String address = restaurantJSON.getString("address");
 
-    @Override
-    public void bindView(IDashboardViewContainer view) {
-        super.bindView(view);
-        dataProvider = new DataProvider();
-        refreshOffers();
-    }
+        JSONObject openingTimesObject = restaurantJSON.getJSONObject("openingTimes");
+        JSONArray mondayArray = openingTimesObject.getJSONArray("monday");
+        JSONArray tuesdayArray = openingTimesObject.getJSONArray("tuesday");
+        JSONArray wednesdayArray = openingTimesObject.getJSONArray("wednesday");
+        JSONArray thursdayArray = openingTimesObject.getJSONArray("thursday");
+        JSONArray fridayArray = openingTimesObject.getJSONArray("friday");
+        JSONArray saturdayArray = openingTimesObject.getJSONArray("saturday");
+        JSONArray sundayArray = openingTimesObject.getJSONArray("sunday");
+        Map<Integer, DateTime[]> openingTimes = new HashMap<>();
+        openingTimes.put(Calendar.MONDAY, convertToDateTimeArray(Calendar.MONDAY, mondayArray));
+        openingTimes.put(Calendar.TUESDAY, convertToDateTimeArray(Calendar.TUESDAY, tuesdayArray));
+        openingTimes.put(Calendar.WEDNESDAY, convertToDateTimeArray(Calendar.WEDNESDAY, wednesdayArray));
+        openingTimes.put(Calendar.THURSDAY, convertToDateTimeArray(Calendar.THURSDAY, thursdayArray));
+        openingTimes.put(Calendar.FRIDAY, convertToDateTimeArray(Calendar.FRIDAY, fridayArray));
+        openingTimes.put(Calendar.SATURDAY, convertToDateTimeArray(Calendar.SATURDAY, saturdayArray));
+        openingTimes.put(Calendar.SUNDAY, convertToDateTimeArray(Calendar.SUNDAY, sundayArray));
 
-    @Override
-    public void unbindView() {
-        stopTimeBasedRefresh();
-        super.unbindView();
-    }
-
-    private void restartTimeBasedRefresh(List<RestaurantOffers> restaurantOffersList) {
-        stopTimeBasedRefresh();
-        startTimeBasedRefresh(restaurantOffersList);
-    }
-
-    private void startTimeBasedRefresh(List<RestaurantOffers> restaurantOffersList) {
-        Set<DateTime> refreshDates = new HashSet<>();
-        for (RestaurantOffers restaurantOffers : restaurantOffersList) {
-            refreshDates.addAll(restaurantOffers.getUiRefreshDates());
-        }
-        startTimers(refreshDates);
-    }
-
-    private void startTimers(Set<DateTime> dates) {
-        if (timer == null) {
-            timer = new Timer();
-        }
-        for (DateTime date : dates) {
-            timer.schedule(createTimerTask(), date.toDate());
-        }
-    }
-
-    private TimerTask createTimerTask() {
-        return new TimerTask() {
-            @Override
-            public void run() {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        presentOffers(dataProvider.loadOffersFromCache());
-                    }
-                });
-            }
-        };
-    }
-
-    private void stopTimeBasedRefresh() {
-        timer.cancel();
-        timer = null;
-    }
-
-    @Override
-    public void onDownloadStarted() {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                getView().clearOffers();
-                getView().hideNoOffersView();
-                getView().setProgressBarVisibility(true);
-            }
-        });
-    }
-
-    @Override
-    public void onDownloadFailed(final String message) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                presentOffers(dataProvider.loadOffersFromCache());
-                Toast.makeText(LunchtimeApplication.getContext(), message, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    @Override
-    public void onDownloadFinished(List<RestaurantOffers> restaurantOffersList) {
-        IDashboardViewContainer view = getView();
-        if (view == null) {
-            return;
+        String parking = null;
+        if (restaurantJSON.has("parking")) {
+            parking = restaurantJSON.getString("parking");
         }
 
-        view.setProgressBarVisibility(false);
-        presentOffers(restaurantOffersList);
-    }
-
-    private void presentOffers(List<RestaurantOffers> restaurantOffersList) {
-        IDashboardViewContainer view = getView();
-        boolean foundOffers = false;
-
-        view.setProgressBarVisibility(false);
-        view.hideNoOffersView();
-        view.clearOffers();
-
-        for (final RestaurantOffers nearbyRestaurantOffers : restaurantOffersList) {
-            final HorizontalSliderView.OnSliderItemClickListener onSliderItemClickListener = new HorizontalSliderView.OnSliderItemClickListener() {
-                @Override
-                public void onSliderItemClick(Offer offer, View view) {
-                    openDetailPage(offer.getRestaurantId(), nearbyRestaurantOffers.getIndex(offer));
-                }
-            };
-            if (nearbyRestaurantOffers.isEmpty()) {
-                continue;
-            }
-
-            foundOffers = true;
-
-            final String restaurantId = nearbyRestaurantOffers.getRestaurantId();
-            final HorizontalSliderView.OnSliderHeaderClickListener headerClickListener = new HorizontalSliderView.OnSliderHeaderClickListener() {
-                @Override
-                public void onSliderHeaderClick() {
-                    openDetailPage(restaurantId, -1);
-                }
-            };
-            view.addOffers(
-                    nearbyRestaurantOffers.getRestaurantName(),
-                    nearbyRestaurantOffers.getRestaurantDescription(),
-                    nearbyRestaurantOffers.getOffers(),
-                    headerClickListener,
-                    onSliderItemClickListener
-            );
-        }
-
-        restartTimeBasedRefresh(restaurantOffersList);
-
-        if (!foundOffers) {
-            final int[] noOffersMessages = new int[] {
-                    R.string.no_offers_today1,
-                    R.string.no_offers_today2,
-                    R.string.no_offers_today3,
-                    R.string.no_offers_today4,
-                    R.string.no_offers_today5
-            };
-            final int randomNumber = (int) (Math.random() * 5);
-            view.enableNoOffersView(noOffersMessages[randomNumber]);
-        }
-    }
-
-    private void openDetailPage(String restaurantId, int index) {
-        Intent openFetchOrderActivityIntent = new Intent(activity, DetailPageActivity.class);
-        openFetchOrderActivityIntent.putExtra(KEY_RESTAURANT_ID, restaurantId);
-        if (index != -1) {
-            openFetchOrderActivityIntent.putExtra(KEY_OFFER_INDEX, index);
-        }
-        activity.startActivity(openFetchOrderActivityIntent);
-    }
-
-    public void refreshOffers() {
-        dataProvider.syncNearbyOffers(this);
-        List<RestaurantOffers> restaurantOffersListTemp = dataProvider.loadOffersFromCache();
-        boolean dataSetChanged = restaurantOffersList == null || restaurantOffersListTemp.size() != restaurantOffersList.size();
-        if (!dataSetChanged) {
-            for (int i = 0; i < restaurantOffersListTemp.size(); i++) {
-                boolean isEqual = restaurantOffersListTemp.get(i).equals(restaurantOffersList.get(i));
-                if (!isEqual) {
-                    dataSetChanged = true;
-                    break;
-                }
+        String paying = "";
+        if (restaurantJSON.has("paying")) {
+            JSONArray payingArray = restaurantJSON.getJSONArray("paying");
+            for (int i = 0; i < payingArray.length(); i++) {
+                paying += i == 0 ? "" : ", ";
+                paying += payingArray.getString(i);
             }
         }
 
-        restaurantOffersList = restaurantOffersListTemp;
-
-        startTimeBasedRefresh(restaurantOffersList);
-        IDashboardViewContainer view = getView();
-        if (view != null && (!view.isInitialized() || dataSetChanged)) {
-            presentOffers(restaurantOffersList);
+        String phoneNumber = null;
+        if (restaurantJSON.has("phoneNumber")) {
+            phoneNumber = restaurantJSON.getString("phoneNumber");
         }
+
+        String email = null;
+        if (restaurantJSON.has("email")) {
+            email = restaurantJSON.getString("email");
+        }
+
+        String website = null;
+        if (restaurantJSON.has("website")) {
+            website = restaurantJSON.getString("website");
+        }
+
+        String[] photoUrls = null;
+        if (restaurantJSON.has("photoUrls")) {
+            JSONArray photoUrlsObjects = restaurantJSON.getJSONArray("photoUrls");
+            photoUrls = convertToStringArray(photoUrlsObjects);
+        }
+
+        return new Restaurant(restaurantId, name, shortDescription, longDescription, address,
+                openingTimes, parking, paying, phoneNumber, email, website, photoUrls);
     }
+
+    private String[] convertToStringArray(JSONArray array) throws JSONException {
+        if (array.length() == 0) {
+            return null;
+        }
+
+        String[] listOfStrings = new String[array.length()];
+        for (int i = 0; i < listOfStrings.length; i++) {
+            listOfStrings[i] = array.getString(i);
+        }
+        return listOfStrings;
+    }
+
+    private DateTime[] convertToDateTimeArray(int weekDay, JSONArray array) throws JSONException {
+        if (array.length() == 0) {
+            return null;
+        }
+
+        DateTime[] listOfStrings = new DateTime[array.length()];
+        String[] openingValues;
+        for (int i = 0; i < listOfStrings.length; i++) {
+            openingValues = array.getString(i).split(":");
+            int hours = Integer.valueOf(openingValues[0]);
+            int minutes = Integer.valueOf(openingValues[1]);
+            listOfStrings[i] = DateUtils.getDate(hours, minutes).updateWeekDay(weekDay);
+        }
+        return listOfStrings;
+    }
+
 }

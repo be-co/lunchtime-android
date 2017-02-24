@@ -674,231 +674,124 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.presenter;
+package com.tbaehr.lunchtime.model.parsing;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.view.View;
-import android.widget.Toast;
-
-import com.propaneapps.tomorrow.presenter.BasePresenter;
-import com.tbaehr.lunchtime.DataProvider;
-import com.tbaehr.lunchtime.LunchtimeApplication;
-import com.tbaehr.lunchtime.R;
-import com.tbaehr.lunchtime.controller.DashboardFragment;
-import com.tbaehr.lunchtime.controller.DetailPageActivity;
+import com.tbaehr.lunchtime.BuildConfig;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
-import com.tbaehr.lunchtime.utils.DateTime;
-import com.tbaehr.lunchtime.utils.LoadJobListener;
-import com.tbaehr.lunchtime.view.HorizontalSliderView;
-import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_OFFER_INDEX;
-import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_ID;
 
 /**
- * Created by timo.baehr@gmail.com on 31.12.16.
+ * Created by timo.baehr@gmail.com on 24.02.17.
  */
-public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
-        implements LoadJobListener<List<RestaurantOffers>> {
+public class ParseRestaurantOffers implements ParseJson<RestaurantOffers> {
 
-    private DataProvider dataProvider;
+    private static ParseRestaurantOffers instance;
 
-    private Activity activity;
+    public static ParseRestaurantOffers getInstance() {
+        if (instance == null) {
+            instance = new ParseRestaurantOffers();
+        }
+        return instance;
+    }
 
-    private Timer timer;
-
-    List<RestaurantOffers> restaurantOffersList;
-
-    public DashboardPresenter(DashboardFragment fragment) {
-        this.activity = fragment.getActivity();
+    private ParseRestaurantOffers() {
+        // ;
     }
 
     @Override
-    public void onDestroy() {
-        dataProvider = null;
-        activity = null;
-        timer = null;
-        restaurantOffersList = null;
-        super.onDestroy();
-    }
-
-    @Override
-    public void bindView(IDashboardViewContainer view) {
-        super.bindView(view);
-        dataProvider = new DataProvider();
-        refreshOffers();
-    }
-
-    @Override
-    public void unbindView() {
-        stopTimeBasedRefresh();
-        super.unbindView();
-    }
-
-    private void restartTimeBasedRefresh(List<RestaurantOffers> restaurantOffersList) {
-        stopTimeBasedRefresh();
-        startTimeBasedRefresh(restaurantOffersList);
-    }
-
-    private void startTimeBasedRefresh(List<RestaurantOffers> restaurantOffersList) {
-        Set<DateTime> refreshDates = new HashSet<>();
-        for (RestaurantOffers restaurantOffers : restaurantOffersList) {
-            refreshDates.addAll(restaurantOffers.getUiRefreshDates());
-        }
-        startTimers(refreshDates);
-    }
-
-    private void startTimers(Set<DateTime> dates) {
-        if (timer == null) {
-            timer = new Timer();
-        }
-        for (DateTime date : dates) {
-            timer.schedule(createTimerTask(), date.toDate());
-        }
-    }
-
-    private TimerTask createTimerTask() {
-        return new TimerTask() {
-            @Override
-            public void run() {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        presentOffers(dataProvider.loadOffersFromCache());
-                    }
-                });
-            }
-        };
-    }
-
-    private void stopTimeBasedRefresh() {
-        timer.cancel();
-        timer = null;
-    }
-
-    @Override
-    public void onDownloadStarted() {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                getView().clearOffers();
-                getView().hideNoOffersView();
-                getView().setProgressBarVisibility(true);
-            }
-        });
-    }
-
-    @Override
-    public void onDownloadFailed(final String message) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                presentOffers(dataProvider.loadOffersFromCache());
-                Toast.makeText(LunchtimeApplication.getContext(), message, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    @Override
-    public void onDownloadFinished(List<RestaurantOffers> restaurantOffersList) {
-        IDashboardViewContainer view = getView();
-        if (view == null) {
-            return;
-        }
-
-        view.setProgressBarVisibility(false);
-        presentOffers(restaurantOffersList);
-    }
-
-    private void presentOffers(List<RestaurantOffers> restaurantOffersList) {
-        IDashboardViewContainer view = getView();
-        boolean foundOffers = false;
-
-        view.setProgressBarVisibility(false);
-        view.hideNoOffersView();
-        view.clearOffers();
-
-        for (final RestaurantOffers nearbyRestaurantOffers : restaurantOffersList) {
-            final HorizontalSliderView.OnSliderItemClickListener onSliderItemClickListener = new HorizontalSliderView.OnSliderItemClickListener() {
-                @Override
-                public void onSliderItemClick(Offer offer, View view) {
-                    openDetailPage(offer.getRestaurantId(), nearbyRestaurantOffers.getIndex(offer));
-                }
-            };
-            if (nearbyRestaurantOffers.isEmpty()) {
-                continue;
-            }
-
-            foundOffers = true;
-
-            final String restaurantId = nearbyRestaurantOffers.getRestaurantId();
-            final HorizontalSliderView.OnSliderHeaderClickListener headerClickListener = new HorizontalSliderView.OnSliderHeaderClickListener() {
-                @Override
-                public void onSliderHeaderClick() {
-                    openDetailPage(restaurantId, -1);
-                }
-            };
-            view.addOffers(
-                    nearbyRestaurantOffers.getRestaurantName(),
-                    nearbyRestaurantOffers.getRestaurantDescription(),
-                    nearbyRestaurantOffers.getOffers(),
-                    headerClickListener,
-                    onSliderItemClickListener
-            );
-        }
-
-        restartTimeBasedRefresh(restaurantOffersList);
-
-        if (!foundOffers) {
-            final int[] noOffersMessages = new int[] {
-                    R.string.no_offers_today1,
-                    R.string.no_offers_today2,
-                    R.string.no_offers_today3,
-                    R.string.no_offers_today4,
-                    R.string.no_offers_today5
-            };
-            final int randomNumber = (int) (Math.random() * 5);
-            view.enableNoOffersView(noOffersMessages[randomNumber]);
-        }
-    }
-
-    private void openDetailPage(String restaurantId, int index) {
-        Intent openFetchOrderActivityIntent = new Intent(activity, DetailPageActivity.class);
-        openFetchOrderActivityIntent.putExtra(KEY_RESTAURANT_ID, restaurantId);
-        if (index != -1) {
-            openFetchOrderActivityIntent.putExtra(KEY_OFFER_INDEX, index);
-        }
-        activity.startActivity(openFetchOrderActivityIntent);
-    }
-
-    public void refreshOffers() {
-        dataProvider.syncNearbyOffers(this);
-        List<RestaurantOffers> restaurantOffersListTemp = dataProvider.loadOffersFromCache();
-        boolean dataSetChanged = restaurantOffersList == null || restaurantOffersListTemp.size() != restaurantOffersList.size();
-        if (!dataSetChanged) {
-            for (int i = 0; i < restaurantOffersListTemp.size(); i++) {
-                boolean isEqual = restaurantOffersListTemp.get(i).equals(restaurantOffersList.get(i));
-                if (!isEqual) {
-                    dataSetChanged = true;
-                    break;
+    public RestaurantOffers parse(String jsonText) throws JSONException {
+        JSONObject restaurantObject = new JSONObject(jsonText);
+        final String restaurantId = restaurantObject.getString("restaurantID");
+        final String restaurantTitle = restaurantObject.getString("title");
+        final String restaurantDescription = restaurantObject.getString("description");
+        final JSONArray restaurantOffersArray = restaurantObject.getJSONArray("offers");
+        final List<Offer> offersNextDays = new ArrayList<>();
+        List<Offer> offersToday = new ArrayList<>();
+        for (int offerIndex = 0; offerIndex < restaurantOffersArray.length(); offerIndex++) {
+            final JSONObject offerObject = restaurantOffersArray.getJSONObject(offerIndex);
+            final String offerTitle = offerObject.getString("title");
+            final String offerDescription = offerObject.getString("description");
+            final int offerPrize = offerObject.getInt("prize");
+            final String starts = offerObject.getString("starts");
+            final String ends = offerObject.getString("ends");
+            final Offer.Category category = Offer.Category.valueOf(offerObject.getString("category").toUpperCase());
+            final JSONArray ingredientsArray = offerObject.getJSONArray("ingredients");
+            final Set<Offer.Ingredient> ingredients = new HashSet<>();
+            for (int ingrIndex = 0; ingrIndex < ingredientsArray.length(); ingrIndex++) {
+                try {
+                    ingredients.add(Offer.Ingredient.valueOf(ingredientsArray.getString(ingrIndex)));
+                } catch (IllegalArgumentException e) {
+                    throw new JSONException("Invalid offer " + offerTitle + " for " +restaurantTitle + ": " + e.getMessage());
                 }
             }
+
+            autoSearchForIngredients(ingredients, offerTitle);
+            autoSearchForIngredients(ingredients, offerDescription);
+            final Offer offer = new Offer(
+                    restaurantId,
+                    offerTitle,
+                    offerDescription,
+                    offerPrize,
+                    starts, ends,
+                    category,
+                    ingredients);
+            final Offer.ValidationState validationState = offer.getValidationState();
+            if (validationState.equals(Offer.ValidationState.NOW_VALID) ||
+                    validationState.equals(Offer.ValidationState.SOON_VALID)) {
+                offersToday.add(offer);
+            } else if (validationState.equals(Offer.ValidationState.TOMMORROW_VALID) ||
+                    (BuildConfig.DEBUG && validationState.equals(Offer.ValidationState.NEXT_DAYS_VALID))) {
+                offersNextDays.add(offer);
+            } else if (validationState.equals(Offer.ValidationState.INVALID)) {
+                throw new JSONException("Invalid offer " + offer.getTitle() + " for " + restaurantTitle + ": Check date format: " + starts + "," + ends);
+            }
         }
 
-        restaurantOffersList = restaurantOffersListTemp;
+        return new RestaurantOffers(restaurantId, restaurantTitle, restaurantDescription, offersToday.isEmpty() ? offersNextDays : offersToday);
+    }
 
-        startTimeBasedRefresh(restaurantOffersList);
-        IDashboardViewContainer view = getView();
-        if (view != null && (!view.isInitialized() || dataSetChanged)) {
-            presentOffers(restaurantOffersList);
+
+    private void autoSearchForIngredients(Set<Offer.Ingredient> ingredientList, String title) {
+        if (contains(title, "Mettenden", "Mettwurst", "schinken", "Cevapcici", "Wildbraten", "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
+            if (!title.contains("vom Rind") && !title.contains("vegetarisch")) {
+                ingredientList.add(Offer.Ingredient.PORK);
+            }
         }
+        if (contains(title, "Wildbraten", "Rumpsteak", "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Rindswurst", "Carne", "Hacksteak", "Bockwurst")) {
+            ingredientList.add(Offer.Ingredient.COW);
+        }
+        if (contains(title, "Coq", "Gans", "Geflügel", "Hähnchen", "Huhn", "Hühner", "Pute", "Truthahn")) {
+            ingredientList.add(Offer.Ingredient.CHICKEN);
+        }
+        if (contains(title, "Lasagne", "Rigatoni", "Pasta", "Futtuccine", "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
+            ingredientList.add(Offer.Ingredient.GLUTEN);
+        }
+        if (contains(title, "Mozzarella", "Feta", "Lasagne", "quark", "schmarrn", "Parmesan", "Käse", "käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand", "Frischkaese", "Kochkaese", "Frischkäse", "Kochkäs")) {
+            ingredientList.add(Offer.Ingredient.LACTOSE);
+        }
+        if (contains(title, "Wolfsbarsch", "Kabeljau", "Schlemmerfilet", "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {
+            ingredientList.add(Offer.Ingredient.FISH);
+        }
+        if (contains(title, "Omelett", " Ei", "Ei ", "Eier", "eier", "Spiegelei", "Majonese", "Eierknöpfle", "Tagliatelle", "Spaghetti", "Spätzle", "Nudel", "nudel")) {
+            ingredientList.add(Offer.Ingredient.EGG);
+        }
+    }
+
+    private boolean contains(String text, String... subtext) {
+        for (int i = 0; i < subtext.length; i++) {
+            if (text.contains(subtext[i])) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -713,7 +713,7 @@ import static com.tbaehr.lunchtime.utils.DateTime.SECOND_IN_MILLIS;
 /**
  * Created by timo.baehr@gmail.com on 26.01.17.
  */
-public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewContainer> implements LoadJobListener<List<Restaurant>>, IDetailPageViewContainer.ClickListener {
+public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewContainer> implements LoadJobListener<Restaurant>, IDetailPageViewContainer.ClickListener {
 
     private static final int PERMISSION_REQUEST_CODE = 42;
 
@@ -741,7 +741,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     public DetailPagePresenter(DetailPageActivity activity) {
         this.activity = activity;
-        this.dataProvider = new ModelDownloader();
+        this.dataProvider = ModelDownloader.getInstance();
         this.index = activity.getIntent().getIntExtra(KEY_OFFER_INDEX, -1);
         this.restaurantId = activity.getIntent().getStringExtra(KEY_RESTAURANT_ID);
         restaurant = getRestaurant();
@@ -973,7 +973,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     }
 
     @Override
-    public void onDownloadFinished(List<Restaurant> downloadedObject) {
+    public void onDownloadFinished(Restaurant downloadedObject) {
         updateRestaurantData();
     }
 

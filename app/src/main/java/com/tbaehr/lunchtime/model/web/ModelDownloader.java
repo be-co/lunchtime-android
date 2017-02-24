@@ -717,6 +717,19 @@ public class ModelDownloader {
 
     private static final String URI_OFFER = BASE_URI + "offers_%s.json";
 
+    private static ModelDownloader instance;
+
+    public static ModelDownloader getInstance() {
+        if (instance == null) {
+            instance = new ModelDownloader();
+        }
+        return instance;
+    }
+
+    private ModelDownloader() {
+        // ;
+    }
+
     public void syncNearbyOffers(final LoadJobListener callback) {
         // TODO: Sync max. 1/min
         final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
@@ -759,12 +772,14 @@ public class ModelDownloader {
         }.execute();
     }
 
-    public void syncRestaurant(final LoadJobListener callback, final String restaurantId) {
+    public void syncRestaurant(final LoadJobListener<Restaurant> callback, final String restaurantId) {
         final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
         final String uriSync = String.format(URI_NEARBY_RESTAURANTS, locationId);
 
         new AsyncTask<Void, Void, Void>() {
             private boolean dataSetChanged = false;
+
+            private Restaurant restaurant;
 
             @Override
             protected Void doInBackground(Void... params) {
@@ -777,7 +792,9 @@ public class ModelDownloader {
                         Pair<Map<String, String>, Map<String, String>> nearbyKeys = ModelParser.getInstance().parseNearbyRestaurants(jsonDownloaded);
                         ModelCache.getInstance().saveNearbyJsonToCache(jsonDownloaded, locationId);
                         Map<String, String> nearbyRestaurantKeys = nearbyKeys.first;
-                        dataSetChanged = updateRestaurant(restaurantId, nearbyRestaurantKeys.get(restaurantId), callback) || dataSetChanged;
+                        Restaurant restaurant = updateRestaurant(restaurantId, nearbyRestaurantKeys.get(restaurantId), callback);
+                        this.restaurant = restaurant;
+                        dataSetChanged = restaurant != null || dataSetChanged;
                     } catch (JSONException e) {
                         // TODO: Error handling
                         e.printStackTrace();
@@ -790,7 +807,7 @@ public class ModelDownloader {
             @Override
             protected void onPostExecute(Void aVoid) {
                 if (dataSetChanged && callback != null) {
-                    callback.onDownloadFinished(null);
+                    callback.onDownloadFinished(restaurant);
                 }
                 super.onPostExecute(aVoid);
             }
@@ -831,7 +848,7 @@ public class ModelDownloader {
         }.execute();
     }
 
-    private boolean updateRestaurant(@NonNull String restaurantKey, @NonNull String dateUpdated, final LoadJobListener callback) {
+    private Restaurant updateRestaurant(@NonNull String restaurantKey, @NonNull String dateUpdated, final LoadJobListener callback) {
         final String uriRestaurant = String.format(URI_RESTAURANT, restaurantKey);
 
         DateTime cachedDate = ModelCache.getInstance().getRestaurantLastUpdated(restaurantKey);
@@ -848,7 +865,7 @@ public class ModelDownloader {
                     Restaurant restaurant = ModelParser.getInstance().parseRestaurant(jsonRestaurant, restaurantKey);
                     if (restaurant != null) {
                         ModelCache.getInstance().saveRestaurantJsonToCache(jsonRestaurant, restaurantKey, dateUpdated);
-                        return true;
+                        return restaurant;
                     }
                 } catch (JSONException jsonException) {
                     jsonException.printStackTrace();
@@ -859,7 +876,7 @@ public class ModelDownloader {
                 }
             }
         }
-        return false;
+        return null;
     }
 
     private boolean updateOffers(@NonNull String restaurantKey, @NonNull String dateUpdated, final LoadJobListener callback) {

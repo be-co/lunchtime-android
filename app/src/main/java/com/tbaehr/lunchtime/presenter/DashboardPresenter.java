@@ -734,7 +734,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     @Override
     public void bindView(IDashboardViewContainer view) {
         super.bindView(view);
-        dataProvider = new ModelDownloader();
+        dataProvider = ModelDownloader.getInstance();
         refreshOffers();
     }
 

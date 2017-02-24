@@ -682,15 +682,16 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.propaneapps.tomorrow.presenter.BasePresenter;
-import com.tbaehr.lunchtime.DataProvider;
 import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DashboardFragment;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
+import com.tbaehr.lunchtime.model.caching.ModelCache;
+import com.tbaehr.lunchtime.model.web.LoadJobListener;
+import com.tbaehr.lunchtime.model.web.ModelDownloader;
 import com.tbaehr.lunchtime.utils.DateTime;
-import com.tbaehr.lunchtime.utils.LoadJobListener;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
@@ -709,7 +710,7 @@ import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_
 public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         implements LoadJobListener<List<RestaurantOffers>> {
 
-    private DataProvider dataProvider;
+    private ModelDownloader dataProvider;
 
     private Activity activity;
 
@@ -733,7 +734,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     @Override
     public void bindView(IDashboardViewContainer view) {
         super.bindView(view);
-        dataProvider = new DataProvider();
+        dataProvider = new ModelDownloader();
         refreshOffers();
     }
 
@@ -772,7 +773,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        presentOffers(dataProvider.loadOffersFromCache());
+                        presentOffers(ModelCache.getInstance().loadRestaurantOffersFromCache());
                     }
                 });
             }
@@ -801,7 +802,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                presentOffers(dataProvider.loadOffersFromCache());
+                presentOffers(ModelCache.getInstance().loadRestaurantOffersFromCache());
                 Toast.makeText(LunchtimeApplication.getContext(), message, Toast.LENGTH_LONG).show();
             }
         });
@@ -881,7 +882,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
     public void refreshOffers() {
         dataProvider.syncNearbyOffers(this);
-        List<RestaurantOffers> restaurantOffersListTemp = dataProvider.loadOffersFromCache();
+        List<RestaurantOffers> restaurantOffersListTemp = ModelCache.getInstance().loadRestaurantOffersFromCache();
         boolean dataSetChanged = restaurantOffersList == null || restaurantOffersListTemp.size() != restaurantOffersList.size();
         if (!dataSetChanged) {
             for (int i = 0; i < restaurantOffersListTemp.size(); i++) {

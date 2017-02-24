@@ -674,355 +674,280 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.presenter;
+package com.tbaehr.lunchtime.model.web;
 
-import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.view.MenuItem;
+import android.util.Log;
+import android.util.Pair;
 
-import com.tbaehr.lunchtime.R;
-import com.tbaehr.lunchtime.controller.DetailPageActivity;
-import com.tbaehr.lunchtime.model.Offer;
+import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.model.Restaurant;
+import com.tbaehr.lunchtime.model.RestaurantOffers;
 import com.tbaehr.lunchtime.model.caching.ModelCache;
-import com.tbaehr.lunchtime.model.web.LoadJobListener;
-import com.tbaehr.lunchtime.model.web.ModelDownloader;
+import com.tbaehr.lunchtime.model.parsing.ParseNearbyRestaurants;
+import com.tbaehr.lunchtime.model.parsing.ParseRestaurant;
+import com.tbaehr.lunchtime.model.parsing.ParseRestaurantOffers;
 import com.tbaehr.lunchtime.utils.DateTime;
-import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
+import com.tbaehr.lunchtime.utils.DateUtils;
+import com.tbaehr.lunchtime.utils.ImageUtils;
+import com.tbaehr.lunchtime.utils.LocationHelper;
 
-import java.util.Calendar;
-import java.util.Date;
+import org.json.JSONException;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_OFFER_INDEX;
-import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_ID;
-import static com.tbaehr.lunchtime.utils.DateTime.SECOND_IN_MILLIS;
+import java.util.Map;
 
 /**
- * Created by timo.baehr@gmail.com on 26.01.17.
+ * Created by timo.baehr@gmail.com on 27.12.16.
  */
-public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewContainer> implements LoadJobListener<List<Restaurant>>, IDetailPageViewContainer.ClickListener {
+public class ModelDownloader {
 
-    private static final int PERMISSION_REQUEST_CODE = 42;
+    private static final String BASE_URI = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/";
 
-    private static final int IMAGE_DURATION = 8000;
+    private static final String URI_NEARBY_RESTAURANTS = BASE_URI + "nearby_restaurants_%s.json";
 
-    private DetailPageActivity activity;
+    private static final String URI_RESTAURANT = BASE_URI + "restaurant_%s.json";
 
-    private String restaurantId;
+    private static final String URI_OFFER = BASE_URI + "offers_%s.json";
 
-    private Restaurant restaurant;
+    public void syncNearbyOffers(final LoadJobListener callback) {
+        // TODO: Sync max. 1/min
+        final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
+        final String uriSync = String.format(URI_NEARBY_RESTAURANTS, locationId);
 
-    private boolean retryImageSync = true;
+        new AsyncTask<Void, Void, Void>() {
+            private boolean dataSetChanged = false;
 
-    private List<Drawable> drawables;
-
-    private int drawableCounter = 0;
-
-    private final int index;
-
-    private ModelDownloader dataProvider;
-
-    private Timer timer;
-
-    private TimerTask slideshowTask;
-
-    public DetailPagePresenter(DetailPageActivity activity) {
-        this.activity = activity;
-        this.dataProvider = new ModelDownloader();
-        this.index = activity.getIntent().getIntExtra(KEY_OFFER_INDEX, -1);
-        this.restaurantId = activity.getIntent().getStringExtra(KEY_RESTAURANT_ID);
-        restaurant = getRestaurant();
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        timer = new Timer();
-        dataProvider.syncRestaurant(this, restaurantId);
-        syncRestaurantImages();
-    }
-
-    @Override
-    public void onDestroy() {
-        activity = null;
-        restaurantId = null;
-        restaurant = null;
-        if (drawables != null) drawables.clear();
-        drawables = null;
-        dataProvider = null;
-        slideshowTask = null;
-        super.onDestroy();
-    }
-
-    @Override
-    public void bindView(IDetailPageViewContainer view) {
-        super.bindView(view);
-        getView().setTitle(getRestaurantName());
-        updateSelectedOffer();
-        updateRestaurantData();
-        if (index != -1) {
-            startTimer();
-        }
-        if (restaurant != null) {
-            DateTime openingDate = restaurant.getOpeningDate();
-            DateTime closingDate = restaurant.getClosingDate();
-            if (openingDate != null && closingDate != null) {
-                startTimeBasedRefresh(openingDate, closingDate);
-            }
-        }
-        syncRestaurantImages();
-    }
-
-    @Override
-    public void unbindView() {
-        stopTimer();
-        super.unbindView();
-    }
-
-    private void syncRestaurantImages() {
-        if (restaurant != null && retryImageSync) {
-            dataProvider.syncRestaurantImages(restaurant, new LoadJobListener<List<Drawable>>() {
-                @Override
-                public void onDownloadStarted() {
-                    retryImageSync = false;
-                }
-
-                @Override
-                public void onDownloadFailed(String message) {
-                    retryImageSync = true;
-                }
-
-                @Override
-                public void onDownloadFinished(List<Drawable> drawables) {
-                    DetailPagePresenter.this.drawables = drawables;
-                    startRestaurantSlideshow();
-                }
-            });
-        } else {
-            retryImageSync = true;
-        }
-    }
-
-    private void startRestaurantSlideshow() {
-        final IDetailPageViewContainer view = getView();
-        if (view == null || drawables == null || drawables.size() == 0) {
-            return;
-        }
-        view.setBackgroundDrawable(drawables.get(drawableCounter));
-
-        if (drawables.size() > 1) {
-            if (slideshowTask != null) slideshowTask.cancel();
-            slideshowTask = createTimerTask(new Runnable() {
-                @Override
-                public void run() {
-                    drawableCounter = drawableCounter < drawables.size() - 1 ? drawableCounter + 1 : 0;
-                    view.setBackgroundDrawable(drawables.get(drawableCounter));
-                }
-            });
-            if (timer == null) {
-                timer = new Timer();
-            }
-            timer.schedule(slideshowTask, IMAGE_DURATION, IMAGE_DURATION);
-        }
-    }
-
-    private TimerTask createTimerTask(final Runnable runnable) {
-        return new TimerTask() {
             @Override
-            public void run() {
-                activity.runOnUiThread(runnable);
-            }
-        };
-    }
+            protected Void doInBackground(Void... params) {
+                // Try to download restaurants json from server
+                String jsonDownloaded = downloadTextFromServer(uriSync);
 
-    private void startTimeBasedRefresh(DateTime... date) {
-        if (timer == null) {
-            timer = new Timer();
-        }
-        for (DateTime d : date) {
-            timer.schedule(createTimerTask(new Runnable() {
-                @Override
-                public void run() {
-                    updateRestaurantData();
+                // Server answered with json -> save to cache and update offers
+                if (jsonDownloaded != null) {
+                    try {
+                        ParseNearbyRestaurants parseNearbyRestaurants = ParseNearbyRestaurants.getInstance();
+                        Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurants.parse(jsonDownloaded);
+                        ModelCache.getInstance().saveNearbyJsonToCache(jsonDownloaded, locationId);
+                        Map<String, String> nearbyRestaurantKeys = nearbyKeys.second;
+                        for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
+                            dataSetChanged = updateOffers(restaurantKey, nearbyRestaurantKeys.get(restaurantKey), callback) || dataSetChanged;
+                        }
+                    } catch (JSONException e) {
+                        // TODO: Error handling
+                        e.printStackTrace();
+                    }
                 }
-            }), d.toDate());
-        }
-    }
 
-    private void startTimer() {
-        if (timer == null) {
-            timer = new Timer();
-        }
+                return null;
+            }
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), 0);
-        Date now = calendar.getTime();
-        timer.schedule(createTimerTask(new Runnable() {
             @Override
-            public void run() {
-                updateSelectedOffer();
+            protected void onPostExecute(Void aVoid) {
+                if (dataSetChanged) {
+                    List<RestaurantOffers> restaurantOffersList = ModelCache.getInstance().loadRestaurantOffersFromCache();
+                    callback.onDownloadFinished(restaurantOffersList);
+                }
+                super.onPostExecute(aVoid);
             }
-        }), now, SECOND_IN_MILLIS);
+        }.execute();
     }
 
-    private void stopTimer() {
-        if (timer != null) {
-            timer.cancel();
-        }
-        timer = null;
+    public void syncRestaurant(final LoadJobListener callback, final String restaurantId) {
+        final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
+        final String uriSync = String.format(URI_NEARBY_RESTAURANTS, locationId);
+
+        new AsyncTask<Void, Void, Void>() {
+            private boolean dataSetChanged = false;
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                // Try to download restaurants json from server
+                String jsonDownloaded = downloadTextFromServer(uriSync);
+
+                // Server answered with json -> save to cache and update offers
+                if (jsonDownloaded != null) {
+                    try {
+                        ParseNearbyRestaurants parseNearbyRestaurants = ParseNearbyRestaurants.getInstance();
+                        Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurants.parse(jsonDownloaded);
+                        ModelCache.getInstance().saveNearbyJsonToCache(jsonDownloaded, locationId);
+                        Map<String, String> nearbyRestaurantKeys = nearbyKeys.first;
+                        dataSetChanged = updateRestaurant(restaurantId, nearbyRestaurantKeys.get(restaurantId), callback) || dataSetChanged;
+                    } catch (JSONException e) {
+                        // TODO: Error handling
+                        e.printStackTrace();
+                    }
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                if (dataSetChanged && callback != null) {
+                    callback.onDownloadFinished(null);
+                }
+                super.onPostExecute(aVoid);
+            }
+        }.execute();
     }
 
-    private void updateSelectedOffer() {
-        IDetailPageViewContainer view = getView();
-        if (index != -1 && view != null) {
-            Offer offer = getSelectedOffer();
-            String title = "<b>" + offer.getTitle() + "</b>" + " " + offer.getDescription();
-            String prize = Offer.formatPrize(offer.getPrize());
+    public void syncRestaurantImages(@NonNull final Restaurant restaurant, final LoadJobListener<List<Drawable>> callback) {
+        new AsyncTask<Void, Void, Void>() {
+            private List<Drawable> drawables = new ArrayList<>();
 
-            Offer.ValidationState validationState = offer.getValidationState();
-            String availability;
-            if (validationState.equals(Offer.ValidationState.OUTDATED)
-                    || validationState.equals(Offer.ValidationState.NEXT_DAYS_VALID)
-                    || validationState.equals(Offer.ValidationState.INVALID)) {
-                availability = offer.getOpeningTimeShortDescription();
-            } else {
-                DateTime now = new DateTime();
+            private boolean failed;
 
-                if (validationState.equals(Offer.ValidationState.SOON_VALID) || validationState.equals(Offer.ValidationState.TOMMORROW_VALID)) {
-                    DateTime opens = offer.getStartDate();
-                    availability = activity.getString(R.string.available_at, now.differenceAsHourMinute(opens));
-                } else {
-                    DateTime closes = offer.getEndDate();
-                    availability = activity.getString(R.string.available_since, now.differenceAsHourMinute(closes));
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    String[] imageUrls = restaurant.getPhotoUrls();
+                    if (imageUrls != null) {
+                        drawables = ImageUtils.downloadDrawables(imageUrls);
+                    } else {
+                        callback.onDownloadFailed("No images defined for restaurant " + restaurant.getId());
+                        failed = true;
+                    }
+                } catch (IOException e) {
+                    callback.onDownloadFailed(e.getMessage());
+                    failed = true;
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                if (!failed) {
+                    callback.onDownloadFinished(drawables);
+                }
+                super.onPostExecute(aVoid);
+            }
+        }.execute();
+    }
+
+    private boolean updateRestaurant(@NonNull String restaurantKey, @NonNull String dateUpdated, final LoadJobListener callback) {
+        final String uriRestaurant = String.format(URI_RESTAURANT, restaurantKey);
+
+        DateTime cachedDate = ModelCache.getInstance().getRestaurantLastUpdated(restaurantKey);
+        DateTime downloadDate = DateUtils.createDateFromString(dateUpdated);
+
+        String jsonRestaurant;
+        if (downloadDate != null && (cachedDate == null || downloadDate.after(cachedDate))) {
+            if (callback != null) {
+                callback.onDownloadStarted();
+            }
+            jsonRestaurant = downloadTextFromServer(uriRestaurant);
+            if (jsonRestaurant != null) {
+                try {
+                    ParseRestaurant parseRestaurant = ParseRestaurant.getInstance(restaurantKey);
+                    Restaurant restaurant = parseRestaurant.parse(jsonRestaurant);
+                    if (restaurant != null) {
+                        ModelCache.getInstance().saveRestaurantJsonToCache(jsonRestaurant, restaurantKey, dateUpdated);
+                        return true;
+                    }
+                } catch (JSONException jsonException) {
+                    jsonException.printStackTrace();
+                    String message = "Failed to download " + restaurantKey + " updated " + dateUpdated;
+                    if (callback != null) {
+                        callback.onDownloadFailed(message);
+                    }
                 }
             }
-
-            Set<Offer.Ingredient> ingredients = offer.getIngredients();
-            view.setSelectedOffer(title, prize, availability, ingredients);
         }
+        return false;
     }
 
-    private void updateRestaurantData() {
-        restaurant = getRestaurant();
-        syncRestaurantImages();
-        if (restaurant != null) {
-            String shortDescription = restaurant.getShortDescription();
-            String longDescription = restaurant.getLongDescription();
-            String location = restaurant.getLocationDescription();
-            String openingTimes = restaurant.getOpeningTimeDescriptionForToday();
-            String[] openingTimesExpanded = restaurant.getOpeningTimeDescriptionFull();
-            String parking = restaurant.getParkingInformation();
-            String paymentMethods = restaurant.getPaymentMethods();
-            String phone = restaurant.getPhoneNumber();
-            String url = restaurant.getUrl().replace("http://www.", "");
-            getView().setRestaurantData(this, shortDescription, longDescription, location, openingTimes, parking, paymentMethods, openingTimesExpanded, phone, url);
-        }
-    }
+    private boolean updateOffers(@NonNull String restaurantKey, @NonNull String dateUpdated, final LoadJobListener callback) {
+        final String uriRestaurantOffers = String.format(URI_OFFER, restaurantKey);
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
+        DateTime cachedDate = ModelCache.getInstance().getRestaurantOffersLastUpdated(restaurantKey);
+        DateTime downloadDate = DateUtils.createDateFromString(dateUpdated);
 
-    public void onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-        }
-    }
-
-    public void onBackPressed() {
-        activity.finish();
-        getView().onBackPressed();
-    }
-
-    private Restaurant getRestaurant() {
-        return ModelCache.getInstance().loadRestaurantFromCache(restaurantId);
-    }
-
-    private String getRestaurantName() {
-        return ModelCache.getInstance().loadRestaurantOffersFromCache(restaurantId).getRestaurantName();
-    }
-
-    private Offer getSelectedOffer() {
-        return ModelCache.getInstance().loadRestaurantOffersFromCache(restaurantId).getOffer(index);
-    }
-
-    @Override
-    public void onDownloadStarted() {
-        // ;
-    }
-
-    @Override
-    public void onDownloadFailed(String message) {
-        // TODO: User feedback, Downloading restaurant content failed
-    }
-
-    @Override
-    public void onDownloadFinished(List<Restaurant> downloadedObject) {
-        updateRestaurantData();
-    }
-
-    @Override
-    public void onRestaurantShortDescriptionClicked() {
-        getView().expandCollapseDescription();
-    }
-
-    @Override
-    public void onRestaurantLocationClicked() {
-        String uri = String.format(Locale.ENGLISH, "geo:0,0?q=%s$1", restaurant.getLocationDescription());
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-        activity.startActivity(intent);
-    }
-
-    @Override
-    public void onRestaurantOpeningTimesClicked() {
-        getView().expandCollapseOpeningTimes();
-    }
-
-    @Override
-    public void onRestaurantUrlClicked() {
-        activity.openUrl(Uri.parse(restaurant.getUrl()));
-    }
-
-    @Override
-    public void onRestaurantPhoneNumberClicked() {
-        String uri = String.format(Locale.ENGLISH, "tel:%s$1", restaurant.getPhoneNumber());
-        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(uri));
-        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                activity.requestPermissions(new String[] { Manifest.permission.CALL_PHONE }, PERMISSION_REQUEST_CODE);
+        String jsonOffers;
+        if (downloadDate != null && (cachedDate == null || downloadDate.after(cachedDate))) {
+            if (callback != null) {
+                callback.onDownloadStarted();
             }
-            return;
+            jsonOffers = downloadTextFromServer(uriRestaurantOffers);
+            if (jsonOffers != null) {
+                try {
+                    ParseRestaurantOffers parseRestaurantOffers = ParseRestaurantOffers.getInstance();
+                    RestaurantOffers restaurantOffers = parseRestaurantOffers.parse(jsonOffers);
+                    if (restaurantOffers != null) {
+                        ModelCache.getInstance().saveRestaurantOffersJsonToCache(jsonOffers, restaurantKey, dateUpdated);
+                        return true;
+                    }
+                } catch (JSONException jsonException) {
+                    jsonException.printStackTrace();
+                    String message = "Failed to download " + restaurantKey + " updated " + dateUpdated + ". " + jsonException.getMessage();
+                    if (callback != null) {
+                        callback.onDownloadFailed(message);
+                    }
+                }
+            }
         }
-        activity.startActivity(intent);
+        return false;
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull int[] grantResults) {
-        if (requestCode != PERMISSION_REQUEST_CODE) {
-            return;
-        }
+    private String downloadTextFromServer(String path) {
+        try {
+            StringBuilder stringBuilder = new StringBuilder();
+            URL url = new URL(path);
 
-        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            onRestaurantPhoneNumberClicked();
-        } else {
-            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", restaurant.getPhoneNumber(), null));
-            activity.startActivity(intent);
+            InputStream stream = url.openStream();
+            InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
+            BufferedReader in = new BufferedReader(reader);
+            String line;
+            while ((line = in.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            in.close();
+            return stringBuilder.toString();
+        } catch (IOException e) {
+            // TODO: Error handling
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Deprecated
+    private String parseJsonFromAssets(String filePath) {
+        BufferedReader reader = null;
+        String jsonOutput = null;
+        try {
+            AssetManager assetManager = LunchtimeApplication.getContext().getAssets();
+            InputStream is = assetManager.open(filePath);
+            reader = new BufferedReader(
+                    new InputStreamReader(is, "UTF-8"));
+
+            StringBuilder json = new StringBuilder();
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                json.append(line);
+            }
+            jsonOutput = json.toString();
+        } catch (IOException ioException) {
+            Log.e(this.getClass().getCanonicalName(), ioException.getMessage());
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    Log.e(this.getClass().getCanonicalName(), "Error closing asset " + filePath);
+                }
+            }
+            return jsonOutput;
         }
     }
+
 }

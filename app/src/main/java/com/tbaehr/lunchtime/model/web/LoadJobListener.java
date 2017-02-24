@@ -1,4 +1,4 @@
-package com.tbaehr.lunchtime.utils;
+package com.tbaehr.lunchtime.model.web;
 
 /**
  * Created by timo.baehr@gmail.com on 09.02.17.

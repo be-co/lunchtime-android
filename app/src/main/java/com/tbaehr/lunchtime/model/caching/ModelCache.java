@@ -674,11 +674,8 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime;
+package com.tbaehr.lunchtime.model.caching;
 
-import android.content.res.AssetManager;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.Pair;
@@ -690,18 +687,10 @@ import com.tbaehr.lunchtime.model.parsing.ParseRestaurant;
 import com.tbaehr.lunchtime.model.parsing.ParseRestaurantOffers;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
-import com.tbaehr.lunchtime.utils.ImageUtils;
-import com.tbaehr.lunchtime.utils.LoadJobListener;
 import com.tbaehr.lunchtime.utils.LocationHelper;
 
 import org.json.JSONException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -710,9 +699,9 @@ import static com.tbaehr.lunchtime.utils.SharedPrefsHelper.getString;
 import static com.tbaehr.lunchtime.utils.SharedPrefsHelper.putString;
 
 /**
- * Created by timo.baehr@gmail.com on 27.12.16.
+ * Created by timo.baehr@gmail.com on 24.02.17.
  */
-public class DataProvider {
+public class ModelCache {
 
     private static final String KEY_NEARBY_OFFERS = "nearby_offers_%s";
 
@@ -724,145 +713,69 @@ public class DataProvider {
 
     private static final String KEY_RESTAURANT_UPDATED = "restaurant_updated_%s";
 
-    private static final String BASE_URI = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/";
+    private static ModelCache instance;
 
-    private static final String URI_NEARBY_RESTAURANTS = BASE_URI + "nearby_restaurants_%s.json";
-
-    private static final String URI_RESTAURANT = BASE_URI + "restaurant_%s.json";
-
-    private static final String URI_OFFER = BASE_URI + "offers_%s.json";
-
-    public void syncNearbyOffers(final LoadJobListener callback) {
-        // TODO: Sync max. 1/min
-        final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
-        final String uriSync = String.format(URI_NEARBY_RESTAURANTS, locationId);
-        final String keySync = String.format(KEY_NEARBY_OFFERS, locationId);
-
-        new AsyncTask<Void, Void, Void>() {
-            private boolean dataSetChanged = false;
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                // Try to download restaurants json from server
-                String jsonDownloaded = downloadTextFromServer(uriSync);
-
-                // Server answered with json -> save to cache and update offers
-                if (jsonDownloaded != null) {
-                    try {
-                        ParseNearbyRestaurants parseNearbyRestaurants = ParseNearbyRestaurants.getInstance();
-                        Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurants.parse(jsonDownloaded);
-                        putString(keySync, jsonDownloaded);
-                        Map<String, String> nearbyRestaurantKeys = nearbyKeys.second;
-                        for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
-                            dataSetChanged = updateOffers(restaurantKey, nearbyRestaurantKeys.get(restaurantKey), callback) || dataSetChanged;
-                        }
-                    } catch (JSONException e) {
-                        // TODO: Error handling
-                        e.printStackTrace();
-                    }
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                if (dataSetChanged) {
-                    List<RestaurantOffers> restaurantOffersList = null;
-                    restaurantOffersList = loadOffersFromCache();
-                    callback.onDownloadFinished(restaurantOffersList);
-                }
-                super.onPostExecute(aVoid);
-            }
-        }.execute();
+    private ModelCache() {
+        // ;
     }
 
-    public void syncRestaurant(final LoadJobListener callback, final String restaurantId) {
-        final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
-        final String uriSync = String.format(URI_NEARBY_RESTAURANTS, locationId);
-        final String keySync = String.format(KEY_NEARBY_OFFERS, locationId);
-
-        new AsyncTask<Void, Void, Void>() {
-            private boolean dataSetChanged = false;
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                // Try to download restaurants json from server
-                String jsonDownloaded = downloadTextFromServer(uriSync);
-
-                // Server answered with json -> save to cache and update offers
-                if (jsonDownloaded != null) {
-                    try {
-                        ParseNearbyRestaurants parseNearbyRestaurants = ParseNearbyRestaurants.getInstance();
-                        Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurants.parse(jsonDownloaded);
-                        putString(keySync, jsonDownloaded);
-                        Map<String, String> nearbyRestaurantKeys = nearbyKeys.first;
-                        dataSetChanged = updateRestaurant(restaurantId, nearbyRestaurantKeys.get(restaurantId), callback) || dataSetChanged;
-                    } catch (JSONException e) {
-                        // TODO: Error handling
-                        e.printStackTrace();
-                    }
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                if (dataSetChanged && callback != null) {
-                    callback.onDownloadFinished(null);
-                }
-                super.onPostExecute(aVoid);
-            }
-        }.execute();
+    public static ModelCache getInstance() {
+        if (instance == null) {
+            instance = new ModelCache();
+        }
+        return instance;
     }
 
-    public void syncRestaurantImages(@NonNull final Restaurant restaurant, final LoadJobListener<List<Drawable>> callback) {
-        new AsyncTask<Void, Void, Void>() {
-            private List<Drawable> drawables = new ArrayList<>();
-
-            private boolean failed;
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    String[] imageUrls = restaurant.getPhotoUrls();
-                    if (imageUrls != null) {
-                        drawables = ImageUtils.downloadDrawables(imageUrls);
-                    } else {
-                        callback.onDownloadFailed("No images defined for restaurant " + restaurant.getId());
-                        failed = true;
-                    }
-                } catch (IOException e) {
-                    callback.onDownloadFailed(e.getMessage());
-                    failed = true;
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                if (!failed) {
-                    callback.onDownloadFinished(drawables);
-                }
-                super.onPostExecute(aVoid);
-            }
-        }.execute();
+    public void saveNearbyJsonToCache(String jsonText, String locationId) {
+        final String keySync = String.format(KEY_NEARBY_OFFERS, locationId);
+        putString(keySync, jsonText);
     }
 
-    public List<RestaurantOffers> loadOffersFromCache() {
-        final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
+    public void saveRestaurantJsonToCache(String jsonText, String restaurantId, String dateUpdated) {
+        final String keyRestaurant = String.format(KEY_RESTAURANT, restaurantId);
+        final String keyRestaurantUpdated = String.format(KEY_RESTAURANT_UPDATED, restaurantId);
+
+        putString(keyRestaurantUpdated, dateUpdated);
+        putString(keyRestaurant, jsonText);
+    }
+
+    public void saveRestaurantOffersJsonToCache(String jsonText, String restaurantId, String dateUpdated) {
+        final String keyRestaurant = String.format(KEY_OFFER, restaurantId);
+        final String keyRestaurantOffersUpdated = String.format(KEY_OFFER_UPDATED, restaurantId);
+
+        putString(keyRestaurantOffersUpdated, dateUpdated);
+        putString(keyRestaurant, jsonText);
+    }
+
+    public DateTime getRestaurantLastUpdated(String restaurantId) {
+        final String keyRestaurantUpdated = String.format(KEY_RESTAURANT_UPDATED, restaurantId);
+        DateTime cachedDate = DateUtils.createDateFromString(getString(keyRestaurantUpdated));
+        return cachedDate;
+    }
+
+    public DateTime getRestaurantOffersLastUpdated(String restaurantId) {
+        final String keyRestaurantOffersUpdated = String.format(KEY_OFFER_UPDATED, restaurantId);
+        DateTime cachedDate = DateUtils.createDateFromString(getString(keyRestaurantOffersUpdated));
+        return cachedDate;
+    }
+
+    public String loadNearbyFromCache(@NonNull String locationId) {
         final String keySync = String.format(KEY_NEARBY_OFFERS, locationId);
+        return getString(keySync);
+    }
+
+    public List<RestaurantOffers> loadRestaurantOffersFromCache() {
+        final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
+
         List<RestaurantOffers> restaurantOffersList = new ArrayList<>();
-        String jsonNearbyRestaurantsCached = getString(keySync);
+        String jsonNearbyRestaurantsCached = loadNearbyFromCache(locationId);
         if (jsonNearbyRestaurantsCached != null) {
             try {
                 ParseNearbyRestaurants parseNearbyRestaurants = ParseNearbyRestaurants.getInstance();
                 Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurants.parse(jsonNearbyRestaurantsCached);
                 Map<String, String> nearbyRestaurantKeys = nearbyKeys.second;
                 for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
-                    RestaurantOffers restaurantOffers = loadOffersFromCache(restaurantKey);
+                    RestaurantOffers restaurantOffers = loadRestaurantOffersFromCache(restaurantKey);
                     if (restaurantOffers != null) {
                         restaurantOffersList.add(restaurantOffers);
                     }
@@ -875,7 +788,7 @@ public class DataProvider {
         return restaurantOffersList;
     }
 
-    public RestaurantOffers loadOffersFromCache(@NonNull String restaurantKey) {
+    public RestaurantOffers loadRestaurantOffersFromCache(@NonNull String restaurantKey) {
         final String keyRestaurant = String.format(KEY_OFFER, restaurantKey);
         String jsonOffers = getString(keyRestaurant);
 
@@ -903,124 +816,6 @@ public class DataProvider {
         }
 
         return null;
-    }
-
-    private boolean updateRestaurant(@NonNull String restaurantKey, @NonNull String dateUpdated, final LoadJobListener callback) {
-        final String uriRestaurant = String.format(URI_RESTAURANT, restaurantKey);
-        final String keyRestaurantUpdated = String.format(KEY_RESTAURANT_UPDATED, restaurantKey);
-
-        DateTime cachedDate = DateUtils.createDateFromString(getString(keyRestaurantUpdated));
-        DateTime downloadDate = DateUtils.createDateFromString(dateUpdated);
-
-        String jsonRestaurant;
-        if (downloadDate != null && (cachedDate == null || downloadDate.after(cachedDate))) {
-            if (callback != null) {
-                callback.onDownloadStarted();
-            }
-            jsonRestaurant = downloadTextFromServer(uriRestaurant);
-            if (jsonRestaurant != null) {
-                try {
-                    ParseRestaurant parseRestaurant = ParseRestaurant.getInstance(restaurantKey);
-                    Restaurant restaurant = parseRestaurant.parse(jsonRestaurant);
-                    if (restaurant != null) {
-                        putString(String.format(KEY_RESTAURANT, restaurantKey), jsonRestaurant);
-                        putString(keyRestaurantUpdated, dateUpdated);
-                        return true;
-                    }
-                } catch (JSONException jsonException) {
-                    jsonException.printStackTrace();
-                    String message = "Failed to download " + restaurantKey + " updated " + dateUpdated;
-                    if (callback != null) {
-                        callback.onDownloadFailed(message);
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean updateOffers(@NonNull String restaurantKey, @NonNull String dateUpdated, final LoadJobListener callback) {
-        final String uriRestaurantOffers = String.format(URI_OFFER, restaurantKey);
-        final String keyOfferUpdated = String.format(KEY_OFFER_UPDATED, restaurantKey);
-
-        DateTime cachedDate = DateUtils.createDateFromString(getString(keyOfferUpdated));
-        DateTime downloadDate = DateUtils.createDateFromString(dateUpdated);
-
-        String jsonOffers;
-        if (downloadDate != null && (cachedDate == null || downloadDate.after(cachedDate))) {
-            if (callback != null) {
-                callback.onDownloadStarted();
-            }
-            jsonOffers = downloadTextFromServer(uriRestaurantOffers);
-            if (jsonOffers != null) {
-                try {
-                    ParseRestaurantOffers parseRestaurantOffers = ParseRestaurantOffers.getInstance();
-                    RestaurantOffers restaurantOffers = parseRestaurantOffers.parse(jsonOffers);
-                    if (restaurantOffers != null) {
-                        putString(String.format(KEY_OFFER, restaurantKey), jsonOffers);
-                        putString(keyOfferUpdated, dateUpdated);
-                        return true;
-                    }
-                } catch (JSONException jsonException) {
-                    jsonException.printStackTrace();
-                    String message = "Failed to download " + restaurantKey + " updated " + dateUpdated + ". " + jsonException.getMessage();
-                    if (callback != null) {
-                        callback.onDownloadFailed(message);
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    private String downloadTextFromServer(String path) {
-        try {
-            StringBuilder stringBuilder = new StringBuilder();
-            URL url = new URL(path);
-
-            InputStream stream = url.openStream();
-            InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
-            BufferedReader in = new BufferedReader(reader);
-            String line;
-            while ((line = in.readLine()) != null) {
-                stringBuilder.append(line);
-            }
-            in.close();
-            return stringBuilder.toString();
-        } catch (MalformedURLException e) {
-        } catch (IOException e) {
-        }
-        return null;
-    }
-
-    @Deprecated
-    private String parseJsonFromAssets(String filePath) {
-        BufferedReader reader = null;
-        String jsonOutput = null;
-        try {
-            AssetManager assetManager = LunchtimeApplication.getContext().getAssets();
-            InputStream is = assetManager.open(filePath);
-            reader = new BufferedReader(
-                    new InputStreamReader(is, "UTF-8"));
-
-            StringBuilder json = new StringBuilder();
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                json.append(line);
-            }
-            jsonOutput = json.toString();
-        } catch (IOException ioException) {
-            Log.e(this.getClass().getCanonicalName(), ioException.getMessage());
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    Log.e(this.getClass().getCanonicalName(), "Error closing asset " + filePath);
-                }
-            }
-            return jsonOutput;
-        }
     }
 
 }

@@ -968,7 +968,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     @Override
     public void onDownloadFailed(String message) {
-        // TODO: User feedback
+        // TODO: User feedback, Downloading restaurant content failed
     }
 
     @Override

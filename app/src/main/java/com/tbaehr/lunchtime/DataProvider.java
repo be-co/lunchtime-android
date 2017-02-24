@@ -1050,19 +1050,40 @@ public class DataProvider {
         openingTimes.put(Calendar.SATURDAY, convertToDateTimeArray(Calendar.SATURDAY, saturdayArray));
         openingTimes.put(Calendar.SUNDAY, convertToDateTimeArray(Calendar.SUNDAY, sundayArray));
 
-        String parking = restaurantJSON.getString("parking");
-        JSONArray payingArray = restaurantJSON.getJSONArray("paying");
-        String paying = "";
-        for (int i = 0; i < payingArray.length(); i++) {
-            paying += i == 0 ? "" : ", ";
-            paying += payingArray.getString(i);
+        String parking = null;
+        if (restaurantJSON.has("parking")) {
+            parking = restaurantJSON.getString("parking");
         }
 
-        String phoneNumber = restaurantJSON.getString("phoneNumber");
-        String email = restaurantJSON.getString("email");
-        String website = restaurantJSON.getString("website");
-        JSONArray photoUrlsObjects = restaurantJSON.getJSONArray("photoUrls");
-        String[] photoUrls = convertToArray(photoUrlsObjects);
+        String paying = "";
+        if (restaurantJSON.has("paying")) {
+            JSONArray payingArray = restaurantJSON.getJSONArray("paying");
+            for (int i = 0; i < payingArray.length(); i++) {
+                paying += i == 0 ? "" : ", ";
+                paying += payingArray.getString(i);
+            }
+        }
+
+        String phoneNumber = null;
+        if (restaurantJSON.has("phoneNumber")) {
+            phoneNumber = restaurantJSON.getString("phoneNumber");
+        }
+
+        String email = null;
+        if (restaurantJSON.has("email")) {
+            email = restaurantJSON.getString("email");
+        }
+
+        String website = null;
+        if (restaurantJSON.has("website")) {
+            website = restaurantJSON.getString("website");
+        }
+
+        String[] photoUrls = null;
+        if (restaurantJSON.has("photoUrls")) {
+            JSONArray photoUrlsObjects = restaurantJSON.getJSONArray("photoUrls");
+            photoUrls = convertToArray(photoUrlsObjects);
+        }
 
         return new Restaurant(restaurantId, name, shortDescription, longDescription, address,
                 openingTimes, parking, paying, phoneNumber, email, website, photoUrls);
@@ -1147,7 +1168,7 @@ public class DataProvider {
     }
 
     private void autoSearchForIngredients(Set<Offer.Ingredient> ingredientList, String title) {
-        if (contains(title, "Mettenden", "Mettwurst", "schinken", "Cevapcici", "Lasagne", "Wildbraten", "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
+        if (contains(title, "Mettenden", "Mettwurst", "schinken", "Cevapcici", "Wildbraten", "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
             if (!title.contains("vom Rind") && !title.contains("vegetarisch")) {
                 ingredientList.add(Offer.Ingredient.PORK);
             }

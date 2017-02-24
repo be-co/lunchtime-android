@@ -703,6 +703,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by timo.baehr@gmail.com on 27.12.16.
@@ -730,84 +731,106 @@ public class ModelDownloader {
         // ;
     }
 
+    @Deprecated
     public void syncNearbyOffers(final LoadJobListener callback) {
         // TODO: Sync max. 1/min
-        final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
-        final String uriSync = String.format(URI_NEARBY_RESTAURANTS, locationId);
-
         new AsyncTask<Void, Void, Void>() {
             private boolean dataSetChanged = false;
 
+            private boolean error = false;
+
             @Override
             protected Void doInBackground(Void... params) {
-                // Try to download restaurants json from server
-                String jsonDownloaded = downloadTextFromServer(uriSync);
-
-                // Server answered with json -> save to cache and update offers
-                if (jsonDownloaded != null) {
-                    try {
-                        Pair<Map<String, String>, Map<String, String>> nearbyKeys = ModelParser.getInstance().parseNearbyRestaurants(jsonDownloaded);
-                        ModelCache.getInstance().saveNearbyJsonToCache(jsonDownloaded, locationId);
-                        Map<String, String> nearbyRestaurantKeys = nearbyKeys.second;
+                try {
+                    Map<String, String> nearbyRestaurantKeys = getDateRestaurantOffersOnServerUpdated();
+                    if (nearbyRestaurantKeys != null) {
                         for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
                             dataSetChanged = updateOffers(restaurantKey, nearbyRestaurantKeys.get(restaurantKey), callback) || dataSetChanged;
                         }
-                    } catch (JSONException e) {
-                        // TODO: Error handling
-                        e.printStackTrace();
                     }
+                } catch (JSONException e) {
+                    error = true;
+                    e.printStackTrace();
                 }
-
                 return null;
             }
 
             @Override
             protected void onPostExecute(Void aVoid) {
                 if (dataSetChanged) {
-                    List<RestaurantOffers> restaurantOffersList = ModelCache.getInstance().loadRestaurantOffersFromCache();
+                    Set<RestaurantOffers> restaurantOffersList = ModelCache.getInstance().loadRestaurantOffersFromCache();
                     callback.onDownloadFinished(restaurantOffersList);
+                }
+                if (error) {
+                    callback.onDownloadFailed("Could not download offers.");
                 }
                 super.onPostExecute(aVoid);
             }
         }.execute();
     }
 
-    public void syncRestaurant(final LoadJobListener<Restaurant> callback, final String restaurantId) {
+    private Map<String, String> getDateRestaurantOffersOnServerUpdated() throws JSONException {
         final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
         final String uriSync = String.format(URI_NEARBY_RESTAURANTS, locationId);
+        String jsonSync = downloadTextFromServer(uriSync);
+        if (jsonSync != null) {
+            Pair<Map<String, String>, Map<String, String>> nearbyKeys = ModelParser.getInstance().parseNearbyRestaurants(jsonSync);
+            ModelCache.getInstance().saveNearbyJsonToCache(jsonSync, locationId);
+            Map<String, String> nearbyRestaurantKeys = nearbyKeys.second;
+            return nearbyRestaurantKeys;
+        }
+        return null;
+    }
 
+    private String getDateRestaurantOnServerUpdated(String restaurantId) throws JSONException {
+        final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
+        final String uriSync = String.format(URI_NEARBY_RESTAURANTS, locationId);
+        String syncJson = downloadTextFromServer(uriSync);
+        if (syncJson != null) {
+            Pair<Map<String, String>, Map<String, String>> nearbyKeys = ModelParser.getInstance().parseNearbyRestaurants(syncJson);
+            ModelCache.getInstance().saveNearbyJsonToCache(syncJson, locationId);
+            Map<String, String> nearbyRestaurantKeys = nearbyKeys.first;
+            return nearbyRestaurantKeys.get(restaurantId);
+        }
+        return null;
+    }
+
+    public void syncRestaurant(final LoadJobListener<Restaurant> callback, final String restaurantId) {
         new AsyncTask<Void, Void, Void>() {
-            private boolean dataSetChanged = false;
-
             private Restaurant restaurant;
+
+            private boolean error;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                callback.onDownloadStarted();
+            }
 
             @Override
             protected Void doInBackground(Void... params) {
-                // Try to download restaurants json from server
-                String jsonDownloaded = downloadTextFromServer(uriSync);
-
-                // Server answered with json -> save to cache and update offers
-                if (jsonDownloaded != null) {
-                    try {
-                        Pair<Map<String, String>, Map<String, String>> nearbyKeys = ModelParser.getInstance().parseNearbyRestaurants(jsonDownloaded);
-                        ModelCache.getInstance().saveNearbyJsonToCache(jsonDownloaded, locationId);
-                        Map<String, String> nearbyRestaurantKeys = nearbyKeys.first;
-                        Restaurant restaurant = updateRestaurant(restaurantId, nearbyRestaurantKeys.get(restaurantId), callback);
-                        this.restaurant = restaurant;
-                        dataSetChanged = restaurant != null || dataSetChanged;
-                    } catch (JSONException e) {
-                        // TODO: Error handling
-                        e.printStackTrace();
+                try {
+                    String dateUpdated = getDateRestaurantOnServerUpdated(restaurantId);
+                    if (dateUpdated == null) {
+                        error = true;
+                        return null;
                     }
+                    Restaurant restaurant = updateRestaurant(restaurantId, dateUpdated, callback);
+                    this.restaurant = restaurant;
+                } catch (JSONException e) {
+                    error = true;
+                    e.printStackTrace();
                 }
-
                 return null;
             }
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                if (dataSetChanged && callback != null) {
+                if (restaurant != null) {
                     callback.onDownloadFinished(restaurant);
+                }
+                if (error) {
+                    callback.onDownloadFailed("Failed to sync restaurant " + restaurantId);
                 }
                 super.onPostExecute(aVoid);
             }

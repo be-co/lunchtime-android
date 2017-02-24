@@ -696,7 +696,6 @@ import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -708,7 +707,7 @@ import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
 public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
-        implements LoadJobListener<List<RestaurantOffers>> {
+        implements LoadJobListener<Set<RestaurantOffers>> {
 
     private ModelDownloader dataProvider;
 
@@ -716,7 +715,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
     private Timer timer;
 
-    List<RestaurantOffers> restaurantOffersList;
+    Set<RestaurantOffers> restaurantOffersList;
 
     public DashboardPresenter(DashboardFragment fragment) {
         this.activity = fragment.getActivity();
@@ -744,12 +743,12 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         super.unbindView();
     }
 
-    private void restartTimeBasedRefresh(List<RestaurantOffers> restaurantOffersList) {
+    private void restartTimeBasedRefresh(Set<RestaurantOffers> restaurantOffersList) {
         stopTimeBasedRefresh();
         startTimeBasedRefresh(restaurantOffersList);
     }
 
-    private void startTimeBasedRefresh(List<RestaurantOffers> restaurantOffersList) {
+    private void startTimeBasedRefresh(Set<RestaurantOffers> restaurantOffersList) {
         Set<DateTime> refreshDates = new HashSet<>();
         for (RestaurantOffers restaurantOffers : restaurantOffersList) {
             refreshDates.addAll(restaurantOffers.getUiRefreshDates());
@@ -809,7 +808,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     }
 
     @Override
-    public void onDownloadFinished(List<RestaurantOffers> restaurantOffersList) {
+    public void onDownloadFinished(Set<RestaurantOffers> restaurantOffersList) {
         IDashboardViewContainer view = getView();
         if (view == null) {
             return;
@@ -819,7 +818,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         presentOffers(restaurantOffersList);
     }
 
-    private void presentOffers(List<RestaurantOffers> restaurantOffersList) {
+    private void presentOffers(Set<RestaurantOffers> restaurantOffersList) {
         IDashboardViewContainer view = getView();
         boolean foundOffers = false;
 
@@ -882,18 +881,11 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
     public void refreshOffers() {
         dataProvider.syncNearbyOffers(this);
-        List<RestaurantOffers> restaurantOffersListTemp = ModelCache.getInstance().loadRestaurantOffersFromCache();
-        boolean dataSetChanged = restaurantOffersList == null || restaurantOffersListTemp.size() != restaurantOffersList.size();
-        if (!dataSetChanged) {
-            for (int i = 0; i < restaurantOffersListTemp.size(); i++) {
-                boolean isEqual = restaurantOffersListTemp.get(i).equals(restaurantOffersList.get(i));
-                if (!isEqual) {
-                    dataSetChanged = true;
-                    break;
-                }
-            }
-        }
 
+        Set<RestaurantOffers> restaurantOffersListTemp = ModelCache.getInstance().loadRestaurantOffersFromCache();
+        boolean dataSetChanged = restaurantOffersList == null
+                        || restaurantOffersListTemp.size() != restaurantOffersList.size()
+                        || !restaurantOffersListTemp.equals(restaurantOffersList);
         restaurantOffersList = restaurantOffersListTemp;
 
         startTimeBasedRefresh(restaurantOffersList);

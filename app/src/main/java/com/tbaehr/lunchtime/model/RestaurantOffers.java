@@ -732,6 +732,16 @@ public class RestaurantOffers {
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = (restaurantId + title + description).hashCode() + offers.size();
+        for (int i = 0; i< offers.size(); i++) {
+            Offer offer = getOffer(i);
+            hash += offer.hashCode();
+        }
+        return hash;
+    }
+
     public String getRestaurantName() {
         return title;
     }

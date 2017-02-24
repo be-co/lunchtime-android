@@ -689,9 +689,9 @@ import com.tbaehr.lunchtime.utils.LocationHelper;
 
 import org.json.JSONException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static com.tbaehr.lunchtime.utils.SharedPrefsHelper.getString;
 import static com.tbaehr.lunchtime.utils.SharedPrefsHelper.putString;
@@ -762,10 +762,10 @@ public class ModelCache {
         return getString(keySync);
     }
 
-    public List<RestaurantOffers> loadRestaurantOffersFromCache() {
+    public Set<RestaurantOffers> loadRestaurantOffersFromCache() {
         final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
 
-        List<RestaurantOffers> restaurantOffersList = new ArrayList<>();
+        Set<RestaurantOffers> restaurantOffersList = new HashSet<>();
         String jsonNearbyRestaurantsCached = loadNearbyFromCache(locationId);
         if (jsonNearbyRestaurantsCached != null) {
             try {

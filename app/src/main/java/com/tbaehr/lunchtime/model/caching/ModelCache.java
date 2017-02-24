@@ -682,9 +682,7 @@ import android.util.Pair;
 
 import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
-import com.tbaehr.lunchtime.model.parsing.ParseNearbyRestaurants;
-import com.tbaehr.lunchtime.model.parsing.ParseRestaurant;
-import com.tbaehr.lunchtime.model.parsing.ParseRestaurantOffers;
+import com.tbaehr.lunchtime.model.parsing.ModelParser;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
 import com.tbaehr.lunchtime.utils.LocationHelper;
@@ -771,8 +769,7 @@ public class ModelCache {
         String jsonNearbyRestaurantsCached = loadNearbyFromCache(locationId);
         if (jsonNearbyRestaurantsCached != null) {
             try {
-                ParseNearbyRestaurants parseNearbyRestaurants = ParseNearbyRestaurants.getInstance();
-                Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurants.parse(jsonNearbyRestaurantsCached);
+                Pair<Map<String, String>, Map<String, String>> nearbyKeys = ModelParser.getInstance().parseNearbyRestaurants(jsonNearbyRestaurantsCached);
                 Map<String, String> nearbyRestaurantKeys = nearbyKeys.second;
                 for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
                     RestaurantOffers restaurantOffers = loadRestaurantOffersFromCache(restaurantKey);
@@ -794,8 +791,7 @@ public class ModelCache {
 
         if (jsonOffers != null) {
             try {
-                ParseRestaurantOffers parseRestaurantOffers = ParseRestaurantOffers.getInstance();
-                return parseRestaurantOffers.parse(jsonOffers);
+                return ModelParser.getInstance().parseRestaurantOffers(jsonOffers);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -808,8 +804,7 @@ public class ModelCache {
         try {
             String json = getString(String.format(KEY_RESTAURANT, keyRestaurant));
             if (json != null) {
-                ParseRestaurant parseRestaurant = ParseRestaurant.getInstance(keyRestaurant);
-                return parseRestaurant.parse(json);
+                return ModelParser.getInstance().parseRestaurant(json, keyRestaurant);
             }
         } catch (JSONException jsonException) {
             Log.e(this.getClass().getCanonicalName(), jsonException.getMessage());

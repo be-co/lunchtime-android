@@ -676,39 +676,126 @@
  */
 package com.tbaehr.lunchtime.model.parsing;
 
+import android.util.Pair;
+
 import com.tbaehr.lunchtime.BuildConfig;
 import com.tbaehr.lunchtime.model.Offer;
+import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
+import com.tbaehr.lunchtime.utils.DateTime;
+import com.tbaehr.lunchtime.utils.DateUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * Created by timo.baehr@gmail.com on 24.02.17.
  */
-public class ParseRestaurantOffers implements ParseJson<RestaurantOffers> {
+public class ModelParser {
 
-    private static ParseRestaurantOffers instance;
+    private static ModelParser instance;
 
-    public static ParseRestaurantOffers getInstance() {
+    public static ModelParser getInstance() {
         if (instance == null) {
-            instance = new ParseRestaurantOffers();
+            instance = new ModelParser();
         }
         return instance;
     }
 
-    private ParseRestaurantOffers() {
+    private ModelParser() {
         // ;
     }
 
-    @Override
-    public RestaurantOffers parse(String jsonText) throws JSONException {
+    public Pair<Map<String, String>, Map<String, String>> parseNearbyRestaurants(String jsonText) throws JSONException {
+        Map<String, String> nearbyRestaurants = new HashMap<>();
+        Map<String, String> nearbyOffers = new HashMap<>();
+
+        JSONArray jsonArray = new JSONArray(jsonText);
+        for (int index = 0; index < jsonArray.length(); index++) {
+            JSONObject restaurant = jsonArray.getJSONObject(index);
+            String key = restaurant.getString("key");
+            String offersLastUpdated = restaurant.getString("offersLastUpdated");
+            String restaurantLastUpdated = restaurant.getString("restaurantLastUpdated");
+            nearbyRestaurants.put(key, restaurantLastUpdated);
+            nearbyOffers.put(key, offersLastUpdated);
+        }
+
+        return new Pair<>(nearbyRestaurants, nearbyOffers);
+    }
+
+    public Restaurant parseRestaurant(String jsonText, String restaurantId) throws JSONException {
+        JSONObject restaurantJSON = new JSONObject(jsonText);
+        String name = restaurantJSON.getString("title");
+        String shortDescription = restaurantJSON.getString("shortDescription");
+        String longDescription = restaurantJSON.getString("longDescription");
+        String address = restaurantJSON.getString("address");
+
+        JSONObject openingTimesObject = restaurantJSON.getJSONObject("openingTimes");
+        JSONArray mondayArray = openingTimesObject.getJSONArray("monday");
+        JSONArray tuesdayArray = openingTimesObject.getJSONArray("tuesday");
+        JSONArray wednesdayArray = openingTimesObject.getJSONArray("wednesday");
+        JSONArray thursdayArray = openingTimesObject.getJSONArray("thursday");
+        JSONArray fridayArray = openingTimesObject.getJSONArray("friday");
+        JSONArray saturdayArray = openingTimesObject.getJSONArray("saturday");
+        JSONArray sundayArray = openingTimesObject.getJSONArray("sunday");
+        Map<Integer, DateTime[]> openingTimes = new HashMap<>();
+        openingTimes.put(Calendar.MONDAY, convertToDateTimeArray(Calendar.MONDAY, mondayArray));
+        openingTimes.put(Calendar.TUESDAY, convertToDateTimeArray(Calendar.TUESDAY, tuesdayArray));
+        openingTimes.put(Calendar.WEDNESDAY, convertToDateTimeArray(Calendar.WEDNESDAY, wednesdayArray));
+        openingTimes.put(Calendar.THURSDAY, convertToDateTimeArray(Calendar.THURSDAY, thursdayArray));
+        openingTimes.put(Calendar.FRIDAY, convertToDateTimeArray(Calendar.FRIDAY, fridayArray));
+        openingTimes.put(Calendar.SATURDAY, convertToDateTimeArray(Calendar.SATURDAY, saturdayArray));
+        openingTimes.put(Calendar.SUNDAY, convertToDateTimeArray(Calendar.SUNDAY, sundayArray));
+
+        String parking = null;
+        if (restaurantJSON.has("parking")) {
+            parking = restaurantJSON.getString("parking");
+        }
+
+        String paying = "";
+        if (restaurantJSON.has("paying")) {
+            JSONArray payingArray = restaurantJSON.getJSONArray("paying");
+            for (int i = 0; i < payingArray.length(); i++) {
+                paying += i == 0 ? "" : ", ";
+                paying += payingArray.getString(i);
+            }
+        }
+
+        String phoneNumber = null;
+        if (restaurantJSON.has("phoneNumber")) {
+            phoneNumber = restaurantJSON.getString("phoneNumber");
+        }
+
+        String email = null;
+        if (restaurantJSON.has("email")) {
+            email = restaurantJSON.getString("email");
+        }
+
+        String website = null;
+        if (restaurantJSON.has("website")) {
+            website = restaurantJSON.getString("website");
+        }
+
+        String[] photoUrls = null;
+        if (restaurantJSON.has("photoUrls")) {
+            JSONArray photoUrlsObjects = restaurantJSON.getJSONArray("photoUrls");
+            photoUrls = convertToStringArray(photoUrlsObjects);
+        }
+
+        return new Restaurant(restaurantId, name, shortDescription, longDescription, address,
+                openingTimes, parking, paying, phoneNumber, email, website, photoUrls);
+    }
+
+    public RestaurantOffers parseRestaurantOffers(String jsonText) throws JSONException {
         JSONObject restaurantObject = new JSONObject(jsonText);
         final String restaurantId = restaurantObject.getString("restaurantID");
         final String restaurantTitle = restaurantObject.getString("title");
@@ -794,4 +881,33 @@ public class ParseRestaurantOffers implements ParseJson<RestaurantOffers> {
         }
         return false;
     }
+
+    private String[] convertToStringArray(JSONArray array) throws JSONException {
+        if (array.length() == 0) {
+            return null;
+        }
+
+        String[] listOfStrings = new String[array.length()];
+        for (int i = 0; i < listOfStrings.length; i++) {
+            listOfStrings[i] = array.getString(i);
+        }
+        return listOfStrings;
+    }
+
+    private DateTime[] convertToDateTimeArray(int weekDay, JSONArray array) throws JSONException {
+        if (array.length() == 0) {
+            return null;
+        }
+
+        DateTime[] listOfStrings = new DateTime[array.length()];
+        String[] openingValues;
+        for (int i = 0; i < listOfStrings.length; i++) {
+            openingValues = array.getString(i).split(":");
+            int hours = Integer.valueOf(openingValues[0]);
+            int minutes = Integer.valueOf(openingValues[1]);
+            listOfStrings[i] = DateUtils.getDate(hours, minutes).updateWeekDay(weekDay);
+        }
+        return listOfStrings;
+    }
+
 }

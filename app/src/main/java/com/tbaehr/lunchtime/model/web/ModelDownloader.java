@@ -687,9 +687,7 @@ import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
 import com.tbaehr.lunchtime.model.caching.ModelCache;
-import com.tbaehr.lunchtime.model.parsing.ParseNearbyRestaurants;
-import com.tbaehr.lunchtime.model.parsing.ParseRestaurant;
-import com.tbaehr.lunchtime.model.parsing.ParseRestaurantOffers;
+import com.tbaehr.lunchtime.model.parsing.ModelParser;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
 import com.tbaehr.lunchtime.utils.ImageUtils;
@@ -735,8 +733,7 @@ public class ModelDownloader {
                 // Server answered with json -> save to cache and update offers
                 if (jsonDownloaded != null) {
                     try {
-                        ParseNearbyRestaurants parseNearbyRestaurants = ParseNearbyRestaurants.getInstance();
-                        Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurants.parse(jsonDownloaded);
+                        Pair<Map<String, String>, Map<String, String>> nearbyKeys = ModelParser.getInstance().parseNearbyRestaurants(jsonDownloaded);
                         ModelCache.getInstance().saveNearbyJsonToCache(jsonDownloaded, locationId);
                         Map<String, String> nearbyRestaurantKeys = nearbyKeys.second;
                         for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
@@ -777,8 +774,7 @@ public class ModelDownloader {
                 // Server answered with json -> save to cache and update offers
                 if (jsonDownloaded != null) {
                     try {
-                        ParseNearbyRestaurants parseNearbyRestaurants = ParseNearbyRestaurants.getInstance();
-                        Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurants.parse(jsonDownloaded);
+                        Pair<Map<String, String>, Map<String, String>> nearbyKeys = ModelParser.getInstance().parseNearbyRestaurants(jsonDownloaded);
                         ModelCache.getInstance().saveNearbyJsonToCache(jsonDownloaded, locationId);
                         Map<String, String> nearbyRestaurantKeys = nearbyKeys.first;
                         dataSetChanged = updateRestaurant(restaurantId, nearbyRestaurantKeys.get(restaurantId), callback) || dataSetChanged;
@@ -849,8 +845,7 @@ public class ModelDownloader {
             jsonRestaurant = downloadTextFromServer(uriRestaurant);
             if (jsonRestaurant != null) {
                 try {
-                    ParseRestaurant parseRestaurant = ParseRestaurant.getInstance(restaurantKey);
-                    Restaurant restaurant = parseRestaurant.parse(jsonRestaurant);
+                    Restaurant restaurant = ModelParser.getInstance().parseRestaurant(jsonRestaurant, restaurantKey);
                     if (restaurant != null) {
                         ModelCache.getInstance().saveRestaurantJsonToCache(jsonRestaurant, restaurantKey, dateUpdated);
                         return true;
@@ -881,8 +876,7 @@ public class ModelDownloader {
             jsonOffers = downloadTextFromServer(uriRestaurantOffers);
             if (jsonOffers != null) {
                 try {
-                    ParseRestaurantOffers parseRestaurantOffers = ParseRestaurantOffers.getInstance();
-                    RestaurantOffers restaurantOffers = parseRestaurantOffers.parse(jsonOffers);
+                    RestaurantOffers restaurantOffers = ModelParser.getInstance().parseRestaurantOffers(jsonOffers);
                     if (restaurantOffers != null) {
                         ModelCache.getInstance().saveRestaurantOffersJsonToCache(jsonOffers, restaurantKey, dateUpdated);
                         return true;

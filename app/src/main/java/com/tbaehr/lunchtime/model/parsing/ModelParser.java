@@ -676,9 +676,11 @@
  */
 package com.tbaehr.lunchtime.model.parsing;
 
+import android.support.annotation.NonNull;
 import android.util.Pair;
 
 import com.tbaehr.lunchtime.BuildConfig;
+import com.tbaehr.lunchtime.model.NearbyRestaurants;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
@@ -715,9 +717,8 @@ public class ModelParser {
         // ;
     }
 
-    public Pair<Map<String, String>, Map<String, String>> parseNearbyRestaurants(String jsonText) throws JSONException {
-        Map<String, String> nearbyRestaurants = new HashMap<>();
-        Map<String, String> nearbyOffers = new HashMap<>();
+    public NearbyRestaurants parseNearbyRestaurants(@NonNull String jsonText) throws JSONException {
+        Map<String, Pair<String, String>> map = new HashMap<>();
 
         JSONArray jsonArray = new JSONArray(jsonText);
         for (int index = 0; index < jsonArray.length(); index++) {
@@ -725,11 +726,11 @@ public class ModelParser {
             String key = restaurant.getString("key");
             String offersLastUpdated = restaurant.getString("offersLastUpdated");
             String restaurantLastUpdated = restaurant.getString("restaurantLastUpdated");
-            nearbyRestaurants.put(key, restaurantLastUpdated);
-            nearbyOffers.put(key, offersLastUpdated);
+            Pair<String, String> pair = new Pair<>( restaurantLastUpdated, offersLastUpdated);
+            map.put(key, pair);
         }
 
-        return new Pair<>(nearbyRestaurants, nearbyOffers);
+        return new NearbyRestaurants(map);
     }
 
     public Restaurant parseRestaurant(String jsonText, String restaurantId) throws JSONException {

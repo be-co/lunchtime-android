@@ -674,35 +674,289 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.utils;
+package com.tbaehr.lunchtime.model;
 
-import com.tbaehr.lunchtime.model.ModelProvider;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import com.tbaehr.lunchtime.model.caching.ModelCache;
+import com.tbaehr.lunchtime.model.parsing.ModelParser;
+import com.tbaehr.lunchtime.model.web.LoadJobListener;
+import com.tbaehr.lunchtime.model.web.ModelDownloader;
+import com.tbaehr.lunchtime.utils.DateTime;
+import com.tbaehr.lunchtime.utils.LocationHelper;
+
+import org.json.JSONException;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Created by timo.baehr@gmail.com on 21.02.17.
+ * Created by timo.baehr@gmail.com on 24.02.17.
  */
-public class LocationHelper {
+public class ModelProvider {
 
-    private static final String KEY_SELECTED_LOCATION_INDEX = "selected location index";
+    private interface ModelChangeListener<T> {
 
-    private static int selectedLocationIndex = -1;
+        void loadingStarted();
 
-    public static CharSequence[] getLocations() {
-        return new CharSequence[] {"Weiterstadt", "Darmstadt"};
+        void pickUp(T model);
+
+        void failed();
+
     }
 
-    public static int getSelectedLocationIndex() {
-        return selectedLocationIndex != -1 ? selectedLocationIndex : SharedPrefsHelper.getInt(KEY_SELECTED_LOCATION_INDEX, 0);
+    public interface RestaurantChangeListener extends ModelChangeListener<Restaurant> {
+        // ;
     }
 
-    public static String getSelectedLocation() {
-        return (String) getLocations()[getSelectedLocationIndex()];
+    public interface RestaurantOffersChangeListener extends ModelChangeListener<RestaurantOffers> {
+        // ;
     }
 
-    public static void setSelectedLocationIndex(int index) {
-        selectedLocationIndex = index;
-        ModelProvider.getInstance().resetLastSync();
-        SharedPrefsHelper.putInt(KEY_SELECTED_LOCATION_INDEX, index);
+    public interface NearbyOffersChangeListener extends ModelChangeListener<Set<RestaurantOffers>> {
+        // ;
+    }
+
+    private interface NearbyChangeListener extends ModelChangeListener<NearbyRestaurants> {
+        // ;
+    }
+
+    private static long lastSync = -1;
+
+    private static final int MINUTE = 60 * 1000;
+
+    final Set<RestaurantOffers> allOffers = new HashSet<>();
+
+    private static ModelProvider instance;
+
+    public static ModelProvider getInstance() {
+        if (instance == null) {
+            instance = new ModelProvider();
+        }
+        return instance;
+    }
+
+    private ModelProvider() {
+        // ;
+    }
+
+    public void resetLastSync() {
+        lastSync = -1;
+    }
+
+    private void getNearbyAsync(@NonNull final NearbyChangeListener callback) {
+        final String locationId = LocationHelper.getSelectedLocation();
+        final NearbyRestaurants nearby = getNearby();
+        long now = System.currentTimeMillis();
+        if (nearby == null || lastSync + MINUTE < now) {
+            lastSync = now;
+            allOffers.clear();
+            ModelDownloader.getInstance().downloadNearby(locationId, new LoadJobListener<String>() {
+                @Override
+                public void onDownloadStarted() {
+                    callback.loadingStarted();
+                }
+
+                @Override
+                public void onDownloadFailed(String message) {
+                    callback.failed();
+                }
+
+                @Override
+                public void onDownloadFinished(String nearbyJson) {
+                    if (nearbyJson == null) {
+                        callback.failed();
+                        return;
+                    }
+                    try {
+                        NearbyRestaurants nearbyRestaurants = ModelParser.getInstance().parseNearbyRestaurants(nearbyJson);
+                        ModelCache.getInstance().putNearby(nearbyJson, locationId);
+                        callback.pickUp(nearbyRestaurants);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        } else {
+            callback.pickUp(getNearby());
+        }
+    }
+
+    private NearbyRestaurants getNearby() {
+        final String locationId = LocationHelper.getSelectedLocation();
+        String nearbyJson = ModelCache.getInstance().getNearby(locationId);
+        if (nearbyJson != null) {
+            try {
+                NearbyRestaurants nearbyRestaurants = ModelParser.getInstance().parseNearbyRestaurants(nearbyJson);
+                return nearbyRestaurants;
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public void getAllOffersAsync(@Nullable final NearbyOffersChangeListener callback) {
+        getNearbyAsync(new NearbyChangeListener() {
+            @Override
+            public void loadingStarted() {
+                // ;
+            }
+
+            @Override
+            public void pickUp(NearbyRestaurants nearby) {
+                for (String restaurantId : nearby.getRestaurantKeys()) {
+                    getRestaurantOffersAsync(restaurantId, new RestaurantOffersChangeListener() {
+                        @Override
+                        public void loadingStarted() {
+                            // ;
+                        }
+
+                        @Override
+                        public void pickUp(RestaurantOffers model) {
+                            if (allOffers.add(model)) {
+                                callback.pickUp(allOffers);
+                            }
+                        }
+
+                        @Override
+                        public void failed() {
+                            callback.failed();
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void failed() {
+                callback.failed();
+            }
+        });
+    }
+
+    public void getRestaurantAsync(@NonNull final String restaurantId, @Nullable final RestaurantChangeListener callback) {
+        final DateTime locallyUpdated = ModelCache.getInstance().getRestaurantLastUpdated(restaurantId);
+        getNearbyAsync(new NearbyChangeListener() {
+            @Override
+            public void loadingStarted() {
+                callback.loadingStarted();
+            }
+
+            @Override
+            public void pickUp(NearbyRestaurants nearbyServer) {
+                final DateTime onServerUpdated = nearbyServer.restaurantLastUpdated(restaurantId);
+                if (locallyUpdated == null || onServerUpdated.after(locallyUpdated)) {
+                    ModelDownloader.getInstance().downloadRestaurant(restaurantId, new LoadJobListener<String>() {
+                        @Override
+                        public void onDownloadStarted() {
+                            callback.loadingStarted();
+                        }
+
+                        @Override
+                        public void onDownloadFailed(String message) {
+                            callback.failed();
+                        }
+
+                        @Override
+                        public void onDownloadFinished(String restaurantJson) {
+                            try {
+                                Restaurant restaurant = ModelParser.getInstance().parseRestaurant(restaurantJson, restaurantId);
+                                ModelCache.getInstance().putRestaurant(restaurantJson, restaurantId, onServerUpdated);
+                                callback.pickUp(restaurant);
+                            } catch (JSONException e) {
+                                callback.failed();
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                } else {
+                    Restaurant restaurant = getRestaurant(restaurantId);
+                    if (restaurant != null) {
+                        callback.pickUp(restaurant);
+                    } else {
+                        callback.failed();
+                    }
+                }
+            }
+
+            @Override
+            public void failed() {
+                callback.failed();
+            }
+        });
+    }
+
+    private Restaurant getRestaurant(String restaurantId) {
+        String restaurantJson = ModelCache.getInstance().getRestaurant(restaurantId);
+        try {
+            return ModelParser.getInstance().parseRestaurant(restaurantJson, restaurantId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void getRestaurantOffersAsync(final @NonNull String restaurantId, final @Nullable RestaurantOffersChangeListener callback) {
+        final DateTime locallyUpdated = ModelCache.getInstance().getRestaurantOffersLastUpdated(restaurantId);
+        getNearbyAsync(new NearbyChangeListener() {
+            @Override
+            public void loadingStarted() {
+                callback.loadingStarted();
+            }
+
+            @Override
+            public void pickUp(NearbyRestaurants nearbyServer) {
+                final DateTime onServerUpdated = nearbyServer.offersLastUpdated(restaurantId);
+                if (locallyUpdated == null || onServerUpdated.after(locallyUpdated)) {
+                    ModelDownloader.getInstance().downloadRestaurantOffers(restaurantId, new LoadJobListener<String>() {
+                        @Override
+                        public void onDownloadStarted() {
+                            callback.loadingStarted();
+                        }
+
+                        @Override
+                        public void onDownloadFailed(String message) {
+                            callback.failed();
+                        }
+
+                        @Override
+                        public void onDownloadFinished(String offersJson) {
+                            try {
+                                RestaurantOffers offers = ModelParser.getInstance().parseRestaurantOffers(offersJson);
+                                ModelCache.getInstance().putRestaurantOffers(offersJson, restaurantId, onServerUpdated);
+                                callback.pickUp(offers);
+                            } catch (JSONException e) {
+                                callback.failed();
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                } else {
+                    RestaurantOffers offers = getRestaurantOffers(restaurantId);
+                    if (offers != null) {
+                        callback.pickUp(offers);
+                    } else {
+                        callback.failed();
+                    }
+                }
+            }
+
+            @Override
+            public void failed() {
+                callback.failed();
+            }
+        });
+    }
+
+    private RestaurantOffers getRestaurantOffers(@NonNull String restaurantId) {
+        String offersJson = ModelCache.getInstance().getRestaurantOffers(restaurantId);
+        try {
+            return ModelParser.getInstance().parseRestaurantOffers(offersJson);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

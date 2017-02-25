@@ -680,20 +680,11 @@ import android.content.res.AssetManager;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
-import android.util.Pair;
 
 import com.tbaehr.lunchtime.LunchtimeApplication;
-import com.tbaehr.lunchtime.model.Restaurant;
-import com.tbaehr.lunchtime.model.RestaurantOffers;
-import com.tbaehr.lunchtime.model.caching.ModelCache;
-import com.tbaehr.lunchtime.model.parsing.ModelParser;
-import com.tbaehr.lunchtime.utils.DateTime;
-import com.tbaehr.lunchtime.utils.DateUtils;
 import com.tbaehr.lunchtime.utils.ImageUtils;
-import com.tbaehr.lunchtime.utils.LocationHelper;
-
-import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -702,8 +693,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by timo.baehr@gmail.com on 27.12.16.
@@ -731,75 +720,24 @@ public class ModelDownloader {
         // ;
     }
 
-    @Deprecated
-    public void syncNearbyOffers(final LoadJobListener callback) {
-        // TODO: Sync max. 1/min
+    public void downloadNearby(@NonNull final String locationId, @Nullable final LoadJobListener<String> callback) {
+        String uri = String.format(URI_NEARBY_RESTAURANTS, locationId.toLowerCase());
+        downloadFromServer(uri, callback);
+    }
+
+    public void downloadRestaurantOffers(@NonNull final String restaurantId, @Nullable final LoadJobListener<String> callback) {
+        String uri = String.format(URI_OFFER, restaurantId);
+        downloadFromServer(uri, callback);
+    }
+
+    public void downloadRestaurant(@NonNull final String restaurantId, @Nullable final LoadJobListener<String> callback) {
+        String uri = String.format(URI_RESTAURANT, restaurantId);
+        downloadFromServer(uri, callback);
+    }
+
+    private void downloadFromServer(@NonNull final String uri, @Nullable final LoadJobListener<String> callback) {
         new AsyncTask<Void, Void, Void>() {
-            private boolean dataSetChanged = false;
-
-            private boolean error = false;
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    Map<String, String> nearbyRestaurantKeys = getDateRestaurantOffersOnServerUpdated();
-                    if (nearbyRestaurantKeys != null) {
-                        for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
-                            dataSetChanged = updateOffers(restaurantKey, nearbyRestaurantKeys.get(restaurantKey), callback) || dataSetChanged;
-                        }
-                    }
-                } catch (JSONException e) {
-                    error = true;
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                if (dataSetChanged) {
-                    Set<RestaurantOffers> restaurantOffersList = ModelCache.getInstance().loadRestaurantOffersFromCache();
-                    callback.onDownloadFinished(restaurantOffersList);
-                }
-                if (error) {
-                    callback.onDownloadFailed("Could not download offers.");
-                }
-                super.onPostExecute(aVoid);
-            }
-        }.execute();
-    }
-
-    private Map<String, String> getDateRestaurantOffersOnServerUpdated() throws JSONException {
-        final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
-        final String uriSync = String.format(URI_NEARBY_RESTAURANTS, locationId);
-        String jsonSync = downloadTextFromServer(uriSync);
-        if (jsonSync != null) {
-            Pair<Map<String, String>, Map<String, String>> nearbyKeys = ModelParser.getInstance().parseNearbyRestaurants(jsonSync);
-            ModelCache.getInstance().saveNearbyJsonToCache(jsonSync, locationId);
-            Map<String, String> nearbyRestaurantKeys = nearbyKeys.second;
-            return nearbyRestaurantKeys;
-        }
-        return null;
-    }
-
-    private String getDateRestaurantOnServerUpdated(String restaurantId) throws JSONException {
-        final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
-        final String uriSync = String.format(URI_NEARBY_RESTAURANTS, locationId);
-        String syncJson = downloadTextFromServer(uriSync);
-        if (syncJson != null) {
-            Pair<Map<String, String>, Map<String, String>> nearbyKeys = ModelParser.getInstance().parseNearbyRestaurants(syncJson);
-            ModelCache.getInstance().saveNearbyJsonToCache(syncJson, locationId);
-            Map<String, String> nearbyRestaurantKeys = nearbyKeys.first;
-            return nearbyRestaurantKeys.get(restaurantId);
-        }
-        return null;
-    }
-
-    public void syncRestaurant(final LoadJobListener<Restaurant> callback, final String restaurantId) {
-        new AsyncTask<Void, Void, Void>() {
-            private Restaurant restaurant;
-
-            private boolean error;
+            private String result;
 
             @Override
             protected void onPreExecute() {
@@ -808,17 +746,22 @@ public class ModelDownloader {
             }
 
             @Override
-            protected Void doInBackground(Void... params) {
+            protected Void doInBackground(Void... voids) {
                 try {
-                    String dateUpdated = getDateRestaurantOnServerUpdated(restaurantId);
-                    if (dateUpdated == null) {
-                        error = true;
-                        return null;
+                    StringBuilder stringBuilder = new StringBuilder();
+                    URL url = new URL(uri);
+
+                    InputStream stream = url.openStream();
+                    InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
+                    BufferedReader in = new BufferedReader(reader);
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        stringBuilder.append(line);
                     }
-                    Restaurant restaurant = updateRestaurant(restaurantId, dateUpdated, callback);
-                    this.restaurant = restaurant;
-                } catch (JSONException e) {
-                    error = true;
+                    in.close();
+                    result = stringBuilder.toString();
+                } catch (IOException e) {
+                    // TODO: Error handling
                     e.printStackTrace();
                 }
                 return null;
@@ -826,18 +769,13 @@ public class ModelDownloader {
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                if (restaurant != null) {
-                    callback.onDownloadFinished(restaurant);
-                }
-                if (error) {
-                    callback.onDownloadFailed("Failed to sync restaurant " + restaurantId);
-                }
                 super.onPostExecute(aVoid);
+                callback.onDownloadFinished(result);
             }
         }.execute();
     }
 
-    public void syncRestaurantImages(@NonNull final Restaurant restaurant, final LoadJobListener<List<Drawable>> callback) {
+    public void syncRestaurantImages(@NonNull final String[] imageUrls, final LoadJobListener<List<Drawable>> callback) {
         new AsyncTask<Void, Void, Void>() {
             private List<Drawable> drawables = new ArrayList<>();
 
@@ -846,13 +784,7 @@ public class ModelDownloader {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    String[] imageUrls = restaurant.getPhotoUrls();
-                    if (imageUrls != null) {
-                        drawables = ImageUtils.downloadDrawables(imageUrls);
-                    } else {
-                        callback.onDownloadFailed("No images defined for restaurant " + restaurant.getId());
-                        failed = true;
-                    }
+                    drawables = ImageUtils.downloadDrawables(imageUrls);
                 } catch (IOException e) {
                     callback.onDownloadFailed(e.getMessage());
                     failed = true;
@@ -869,89 +801,6 @@ public class ModelDownloader {
                 super.onPostExecute(aVoid);
             }
         }.execute();
-    }
-
-    private Restaurant updateRestaurant(@NonNull String restaurantKey, @NonNull String dateUpdated, final LoadJobListener callback) {
-        final String uriRestaurant = String.format(URI_RESTAURANT, restaurantKey);
-
-        DateTime cachedDate = ModelCache.getInstance().getRestaurantLastUpdated(restaurantKey);
-        DateTime downloadDate = DateUtils.createDateFromString(dateUpdated);
-
-        String jsonRestaurant;
-        if (downloadDate != null && (cachedDate == null || downloadDate.after(cachedDate))) {
-            if (callback != null) {
-                callback.onDownloadStarted();
-            }
-            jsonRestaurant = downloadTextFromServer(uriRestaurant);
-            if (jsonRestaurant != null) {
-                try {
-                    Restaurant restaurant = ModelParser.getInstance().parseRestaurant(jsonRestaurant, restaurantKey);
-                    if (restaurant != null) {
-                        ModelCache.getInstance().saveRestaurantJsonToCache(jsonRestaurant, restaurantKey, dateUpdated);
-                        return restaurant;
-                    }
-                } catch (JSONException jsonException) {
-                    jsonException.printStackTrace();
-                    String message = "Failed to download " + restaurantKey + " updated " + dateUpdated;
-                    if (callback != null) {
-                        callback.onDownloadFailed(message);
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    private boolean updateOffers(@NonNull String restaurantKey, @NonNull String dateUpdated, final LoadJobListener callback) {
-        final String uriRestaurantOffers = String.format(URI_OFFER, restaurantKey);
-
-        DateTime cachedDate = ModelCache.getInstance().getRestaurantOffersLastUpdated(restaurantKey);
-        DateTime downloadDate = DateUtils.createDateFromString(dateUpdated);
-
-        String jsonOffers;
-        if (downloadDate != null && (cachedDate == null || downloadDate.after(cachedDate))) {
-            if (callback != null) {
-                callback.onDownloadStarted();
-            }
-            jsonOffers = downloadTextFromServer(uriRestaurantOffers);
-            if (jsonOffers != null) {
-                try {
-                    RestaurantOffers restaurantOffers = ModelParser.getInstance().parseRestaurantOffers(jsonOffers);
-                    if (restaurantOffers != null) {
-                        ModelCache.getInstance().saveRestaurantOffersJsonToCache(jsonOffers, restaurantKey, dateUpdated);
-                        return true;
-                    }
-                } catch (JSONException jsonException) {
-                    jsonException.printStackTrace();
-                    String message = "Failed to download " + restaurantKey + " updated " + dateUpdated + ". " + jsonException.getMessage();
-                    if (callback != null) {
-                        callback.onDownloadFailed(message);
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    private String downloadTextFromServer(String path) {
-        try {
-            StringBuilder stringBuilder = new StringBuilder();
-            URL url = new URL(path);
-
-            InputStream stream = url.openStream();
-            InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
-            BufferedReader in = new BufferedReader(reader);
-            String line;
-            while ((line = in.readLine()) != null) {
-                stringBuilder.append(line);
-            }
-            in.close();
-            return stringBuilder.toString();
-        } catch (IOException e) {
-            // TODO: Error handling
-            e.printStackTrace();
-        }
-        return null;
     }
 
     @Deprecated

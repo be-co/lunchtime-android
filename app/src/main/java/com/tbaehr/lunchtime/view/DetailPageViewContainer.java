@@ -677,6 +677,7 @@
 package com.tbaehr.lunchtime.view;
 
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
@@ -793,12 +794,21 @@ public class DetailPageViewContainer implements IDetailPageViewContainer {
 
         // Make back arrow white or disable it if opened over notification
         final Drawable backArrow;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             backArrow = activity.getDrawable(R.drawable.ic_back_material);
         } else {
             backArrow = activity.getResources().getDrawable(R.drawable.ic_back_material);
         }
-        actionBar.setHomeAsUpIndicator(backArrow);
+        if (backArrow != null) {
+            int color;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                color = activity.getColor(android.R.color.white);
+            } else {
+                color = activity.getResources().getColor(android.R.color.white);
+            }
+            backArrow.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            actionBar.setHomeAsUpIndicator(backArrow);
+        }
     }
 
     @Override

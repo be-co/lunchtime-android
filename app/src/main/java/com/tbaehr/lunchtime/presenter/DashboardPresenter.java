@@ -679,18 +679,14 @@ package com.tbaehr.lunchtime.presenter;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
-import android.widget.Toast;
 
 import com.propaneapps.tomorrow.presenter.BasePresenter;
-import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DashboardFragment;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
+import com.tbaehr.lunchtime.model.ModelProvider;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
-import com.tbaehr.lunchtime.model.caching.ModelCache;
-import com.tbaehr.lunchtime.model.web.LoadJobListener;
-import com.tbaehr.lunchtime.model.web.ModelDownloader;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
@@ -707,15 +703,11 @@ import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
 public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
-        implements LoadJobListener<Set<RestaurantOffers>> {
-
-    private ModelDownloader dataProvider;
+        implements ModelProvider.NearbyOffersChangeListener {
 
     private Activity activity;
 
     private Timer timer;
-
-    Set<RestaurantOffers> restaurantOffersList;
 
     public DashboardPresenter(DashboardFragment fragment) {
         this.activity = fragment.getActivity();
@@ -723,17 +715,14 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
     @Override
     public void onDestroy() {
-        dataProvider = null;
         activity = null;
         timer = null;
-        restaurantOffersList = null;
         super.onDestroy();
     }
 
     @Override
     public void bindView(IDashboardViewContainer view) {
         super.bindView(view);
-        dataProvider = ModelDownloader.getInstance();
         refreshOffers();
     }
 
@@ -772,7 +761,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        presentOffers(ModelCache.getInstance().loadRestaurantOffersFromCache());
+                        refreshOffers();
                     }
                 });
             }
@@ -780,53 +769,58 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     }
 
     private void stopTimeBasedRefresh() {
-        timer.cancel();
+        if (timer != null) {
+            timer.cancel();
+        }
         timer = null;
     }
 
     @Override
-    public void onDownloadStarted() {
+    public void loadingStarted() {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                getView().clearOffers();
-                getView().hideNoOffersView();
-                getView().setProgressBarVisibility(true);
+                IDashboardViewContainer view = getView();
+                if (view != null) {
+                    getView().clearOffers();
+                    getView().hideNoOffersView();
+                    getView().setProgressBarVisibility(true);
+                }
             }
         });
     }
 
     @Override
-    public void onDownloadFailed(final String message) {
+    public void failed() {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                presentOffers(ModelCache.getInstance().loadRestaurantOffersFromCache());
-                Toast.makeText(LunchtimeApplication.getContext(), message, Toast.LENGTH_LONG).show();
+                IDashboardViewContainer view = getView();
+                if (view != null) {
+                    view.setProgressBarVisibility(false);
+                    //getView().enableNoOffersView(StringResourceId);
+                    //Toast.makeText(LunchtimeApplication.getContext(), "Ein Fehler ist aufgetreten", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
 
     @Override
-    public void onDownloadFinished(Set<RestaurantOffers> restaurantOffersList) {
+    public void pickUp(Set<RestaurantOffers> allOffers) {
         IDashboardViewContainer view = getView();
         if (view == null) {
             return;
         }
 
-        view.setProgressBarVisibility(false);
-        presentOffers(restaurantOffersList);
-    }
+        restartTimeBasedRefresh(allOffers);
 
-    private void presentOffers(Set<RestaurantOffers> restaurantOffersList) {
-        IDashboardViewContainer view = getView();
         boolean foundOffers = false;
 
         view.setProgressBarVisibility(false);
         view.hideNoOffersView();
         view.clearOffers();
 
-        for (final RestaurantOffers nearbyRestaurantOffers : restaurantOffersList) {
+        for (final RestaurantOffers nearbyRestaurantOffers : allOffers) {
             final HorizontalSliderView.OnSliderItemClickListener onSliderItemClickListener = new HorizontalSliderView.OnSliderItemClickListener() {
                 @Override
                 public void onSliderItemClick(Offer offer, View view) {
@@ -855,8 +849,6 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
             );
         }
 
-        restartTimeBasedRefresh(restaurantOffersList);
-
         if (!foundOffers) {
             final int[] noOffersMessages = new int[] {
                     R.string.no_offers_today1,
@@ -880,18 +872,6 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     }
 
     public void refreshOffers() {
-        dataProvider.syncNearbyOffers(this);
-
-        Set<RestaurantOffers> restaurantOffersListTemp = ModelCache.getInstance().loadRestaurantOffersFromCache();
-        boolean dataSetChanged = restaurantOffersList == null
-                        || restaurantOffersListTemp.size() != restaurantOffersList.size()
-                        || !restaurantOffersListTemp.equals(restaurantOffersList);
-        restaurantOffersList = restaurantOffersListTemp;
-
-        startTimeBasedRefresh(restaurantOffersList);
-        IDashboardViewContainer view = getView();
-        if (view != null && (!view.isInitialized() || dataSetChanged)) {
-            presentOffers(restaurantOffersList);
-        }
+        ModelProvider.getInstance().getAllOffersAsync(this);
     }
 }

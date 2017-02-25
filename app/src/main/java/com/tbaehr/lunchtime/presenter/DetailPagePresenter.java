@@ -690,9 +690,10 @@ import android.view.MenuItem;
 
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
+import com.tbaehr.lunchtime.model.ModelProvider;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Restaurant;
-import com.tbaehr.lunchtime.model.caching.ModelCache;
+import com.tbaehr.lunchtime.model.RestaurantOffers;
 import com.tbaehr.lunchtime.model.web.LoadJobListener;
 import com.tbaehr.lunchtime.model.web.ModelDownloader;
 import com.tbaehr.lunchtime.utils.DateTime;
@@ -713,7 +714,8 @@ import static com.tbaehr.lunchtime.utils.DateTime.SECOND_IN_MILLIS;
 /**
  * Created by timo.baehr@gmail.com on 26.01.17.
  */
-public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewContainer> implements LoadJobListener<Restaurant>, IDetailPageViewContainer.ClickListener {
+public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewContainer>
+        implements ModelProvider.RestaurantChangeListener, IDetailPageViewContainer.ClickListener {
 
     private static final int PERMISSION_REQUEST_CODE = 42;
 
@@ -725,6 +727,8 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     private Restaurant restaurant;
 
+    private RestaurantOffers restaurantOffers;
+
     private boolean retryImageSync = true;
 
     private List<Drawable> drawables;
@@ -733,26 +737,20 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     private final int index;
 
-    private ModelDownloader dataProvider;
-
     private Timer timer;
 
     private TimerTask slideshowTask;
 
     public DetailPagePresenter(DetailPageActivity activity) {
         this.activity = activity;
-        this.dataProvider = ModelDownloader.getInstance();
         this.index = activity.getIntent().getIntExtra(KEY_OFFER_INDEX, -1);
         this.restaurantId = activity.getIntent().getStringExtra(KEY_RESTAURANT_ID);
-        restaurant = getRestaurant();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         timer = new Timer();
-        dataProvider.syncRestaurant(this, restaurantId);
-        syncRestaurantImages();
     }
 
     @Override
@@ -760,9 +758,9 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         activity = null;
         restaurantId = null;
         restaurant = null;
+        restaurantOffers = null;
         if (drawables != null) drawables.clear();
         drawables = null;
-        dataProvider = null;
         slideshowTask = null;
         super.onDestroy();
     }
@@ -770,9 +768,8 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     @Override
     public void bindView(IDetailPageViewContainer view) {
         super.bindView(view);
-        getView().setTitle(getRestaurantName());
-        updateSelectedOffer();
-        updateRestaurantData();
+        refreshRestaurant();
+        refreshRestaurantOffers();
         if (index != -1) {
             startTimer();
         }
@@ -783,7 +780,6 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
                 startTimeBasedRefresh(openingDate, closingDate);
             }
         }
-        syncRestaurantImages();
     }
 
     @Override
@@ -794,7 +790,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     private void syncRestaurantImages() {
         if (restaurant != null && retryImageSync) {
-            dataProvider.syncRestaurantImages(restaurant, new LoadJobListener<List<Drawable>>() {
+            ModelDownloader.getInstance().syncRestaurantImages(restaurant.getPhotoUrls(), new LoadJobListener<List<Drawable>>() {
                 @Override
                 public void onDownloadStarted() {
                     retryImageSync = false;
@@ -856,7 +852,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
             timer.schedule(createTimerTask(new Runnable() {
                 @Override
                 public void run() {
-                    updateRestaurantData();
+                    refreshRestaurant();
                 }
             }), d.toDate());
         }
@@ -874,7 +870,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         timer.schedule(createTimerTask(new Runnable() {
             @Override
             public void run() {
-                updateSelectedOffer();
+                updateSelectedOfferView();
             }
         }), now, SECOND_IN_MILLIS);
     }
@@ -886,39 +882,33 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         timer = null;
     }
 
-    private void updateSelectedOffer() {
-        IDetailPageViewContainer view = getView();
-        if (index != -1 && view != null) {
-            Offer offer = getSelectedOffer();
-            String title = "<b>" + offer.getTitle() + "</b>" + " " + offer.getDescription();
-            String prize = Offer.formatPrize(offer.getPrize());
-
-            Offer.ValidationState validationState = offer.getValidationState();
-            String availability;
-            if (validationState.equals(Offer.ValidationState.OUTDATED)
-                    || validationState.equals(Offer.ValidationState.NEXT_DAYS_VALID)
-                    || validationState.equals(Offer.ValidationState.INVALID)) {
-                availability = offer.getOpeningTimeShortDescription();
-            } else {
-                DateTime now = new DateTime();
-
-                if (validationState.equals(Offer.ValidationState.SOON_VALID) || validationState.equals(Offer.ValidationState.TOMMORROW_VALID)) {
-                    DateTime opens = offer.getStartDate();
-                    availability = activity.getString(R.string.available_at, now.differenceAsHourMinute(opens));
-                } else {
-                    DateTime closes = offer.getEndDate();
-                    availability = activity.getString(R.string.available_since, now.differenceAsHourMinute(closes));
-                }
-            }
-
-            Set<Offer.Ingredient> ingredients = offer.getIngredients();
-            view.setSelectedOffer(title, prize, availability, ingredients);
-        }
+    private void refreshRestaurant() {
+        syncRestaurantImages();
+        ModelProvider.getInstance().getRestaurantAsync(restaurantId, this);
     }
 
-    private void updateRestaurantData() {
-        restaurant = getRestaurant();
-        syncRestaurantImages();
+    private void refreshRestaurantOffers() {
+        ModelProvider.getInstance().getRestaurantOffersAsync(restaurantId, new ModelProvider.RestaurantOffersChangeListener() {
+            @Override
+            public void loadingStarted() {
+
+            }
+
+            @Override
+            public void pickUp(RestaurantOffers restaurantOffers) {
+                DetailPagePresenter.this.restaurantOffers = restaurantOffers;
+                DetailPagePresenter.this.restaurantId = restaurantOffers.getRestaurantId();
+                updateSelectedOfferView();
+            }
+
+            @Override
+            public void failed() {
+
+            }
+        });
+    }
+
+    private void updateRestaurantView() {
         if (restaurant != null) {
             String shortDescription = restaurant.getShortDescription();
             String longDescription = restaurant.getLongDescription();
@@ -930,6 +920,39 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
             String phone = restaurant.getPhoneNumber();
             String url = restaurant.getUrl().replace("http://www.", "");
             getView().setRestaurantData(this, shortDescription, longDescription, location, openingTimes, parking, paymentMethods, openingTimesExpanded, phone, url);
+            getView().setTitle(restaurant.getName());
+        }
+    }
+
+    private void updateSelectedOfferView() {
+        IDetailPageViewContainer view = getView();
+        if (index != -1 && view != null) {
+            Offer offer = getSelectedOffer();
+            if (offer != null) {
+                String title = "<b>" + offer.getTitle() + "</b>" + " " + offer.getDescription();
+                String prize = Offer.formatPrize(offer.getPrize());
+
+                Offer.ValidationState validationState = offer.getValidationState();
+                String availability;
+                if (validationState.equals(Offer.ValidationState.OUTDATED)
+                        || validationState.equals(Offer.ValidationState.NEXT_DAYS_VALID)
+                        || validationState.equals(Offer.ValidationState.INVALID)) {
+                    availability = offer.getOpeningTimeShortDescription();
+                } else {
+                    DateTime now = new DateTime();
+
+                    if (validationState.equals(Offer.ValidationState.SOON_VALID) || validationState.equals(Offer.ValidationState.TOMMORROW_VALID)) {
+                        DateTime opens = offer.getStartDate();
+                        availability = activity.getString(R.string.available_at, now.differenceAsHourMinute(opens));
+                    } else {
+                        DateTime closes = offer.getEndDate();
+                        availability = activity.getString(R.string.available_since, now.differenceAsHourMinute(closes));
+                    }
+                }
+
+                Set<Offer.Ingredient> ingredients = offer.getIngredients();
+                view.setSelectedOffer(title, prize, availability, ingredients);
+            }
         }
     }
 
@@ -950,31 +973,30 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         getView().onBackPressed();
     }
 
-    private Restaurant getRestaurant() {
-        return ModelCache.getInstance().loadRestaurantFromCache(restaurantId);
-    }
-
-    private String getRestaurantName() {
-        return ModelCache.getInstance().loadRestaurantOffersFromCache(restaurantId).getRestaurantName();
-    }
-
     private Offer getSelectedOffer() {
-        return ModelCache.getInstance().loadRestaurantOffersFromCache(restaurantId).getOffer(index);
+        if (restaurantOffers != null) {
+            return restaurantOffers.getOffer(index);
+        } else {
+            return null;
+        }
     }
 
     @Override
-    public void onDownloadStarted() {
+    public void loadingStarted() {
         // ;
     }
 
     @Override
-    public void onDownloadFailed(String message) {
+    public void failed() {
         // TODO: User feedback, Downloading restaurant content failed
+        //Toast.makeText(activity, "Ein Fehler ist aufgetreten", Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onDownloadFinished(Restaurant downloadedObject) {
-        updateRestaurantData();
+    public void pickUp(Restaurant restaurant) {
+        this.restaurant = restaurant;
+        syncRestaurantImages();
+        updateRestaurantView();
     }
 
     @Override

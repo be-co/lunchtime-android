@@ -678,20 +678,9 @@ package com.tbaehr.lunchtime.model.caching;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.util.Pair;
 
-import com.tbaehr.lunchtime.model.Restaurant;
-import com.tbaehr.lunchtime.model.RestaurantOffers;
-import com.tbaehr.lunchtime.model.parsing.ModelParser;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
-import com.tbaehr.lunchtime.utils.LocationHelper;
-
-import org.json.JSONException;
-
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import static com.tbaehr.lunchtime.utils.SharedPrefsHelper.getString;
 import static com.tbaehr.lunchtime.utils.SharedPrefsHelper.putString;
@@ -724,24 +713,28 @@ public class ModelCache {
         return instance;
     }
 
-    public void saveNearbyJsonToCache(String jsonText, String locationId) {
+    public void putNearby(String jsonText, String locationId) {
         final String keySync = String.format(KEY_NEARBY_OFFERS, locationId);
         putString(keySync, jsonText);
     }
 
-    public void saveRestaurantJsonToCache(String jsonText, String restaurantId, String dateUpdated) {
+    public void putRestaurant(String jsonText, String restaurantId, DateTime dateUpdated) {
         final String keyRestaurant = String.format(KEY_RESTAURANT, restaurantId);
         final String keyRestaurantUpdated = String.format(KEY_RESTAURANT_UPDATED, restaurantId);
 
-        putString(keyRestaurantUpdated, dateUpdated);
+        String date = dateUpdated.toDate().toString();
+        Log.v("TimoTimo", "putRestaurant: " + date);
+        putString(keyRestaurantUpdated, date);
         putString(keyRestaurant, jsonText);
     }
 
-    public void saveRestaurantOffersJsonToCache(String jsonText, String restaurantId, String dateUpdated) {
+    public void putRestaurantOffers(String jsonText, String restaurantId, DateTime dateUpdated) {
         final String keyRestaurant = String.format(KEY_OFFER, restaurantId);
         final String keyRestaurantOffersUpdated = String.format(KEY_OFFER_UPDATED, restaurantId);
 
-        putString(keyRestaurantOffersUpdated, dateUpdated);
+        String date = dateUpdated.toDate().toString();
+        Log.v("TimoTimo", "putRestaurantOffers: " + date);
+        putString(keyRestaurantOffersUpdated, date);
         putString(keyRestaurant, jsonText);
     }
 
@@ -757,59 +750,25 @@ public class ModelCache {
         return cachedDate;
     }
 
-    public String loadNearbyFromCache(@NonNull String locationId) {
-        final String keySync = String.format(KEY_NEARBY_OFFERS, locationId);
+    public String getNearby(@NonNull String locationId) {
+        final String keySync = String.format(KEY_NEARBY_OFFERS, locationId.toLowerCase());
         return getString(keySync);
     }
 
-    public Set<RestaurantOffers> loadRestaurantOffersFromCache() {
-        final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
-
-        Set<RestaurantOffers> restaurantOffersList = new HashSet<>();
-        String jsonNearbyRestaurantsCached = loadNearbyFromCache(locationId);
-        if (jsonNearbyRestaurantsCached != null) {
-            try {
-                Pair<Map<String, String>, Map<String, String>> nearbyKeys = ModelParser.getInstance().parseNearbyRestaurants(jsonNearbyRestaurantsCached);
-                Map<String, String> nearbyRestaurantKeys = nearbyKeys.second;
-                for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
-                    RestaurantOffers restaurantOffers = loadRestaurantOffersFromCache(restaurantKey);
-                    if (restaurantOffers != null) {
-                        restaurantOffersList.add(restaurantOffers);
-                    }
-                }
-            } catch (JSONException e) {
-                // TODO: Error handling
-                e.printStackTrace();
-            }
-        }
-        return restaurantOffersList;
-    }
-
-    public RestaurantOffers loadRestaurantOffersFromCache(@NonNull String restaurantKey) {
+    public String getRestaurantOffers(@NonNull String restaurantKey) {
         final String keyRestaurant = String.format(KEY_OFFER, restaurantKey);
         String jsonOffers = getString(keyRestaurant);
-
         if (jsonOffers != null) {
-            try {
-                return ModelParser.getInstance().parseRestaurantOffers(jsonOffers);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            return jsonOffers;
         }
-
         return null;
     }
 
-    public Restaurant loadRestaurantFromCache(@NonNull String keyRestaurant) {
-        try {
-            String json = getString(String.format(KEY_RESTAURANT, keyRestaurant));
-            if (json != null) {
-                return ModelParser.getInstance().parseRestaurant(json, keyRestaurant);
-            }
-        } catch (JSONException jsonException) {
-            Log.e(this.getClass().getCanonicalName(), jsonException.getMessage());
+    public String getRestaurant(@NonNull String keyRestaurant) {
+        String json = getString(String.format(KEY_RESTAURANT, keyRestaurant));
+        if (json != null) {
+            return json;
         }
-
         return null;
     }
 

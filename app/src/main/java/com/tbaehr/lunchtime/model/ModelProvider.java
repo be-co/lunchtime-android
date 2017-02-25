@@ -803,12 +803,13 @@ public class ModelProvider {
         getNearbyAsync(new NearbyChangeListener() {
             @Override
             public void loadingStarted() {
-                getAllOffersCounter = 0;
+                // ;
             }
 
             @Override
             public void pickUp(NearbyRestaurants nearby) {
                 final Collection<String> restaurantKeys = nearby.getRestaurantKeys();
+                getAllOffersCounter = 0;
                 for (String restaurantId : restaurantKeys) {
                     getRestaurantOffersAsync(restaurantId, new RestaurantOffersChangeListener() {
                         @Override
@@ -908,7 +909,7 @@ public class ModelProvider {
         getNearbyAsync(new NearbyChangeListener() {
             @Override
             public void loadingStarted() {
-                // ;
+                callback.loadingStarted();
             }
 
             @Override

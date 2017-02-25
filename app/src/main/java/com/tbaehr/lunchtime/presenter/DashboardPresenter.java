@@ -692,6 +692,7 @@ import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -738,12 +739,12 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         cachedOffers = null;
     }
 
-    private void restartTimeBasedRefresh(Set<RestaurantOffers> restaurantOffersList) {
+    private void restartTimeBasedRefresh(Collection<RestaurantOffers> restaurantOffersList) {
         stopTimeBasedRefresh();
         startTimeBasedRefresh(restaurantOffersList);
     }
 
-    private void startTimeBasedRefresh(Set<RestaurantOffers> restaurantOffersList) {
+    private void startTimeBasedRefresh(Collection<RestaurantOffers> restaurantOffersList) {
         Set<DateTime> refreshDates = new HashSet<>();
         for (RestaurantOffers restaurantOffers : restaurantOffersList) {
             refreshDates.addAll(restaurantOffers.getUiRefreshDates());

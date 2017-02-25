@@ -804,8 +804,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
                 IDashboardViewContainer view = getView();
                 if (view != null) {
                     view.setProgressBarVisibility(false);
-                    //getView().enableNoOffersView(StringResourceId);
-                    //Toast.makeText(LunchtimeApplication.getContext(), "Ein Fehler ist aufgetreten", Toast.LENGTH_LONG).show();
+                    getView().enableNoOffersView(R.string.status_offer_sync_failed);
                 }
             }
         });

@@ -677,7 +677,6 @@
 package com.tbaehr.lunchtime.model.caching;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
@@ -714,7 +713,7 @@ public class ModelCache {
     }
 
     public void putNearby(String jsonText, String locationId) {
-        final String keySync = String.format(KEY_NEARBY_OFFERS, locationId);
+        final String keySync = String.format(KEY_NEARBY_OFFERS, locationId.toLowerCase());
         putString(keySync, jsonText);
     }
 
@@ -723,7 +722,6 @@ public class ModelCache {
         final String keyRestaurantUpdated = String.format(KEY_RESTAURANT_UPDATED, restaurantId);
 
         String date = dateUpdated.toDate().toString();
-        Log.v("TimoTimo", "putRestaurant: " + date);
         putString(keyRestaurantUpdated, date);
         putString(keyRestaurant, jsonText);
     }
@@ -733,7 +731,6 @@ public class ModelCache {
         final String keyRestaurantOffersUpdated = String.format(KEY_OFFER_UPDATED, restaurantId);
 
         String date = dateUpdated.toDate().toString();
-        Log.v("TimoTimo", "putRestaurantOffers: " + date);
         putString(keyRestaurantOffersUpdated, date);
         putString(keyRestaurant, jsonText);
     }

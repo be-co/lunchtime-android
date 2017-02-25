@@ -35,6 +35,7 @@
     <string name="no_offers_today4">No offers for today, a messy kitchen is a sign of happiness.</string>
     <string name="no_offers_today5">No offers for today. The onions aren\'t making me cry, it\'s being in the kitchen in general.</string>
     <string name="status_loading">Loading offers</string>
+    <string name="status_offer_sync_failed">Updating offers unfortunately failed.</string>
 
     <!-- Help page -->
     <string name="about_lunchtime">Always the same question… <b>\"<i>What can </i> I <i>eat?</i>\"</b> Lunchtime helps out.

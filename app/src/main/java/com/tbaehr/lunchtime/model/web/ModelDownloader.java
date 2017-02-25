@@ -735,7 +735,7 @@ public class ModelDownloader {
         downloadFromServer(uri, callback);
     }
 
-    private void downloadFromServer(@NonNull final String uri, @Nullable final LoadJobListener<String> callback) {
+    private void downloadFromServer(@NonNull final String uri, @NonNull final LoadJobListener<String> callback) {
         new AsyncTask<Void, Void, Void>() {
             private String result;
 
@@ -747,6 +747,7 @@ public class ModelDownloader {
 
             @Override
             protected Void doInBackground(Void... voids) {
+                Log.v("ModelDownloader", "Downloading JSON from "+uri);
                 try {
                     StringBuilder stringBuilder = new StringBuilder();
                     URL url = new URL(uri);
@@ -761,7 +762,7 @@ public class ModelDownloader {
                     in.close();
                     result = stringBuilder.toString();
                 } catch (IOException e) {
-                    // TODO: Error handling
+                    callback.onDownloadFailed(e.getMessage());
                     e.printStackTrace();
                 }
                 return null;

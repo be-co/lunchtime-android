@@ -688,6 +688,7 @@ import com.tbaehr.lunchtime.utils.LocationHelper;
 
 import org.json.JSONException;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -726,8 +727,6 @@ public class ModelProvider {
 
     private static final int MINUTE = 60 * 1000;
 
-    final Set<RestaurantOffers> allOffers = new HashSet<>();
-
     private static ModelProvider instance;
 
     public static ModelProvider getInstance() {
@@ -751,7 +750,6 @@ public class ModelProvider {
         long now = System.currentTimeMillis();
         if (nearby == null || lastSync + MINUTE < now) {
             lastSync = now;
-            allOffers.clear();
             ModelDownloader.getInstance().downloadNearby(locationId, new LoadJobListener<String>() {
                 @Override
                 public void onDownloadStarted() {
@@ -798,6 +796,8 @@ public class ModelProvider {
     }
 
     public void getAllOffersAsync(@Nullable final NearbyOffersChangeListener callback) {
+        final Set<RestaurantOffers> allOffers = new HashSet<>();
+
         getNearbyAsync(new NearbyChangeListener() {
             @Override
             public void loadingStarted() {
@@ -806,7 +806,8 @@ public class ModelProvider {
 
             @Override
             public void pickUp(NearbyRestaurants nearby) {
-                for (String restaurantId : nearby.getRestaurantKeys()) {
+                final Collection<String> restaurantKeys = nearby.getRestaurantKeys();
+                for (String restaurantId : restaurantKeys) {
                     getRestaurantOffersAsync(restaurantId, new RestaurantOffersChangeListener() {
                         @Override
                         public void loadingStarted() {
@@ -815,7 +816,8 @@ public class ModelProvider {
 
                         @Override
                         public void pickUp(RestaurantOffers model) {
-                            if (allOffers.add(model)) {
+                            allOffers.add(model);
+                            if (allOffers.size() == restaurantKeys.size()) {
                                 callback.pickUp(allOffers);
                             }
                         }

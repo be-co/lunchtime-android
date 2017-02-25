@@ -812,6 +812,16 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
             return;
         }
 
+        // TODO: Check if dataset has changed
+        /*boolean datasetChanged = cachedOffers == null
+                || !cachedOffers.equals(allOffers);
+
+        if (!datasetChanged) {
+            return;
+        }
+
+        cachedOffers = allOffers;*/
+
         restartTimeBasedRefresh(allOffers);
 
         boolean foundOffers = false;

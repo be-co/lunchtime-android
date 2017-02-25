@@ -772,6 +772,7 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
             actionBar.setTitle(title);
         } else {
             activity.setTitle(title);
+            toolbar.setTitle(title);
         }
     }
 

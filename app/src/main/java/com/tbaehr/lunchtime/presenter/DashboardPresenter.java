@@ -822,14 +822,14 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
         /*
          * The Java behaviour on Android is not correct here.
-         * If cachedOffers is of type Set, the dataset change code
+         * If cachedOffers is of type Set, the dataSet change code
          * is not working. From the first line on cachedOffers is
          * the same object as allOffers although it is set at the
          * end of this method.
          */
-        boolean datasetChanged = cachedOffers == null;
+        boolean dataSetChanged = cachedOffers == null;
         if (cachedOffers == null || cachedOffers.size() != allOffers.size()) {
-            datasetChanged = true;
+            dataSetChanged = true;
             cachedOffers = new ArrayList<>();
             for (RestaurantOffers offers : allOffers) {
                 cachedOffers.add(offers);
@@ -838,13 +838,13 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
             for (RestaurantOffers offers : cachedOffers) {
                 boolean contains = allOffers.contains(offers);
                 if (!contains) {
-                    datasetChanged = true;
+                    dataSetChanged = true;
                     break;
                 }
             }
         }
 
-        if (!datasetChanged) {
+        if (!dataSetChanged) {
             return;
         }
 

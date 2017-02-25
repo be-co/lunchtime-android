@@ -1,15 +1,16 @@
 <resources>
     <string name="changelog_header">Changelog</string>
-    <string name="changelog"><b>2017.02.22 (v12)</b>
+    <string name="changelog"><b>2017.02.25 Alpha (v12)</b>
         \n•  New permission PHONE_CALL enables calling restaurants
         \n•  Detail page: Added parking, payment and phone number
         \n•  Dashboard: Select your restaurant location (Darmstadt or Weiterstadt)
         \n•  Dashboard: Card layout instead of grey boxes
+        \n•  Sync: Only one sync per minute
         \n•  Fix: Improved stability for devices smaller than Android 6 Nougat
-        <b>2017.02.18 Alpha (v11)</b>
+        \n\n<b>2017.02.18 Alpha (v11)</b>
         \n•  Fix: Improved layout for tablets
         \n•  Fix: Improved stability (Resolved crashed after opening links, rotation, …)
-        <b>2017.02.11 Alpha (v10)</b>
+        \n\n<b>2017.02.11 Alpha (v10)</b>
         \n&#8226;  Dashboard: Iff no offers for today, show offers of next day
         \n&#8226;  Detail page: Download of Restaurant images and slideshow,
                    Restaurant descriptions and opening times can be expanded

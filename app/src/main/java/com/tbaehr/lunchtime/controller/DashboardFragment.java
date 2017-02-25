@@ -716,6 +716,10 @@ public class DashboardFragment extends BaseFragment<IDashboardViewContainer, Das
     @Override
     public void onDestroy() {
         viewContainer = null;
+        DashboardPresenter presenter = getPresenter();
+        if (presenter != null) {
+            presenter.onDestroyFragment();
+        }
         super.onDestroy();
     }
 

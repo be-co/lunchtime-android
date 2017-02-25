@@ -674,510 +674,124 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime;
+package com.tbaehr.lunchtime.model;
 
-import android.content.res.AssetManager;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
-import android.support.annotation.NonNull;
-import android.util.Log;
-import android.util.Pair;
+import android.support.annotation.Nullable;
 
-import com.tbaehr.lunchtime.model.Offer;
-import com.tbaehr.lunchtime.model.Offers;
-import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
-import com.tbaehr.lunchtime.utils.ImageUtils;
-import com.tbaehr.lunchtime.utils.LoadJobListener;
-import com.tbaehr.lunchtime.utils.LocationHelper;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import static com.tbaehr.lunchtime.utils.SharedPrefsHelper.getString;
-import static com.tbaehr.lunchtime.utils.SharedPrefsHelper.putString;
-
 /**
- * Created by timo.baehr@gmail.com on 27.12.16.
+ * Created by timo.baehr@gmail.com on 08.01.17.
  */
-public class DataProvider {
+public class RestaurantOffers {
 
-    private static final String KEY_NEARBY_OFFERS = "nearby_offers_%s";
+    private String restaurantId;
 
-    private static final String KEY_RESTAURANT = "restaurant_%s";
+    private String title;
 
-    private static final String KEY_OFFER = "offer_%s";
+    private String description;
 
-    private static final String KEY_OFFER_UPDATED = "offer_updated_%s";
+    private List<Offer> offers;
 
-    private static final String KEY_RESTAURANT_UPDATED = "restaurant_updated_%s";
-
-    private static final String BASE_URI = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/";
-
-    private static final String URI_NEARBY_RESTAURANTS = BASE_URI + "nearby_restaurants_%s.json";
-
-    private static final String URI_RESTAURANT = BASE_URI + "restaurant_%s.json";
-
-    private static final String URI_OFFER = BASE_URI + "offers_%s.json";
-
-    public void syncNearbyOffers(final LoadJobListener callback) {
-        final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
-        final String uriSync = String.format(URI_NEARBY_RESTAURANTS, locationId);
-        final String keySync = String.format(KEY_NEARBY_OFFERS, locationId);
-
-        new AsyncTask<Void, Void, Void>() {
-            private boolean dataSetChanged = false;
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                // Try to download restaurants json from server
-                String jsonDownloaded = downloadTextFromServer(uriSync);
-
-                // Server answered with json -> save to cache and update offers
-                if (jsonDownloaded != null) {
-                    putString(keySync, jsonDownloaded);
-                    Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurantKeys(jsonDownloaded);
-                    Map<String, String> nearbyRestaurantKeys = nearbyKeys.second;
-                    for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
-                        dataSetChanged = updateOffers(restaurantKey, nearbyRestaurantKeys.get(restaurantKey), callback) || dataSetChanged;
-                    }
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                if (dataSetChanged) {
-                    List<Offers> offersList = null;
-                    offersList = loadOffersFromCache();
-                    callback.onDownloadFinished(offersList);
-                }
-                super.onPostExecute(aVoid);
-            }
-        }.execute();
+    public RestaurantOffers(String restaurantId, String title, String description, List<Offer> offers) {
+        this.restaurantId = restaurantId;
+        this.title = title;
+        this.description = description;
+        this.offers = offers;
     }
 
-    public void syncRestaurant(final LoadJobListener callback, final String restaurantId) {
-        final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
-        final String uriSync = String.format(URI_NEARBY_RESTAURANTS, locationId);
-        final String keySync = String.format(KEY_NEARBY_OFFERS, locationId);
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        // equal type?
+        if (obj == null || !(obj instanceof RestaurantOffers)) {
+            return false;
+        }
+        RestaurantOffers otherOffers = (RestaurantOffers) obj;
 
-        new AsyncTask<Void, Void, Void>() {
-            private boolean dataSetChanged = false;
+        // equal size?
+        boolean isEqual = getOffers().size() == otherOffers.getOffers().size();
+        if (!isEqual) {
+            return false;
+        }
 
-            @Override
-            protected Void doInBackground(Void... params) {
-                // Try to download restaurants json from server
-                String jsonDownloaded = downloadTextFromServer(uriSync);
-
-                // Server answered with json -> save to cache and update offers
-                if (jsonDownloaded != null) {
-                    putString(keySync, jsonDownloaded);
-                    Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurantKeys(jsonDownloaded);
-                    Map<String, String> nearbyRestaurantKeys = nearbyKeys.first;
-                    dataSetChanged = updateRestaurant(restaurantId, nearbyRestaurantKeys.get(restaurantId), callback) || dataSetChanged;
-                }
-
-                return null;
+        // equal offers?
+        for (int i = 0; i< offers.size(); i++) {
+            Offer offer = getOffer(i);
+            Offer anotherOffer = otherOffers.getOffer(i);
+            isEqual = offer.equals(anotherOffer);
+            if (!isEqual) {
+                return false;
             }
+        }
 
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                if (dataSetChanged && callback != null) {
-                    callback.onDownloadFinished(null);
-                }
-                super.onPostExecute(aVoid);
-            }
-        }.execute();
+        return true;
     }
 
-    public void syncRestaurantImages(@NonNull final Restaurant restaurant, final LoadJobListener<List<Drawable>> callback) {
-        new AsyncTask<Void, Void, Void>() {
-            private List<Drawable> drawables = new ArrayList<>();
-
-            private boolean failed;
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    String[] imageUrls = restaurant.getPhotoUrls();
-                    if (imageUrls != null) {
-                        drawables = ImageUtils.downloadDrawables(imageUrls);
-                    } else {
-                        callback.onDownloadFailed("No images defined for restaurant " + restaurant.getId());
-                        failed = true;
-                    }
-                } catch (IOException e) {
-                    callback.onDownloadFailed(e.getMessage());
-                    failed = true;
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                if (!failed) {
-                    callback.onDownloadFinished(drawables);
-                }
-                super.onPostExecute(aVoid);
-            }
-        }.execute();
+    @Override
+    public int hashCode() {
+        int hash = (restaurantId + title + description).hashCode() + offers.size();
+        for (int i = 0; i< offers.size(); i++) {
+            Offer offer = getOffer(i);
+            hash += offer.hashCode();
+        }
+        return hash;
     }
 
-    public List<Offers> loadOffersFromCache() {
-        final String locationId = LocationHelper.getSelectedLocation().toLowerCase();
-        final String keySync = String.format(KEY_NEARBY_OFFERS, locationId);
-        List<Offers> offersList = new ArrayList<>();
-        String jsonNearbyRestaurantsCached = getString(keySync);
-        if (jsonNearbyRestaurantsCached != null) {
-            Pair<Map<String, String>, Map<String, String>> nearbyKeys = parseNearbyRestaurantKeys(jsonNearbyRestaurantsCached);
-            Map<String, String> nearbyRestaurantKeys = nearbyKeys.second;
-            for (String restaurantKey : nearbyRestaurantKeys.keySet()) {
-                Offers offers = loadOffersFromCache(restaurantKey);
-                if (offers != null) {
-                    offersList.add(offers);
-                }
-            }
-        }
-        return offersList;
+    public String getRestaurantName() {
+        return title;
     }
 
-    public Offers loadOffersFromCache(@NonNull String restaurantKey) {
-        final String keyRestaurant = String.format(KEY_OFFER, restaurantKey);
-        String jsonOffers = getString(keyRestaurant);
-
-        if (jsonOffers != null) {
-            try {
-                return parseOffersFromJson(jsonOffers);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return null;
+    public String getRestaurantDescription() {
+        return description;
     }
 
-    public Restaurant loadRestaurantFromCache(@NonNull String keyRestaurant) {
-        try {
-            String json = getString(String.format(KEY_RESTAURANT, keyRestaurant));
-            if (json != null) {
-                return parseRestaurantFromJson(json, keyRestaurant);
-            }
-        } catch (JSONException jsonException) {
-            Log.e(this.getClass().getCanonicalName(), jsonException.getMessage());
-        }
-
-        return null;
+    public List<Offer> getOffers() {
+        return offers;
     }
 
-    private boolean updateRestaurant(@NonNull String restaurantKey, @NonNull String dateUpdated, final LoadJobListener callback) {
-        final String uriRestaurant = String.format(URI_RESTAURANT, restaurantKey);
-        final String keyRestaurantUpdated = String.format(KEY_RESTAURANT_UPDATED, restaurantKey);
-
-        DateTime cachedDate = DateUtils.createDateFromString(getString(keyRestaurantUpdated));
-        DateTime downloadDate = DateUtils.createDateFromString(dateUpdated);
-
-        String jsonRestaurant;
-        if (downloadDate != null && (cachedDate == null || downloadDate.after(cachedDate))) {
-            if (callback != null) {
-                callback.onDownloadStarted();
-            }
-            jsonRestaurant = downloadTextFromServer(uriRestaurant);
-            if (jsonRestaurant != null) {
-                try {
-                    Restaurant restaurant = parseRestaurantFromJson(jsonRestaurant, restaurantKey);
-                    if (restaurant != null) {
-                        putString(String.format(KEY_RESTAURANT, restaurantKey), jsonRestaurant);
-                        putString(keyRestaurantUpdated, dateUpdated);
-                        return true;
-                    }
-                } catch (JSONException jsonException) {
-                    jsonException.printStackTrace();
-                    String message = "Failed to download " + restaurantKey + " updated " + dateUpdated;
-                    if (callback != null) {
-                        callback.onDownloadFailed(message);
-                    }
-                }
-            }
-        }
-        return false;
+    public int getIndex(Offer offer) {
+        return offers.indexOf(offer);
     }
 
-    private boolean updateOffers(@NonNull String restaurantKey, @NonNull String dateUpdated, final LoadJobListener callback) {
-        final String uriRestaurantOffers = String.format(URI_OFFER, restaurantKey);
-        final String keyOfferUpdated = String.format(KEY_OFFER_UPDATED, restaurantKey);
-
-        DateTime cachedDate = DateUtils.createDateFromString(getString(keyOfferUpdated));
-        DateTime downloadDate = DateUtils.createDateFromString(dateUpdated);
-
-        String jsonOffers;
-        if (downloadDate != null && (cachedDate == null || downloadDate.after(cachedDate))) {
-            if (callback != null) {
-                callback.onDownloadStarted();
-            }
-            jsonOffers = downloadTextFromServer(uriRestaurantOffers);
-            if (jsonOffers != null) {
-                try {
-                    Offers offers = parseOffersFromJson(jsonOffers);
-                    if (offers != null) {
-                        putString(String.format(KEY_OFFER, restaurantKey), jsonOffers);
-                        putString(keyOfferUpdated, dateUpdated);
-                        return true;
-                    }
-                } catch (JSONException jsonException) {
-                    jsonException.printStackTrace();
-                    String message = "Failed to download " + restaurantKey + " updated " + dateUpdated + ". " + jsonException.getMessage();
-                    if (callback != null) {
-                        callback.onDownloadFailed(message);
-                    }
-                }
-            }
-        }
-        return false;
+    public boolean isEmpty() {
+        return offers.isEmpty();
     }
 
-    private Pair<Map<String, String>, Map<String, String>> parseNearbyRestaurantKeys(@NonNull String json) {
-        Map<String, String> nearbyRestaurants = new HashMap<>();
-        Map<String, String> nearbyOffers = new HashMap<>();
-        try {
-            JSONArray jsonArray = new JSONArray(json);
-            for (int index = 0; index < jsonArray.length(); index++) {
-                JSONObject restaurant = jsonArray.getJSONObject(index);
-                String key = restaurant.getString("key");
-                String offersLastUpdated = restaurant.getString("offersLastUpdated");
-                String restaurantLastUpdated = restaurant.getString("restaurantLastUpdated");
-                nearbyRestaurants.put(key, restaurantLastUpdated);
-                nearbyOffers.put(key, offersLastUpdated);
+    /**
+     * @return Refresh dates at the same day
+     */
+    public Set<DateTime> getUiRefreshDates() {
+        Set<DateTime> refreshDates = new HashSet<>();
+        List<Offer> offers = getOffers();
+        DateTime midnight = DateUtils.getDate(0, 0);
+        midnight.updateToNextDay();
+        for (Offer offer : offers) {
+            boolean tomorrowValid = offer.getValidationState().equals(Offer.ValidationState.SOON_VALID);
+            boolean soonValid = offer.getValidationState().equals(Offer.ValidationState.SOON_VALID);
+            boolean nowValid = offer.getValidationState().equals(Offer.ValidationState.NOW_VALID);
+            if (tomorrowValid) {
+                refreshDates.add(midnight);
             }
-        } catch (JSONException jsonException) {
-            jsonException.printStackTrace();
-        }
-
-        return new Pair<>(nearbyRestaurants, nearbyOffers);
-    }
-
-    private Offers parseOffersFromJson(@NonNull String json) throws JSONException {
-        JSONObject restaurantObject = new JSONObject(json);
-        final String restaurantId = restaurantObject.getString("restaurantID");
-        final String restaurantTitle = restaurantObject.getString("title");
-        final String restaurantDescription = restaurantObject.getString("description");
-        final JSONArray restaurantOffersArray = restaurantObject.getJSONArray("offers");
-        final List<Offer> offersNextDays = new ArrayList<>();
-        List<Offer> offersToday = new ArrayList<>();
-        for (int offerIndex = 0; offerIndex < restaurantOffersArray.length(); offerIndex++) {
-            final JSONObject offerObject = restaurantOffersArray.getJSONObject(offerIndex);
-            final String offerTitle = offerObject.getString("title");
-            final String offerDescription = offerObject.getString("description");
-            final int offerPrize = offerObject.getInt("prize");
-            final String starts = offerObject.getString("starts");
-            final String ends = offerObject.getString("ends");
-            final Offer.Category category = Offer.Category.valueOf(offerObject.getString("category").toUpperCase());
-            final JSONArray ingredientsArray = offerObject.getJSONArray("ingredients");
-            final Set<Offer.Ingredient> ingredients = new HashSet<>();
-            for (int ingrIndex = 0; ingrIndex < ingredientsArray.length(); ingrIndex++) {
-                try {
-                    ingredients.add(Offer.Ingredient.valueOf(ingredientsArray.getString(ingrIndex)));
-                } catch (IllegalArgumentException e) {
-                    throw new JSONException("Invalid offer " + offerTitle + " for " +restaurantTitle + ": " + e.getMessage());
-                }
+            if (soonValid) {
+                refreshDates.add(offer.getStartDate());
             }
-
-            autoSearchForIngredients(ingredients, offerTitle);
-            autoSearchForIngredients(ingredients, offerDescription);
-            final Offer offer = new Offer(
-                    restaurantId,
-                    offerTitle,
-                    offerDescription,
-                    offerPrize,
-                    starts, ends,
-                    category,
-                    ingredients);
-            final Offer.ValidationState validationState = offer.getValidationState();
-            if (validationState.equals(Offer.ValidationState.NOW_VALID) ||
-                    validationState.equals(Offer.ValidationState.SOON_VALID)) {
-                offersToday.add(offer);
-            } else if (validationState.equals(Offer.ValidationState.TOMMORROW_VALID) ||
-                    (BuildConfig.DEBUG && validationState.equals(Offer.ValidationState.NEXT_DAYS_VALID))) {
-                offersNextDays.add(offer);
-            } else if (validationState.equals(Offer.ValidationState.INVALID)) {
-                throw new JSONException("Invalid offer " + offer.getTitle() + " for " + restaurantTitle + ": Check date format: " + starts + "," + ends);
+            if (nowValid) {
+                refreshDates.add(offer.getEndDate());
             }
         }
-
-        return new Offers(restaurantId, restaurantTitle, restaurantDescription, offersToday.isEmpty() ? offersNextDays : offersToday);
+        return refreshDates;
     }
 
-    private Restaurant parseRestaurantFromJson(@NonNull String json, @NonNull String restaurantId) throws JSONException {
-        JSONObject restaurantJSON = new JSONObject(json);
-        String name = restaurantJSON.getString("title");
-        String shortDescription = restaurantJSON.getString("shortDescription");
-        String longDescription = restaurantJSON.getString("longDescription");
-        String address = restaurantJSON.getString("address");
-
-        JSONObject openingTimesObject = restaurantJSON.getJSONObject("openingTimes");
-        JSONArray mondayArray = openingTimesObject.getJSONArray("monday");
-        JSONArray tuesdayArray = openingTimesObject.getJSONArray("tuesday");
-        JSONArray wednesdayArray = openingTimesObject.getJSONArray("wednesday");
-        JSONArray thursdayArray = openingTimesObject.getJSONArray("thursday");
-        JSONArray fridayArray = openingTimesObject.getJSONArray("friday");
-        JSONArray saturdayArray = openingTimesObject.getJSONArray("saturday");
-        JSONArray sundayArray = openingTimesObject.getJSONArray("sunday");
-        Map<Integer, DateTime[]> openingTimes = new HashMap<>();
-        openingTimes.put(Calendar.MONDAY, convertToDateTimeArray(Calendar.MONDAY, mondayArray));
-        openingTimes.put(Calendar.TUESDAY, convertToDateTimeArray(Calendar.TUESDAY, tuesdayArray));
-        openingTimes.put(Calendar.WEDNESDAY, convertToDateTimeArray(Calendar.WEDNESDAY, wednesdayArray));
-        openingTimes.put(Calendar.THURSDAY, convertToDateTimeArray(Calendar.THURSDAY, thursdayArray));
-        openingTimes.put(Calendar.FRIDAY, convertToDateTimeArray(Calendar.FRIDAY, fridayArray));
-        openingTimes.put(Calendar.SATURDAY, convertToDateTimeArray(Calendar.SATURDAY, saturdayArray));
-        openingTimes.put(Calendar.SUNDAY, convertToDateTimeArray(Calendar.SUNDAY, sundayArray));
-
-        String parking = restaurantJSON.getString("parking");
-        JSONArray payingArray = restaurantJSON.getJSONArray("paying");
-        String paying = "";
-        for (int i = 0; i < payingArray.length(); i++) {
-            paying += i == 0 ? "" : ", ";
-            paying += payingArray.getString(i);
-        }
-
-        String phoneNumber = restaurantJSON.getString("phoneNumber");
-        String email = restaurantJSON.getString("email");
-        String website = restaurantJSON.getString("website");
-        JSONArray photoUrlsObjects = restaurantJSON.getJSONArray("photoUrls");
-        String[] photoUrls = convertToArray(photoUrlsObjects);
-
-        return new Restaurant(restaurantId, name, shortDescription, longDescription, address,
-                openingTimes, parking, paying, phoneNumber, email, website, photoUrls);
+    public String getRestaurantId() {
+        return restaurantId;
     }
 
-    private String downloadTextFromServer(String path) {
-        try {
-            StringBuilder stringBuilder = new StringBuilder();
-            URL url = new URL(path);
-
-            InputStream stream = url.openStream();
-            InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
-            BufferedReader in = new BufferedReader(reader);
-            String line;
-            while ((line = in.readLine()) != null) {
-                stringBuilder.append(line);
-            }
-            in.close();
-            return stringBuilder.toString();
-        } catch (MalformedURLException e) {
-        } catch (IOException e) {
-        }
-        return null;
+    public Offer getOffer(int index) {
+        return offers.get(index);
     }
-
-    private DateTime[] convertToDateTimeArray(int weekDay, JSONArray array) throws JSONException {
-        if (array.length() == 0) {
-            return null;
-        }
-
-        DateTime[] listOfStrings = new DateTime[array.length()];
-        String[] openingValues;
-        for (int i = 0; i < listOfStrings.length; i++) {
-            openingValues = array.getString(i).split(":");
-            int hours = Integer.valueOf(openingValues[0]);
-            int minutes = Integer.valueOf(openingValues[1]);
-            listOfStrings[i] = DateUtils.getDate(hours, minutes).updateWeekDay(weekDay);
-        }
-        return listOfStrings;
-    }
-
-    private String[] convertToArray(JSONArray array) throws JSONException {
-        if (array.length() == 0) {
-            return null;
-        }
-
-        String[] listOfStrings = new String[array.length()];
-        for (int i = 0; i < listOfStrings.length; i++) {
-            listOfStrings[i] = array.getString(i);
-        }
-        return listOfStrings;
-    }
-
-    @Deprecated
-    private String parseJsonFromAssets(String filePath) {
-        BufferedReader reader = null;
-        String jsonOutput = null;
-        try {
-            AssetManager assetManager = LunchtimeApplication.getContext().getAssets();
-            InputStream is = assetManager.open(filePath);
-            reader = new BufferedReader(
-                    new InputStreamReader(is, "UTF-8"));
-
-            StringBuilder json = new StringBuilder();
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                json.append(line);
-            }
-            jsonOutput = json.toString();
-        } catch (IOException ioException) {
-            Log.e(this.getClass().getCanonicalName(), ioException.getMessage());
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    Log.e(this.getClass().getCanonicalName(), "Error closing asset " + filePath);
-                }
-            }
-            return jsonOutput;
-        }
-    }
-
-    private void autoSearchForIngredients(Set<Offer.Ingredient> ingredientList, String title) {
-        if (contains(title, "Mettenden", "Mettwurst", "schinken", "Cevapcici", "Lasagne", "Wildbraten", "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
-            if (!title.contains("vom Rind") && !title.contains("vegetarisch")) {
-                ingredientList.add(Offer.Ingredient.PORK);
-            }
-        }
-        if (contains(title, "Wildbraten", "Rumpsteak", "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Rindswurst", "Carne", "Hacksteak", "Bockwurst")) {
-            ingredientList.add(Offer.Ingredient.COW);
-        }
-        if (contains(title, "Coq", "Gans", "Geflügel", "Hähnchen", "Huhn", "Hühner", "Pute", "Truthahn")) {
-            ingredientList.add(Offer.Ingredient.CHICKEN);
-        }
-        if (contains(title, "Lasagne", "Rigatoni", "Pasta", "Futtuccine", "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
-            ingredientList.add(Offer.Ingredient.GLUTEN);
-        }
-        if (contains(title, "Mozzarella", "Feta", "Lasagne", "quark", "schmarrn", "Parmesan", "Käse", "käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand", "Frischkaese", "Kochkaese", "Frischkäse", "Kochkäs")) {
-            ingredientList.add(Offer.Ingredient.LACTOSE);
-        }
-        if (contains(title, "Wolfsbarsch", "Kabeljau", "Schlemmerfilet", "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {
-            ingredientList.add(Offer.Ingredient.FISH);
-        }
-        if (contains(title, "Omelett", " Ei", "Ei ", "Eier", "eier", "Spiegelei", "Majonese", "Eierknöpfle", "Tagliatelle", "Spaghetti", "Spätzle", "Nudel", "nudel")) {
-            ingredientList.add(Offer.Ingredient.EGG);
-        }
-    }
-
-    private boolean contains(String text, String... subtext) {
-        for (int i = 0; i < subtext.length; i++) {
-            if (text.contains(subtext[i])) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 }

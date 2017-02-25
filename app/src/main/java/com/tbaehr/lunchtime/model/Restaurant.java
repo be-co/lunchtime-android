@@ -677,6 +677,7 @@
 package com.tbaehr.lunchtime.model;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
@@ -726,9 +727,12 @@ public class Restaurant {
             String longDescription,
             String locationDescription,
             Map<Integer, DateTime[]> openingTimes,
-            String parking,
-            String paying,
-            String phoneNumber, String email, String url, final String[] photoUrls) {
+            @Nullable String parking,
+            @Nullable String paying,
+            @Nullable String phoneNumber,
+            @Nullable String email,
+            @Nullable String url,
+            @Nullable final String[] photoUrls) {
         this.id = id;
         this.name = name;
         this.shortDescription = shortDescription;

@@ -676,6 +676,8 @@
  */
 package com.tbaehr.lunchtime.utils;
 
+import com.tbaehr.lunchtime.model.ModelProvider;
+
 /**
  * Created by timo.baehr@gmail.com on 21.02.17.
  */
@@ -699,6 +701,7 @@ public class LocationHelper {
 
     public static void setSelectedLocationIndex(int index) {
         selectedLocationIndex = index;
+        ModelProvider.getInstance().resetLastSync();
         SharedPrefsHelper.putInt(KEY_SELECTED_LOCATION_INDEX, index);
     }
 

@@ -7,8 +7,8 @@ android {
         applicationId "com.tbaehr.lunchtime"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 11
-        versionName "2017.02.22"
+        versionCode 12
+        versionName "2017.02.25"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }

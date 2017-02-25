@@ -674,240 +674,241 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.presenter;
+package com.tbaehr.lunchtime.model.parsing;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.view.View;
+import android.support.annotation.NonNull;
+import android.util.Pair;
 
-import com.propaneapps.tomorrow.presenter.BasePresenter;
-import com.tbaehr.lunchtime.R;
-import com.tbaehr.lunchtime.controller.DashboardFragment;
-import com.tbaehr.lunchtime.controller.DetailPageActivity;
-import com.tbaehr.lunchtime.model.ModelProvider;
+import com.tbaehr.lunchtime.BuildConfig;
+import com.tbaehr.lunchtime.model.NearbyRestaurants;
 import com.tbaehr.lunchtime.model.Offer;
+import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
 import com.tbaehr.lunchtime.utils.DateTime;
-import com.tbaehr.lunchtime.view.HorizontalSliderView;
-import com.tbaehr.lunchtime.view.IDashboardViewContainer;
+import com.tbaehr.lunchtime.utils.DateUtils;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_OFFER_INDEX;
-import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_ID;
 
 /**
- * Created by timo.baehr@gmail.com on 31.12.16.
+ * Created by timo.baehr@gmail.com on 24.02.17.
  */
-public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
-        implements ModelProvider.NearbyOffersChangeListener {
+public class ModelParser {
 
-    private Activity activity;
+    private static ModelParser instance;
 
-    private Timer timer;
-
-    public DashboardPresenter(DashboardFragment fragment) {
-        this.activity = fragment.getActivity();
-    }
-
-    @Override
-    public void onDestroy() {
-        activity = null;
-        timer = null;
-        super.onDestroy();
-    }
-
-    @Override
-    public void bindView(IDashboardViewContainer view) {
-        super.bindView(view);
-        refreshOffers();
-    }
-
-    @Override
-    public void unbindView() {
-        stopTimeBasedRefresh();
-        super.unbindView();
-    }
-
-    public void onDestroyFragment() {
-        cachedOffers = null;
-    }
-
-    private void restartTimeBasedRefresh(Collection<RestaurantOffers> restaurantOffersList) {
-        stopTimeBasedRefresh();
-        startTimeBasedRefresh(restaurantOffersList);
-    }
-
-    private void startTimeBasedRefresh(Collection<RestaurantOffers> restaurantOffersList) {
-        Set<DateTime> refreshDates = new HashSet<>();
-        for (RestaurantOffers restaurantOffers : restaurantOffersList) {
-            refreshDates.addAll(restaurantOffers.getUiRefreshDates());
+    public static ModelParser getInstance() {
+        if (instance == null) {
+            instance = new ModelParser();
         }
-        startTimers(refreshDates);
+        return instance;
     }
 
-    private void startTimers(Set<DateTime> dates) {
-        if (timer == null) {
-            timer = new Timer();
-        }
-        for (DateTime date : dates) {
-            timer.schedule(createTimerTask(), date.toDate());
-        }
+    private ModelParser() {
+        // ;
     }
 
-    private TimerTask createTimerTask() {
-        return new TimerTask() {
-            @Override
-            public void run() {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshOffers();
-                    }
-                });
+    public NearbyRestaurants parseNearbyRestaurants(@NonNull String jsonText) throws JSONException {
+        Map<String, Pair<String, String>> map = new HashMap<>();
+
+        JSONArray jsonArray = new JSONArray(jsonText);
+        for (int index = 0; index < jsonArray.length(); index++) {
+            JSONObject restaurant = jsonArray.getJSONObject(index);
+            String key = restaurant.getString("key");
+            String offersLastUpdated = restaurant.getString("offersLastUpdated");
+            String restaurantLastUpdated = restaurant.getString("restaurantLastUpdated");
+            Pair<String, String> pair = new Pair<>( restaurantLastUpdated, offersLastUpdated);
+            map.put(key, pair);
+        }
+
+        return new NearbyRestaurants(map);
+    }
+
+    public Restaurant parseRestaurant(String jsonText, String restaurantId) throws JSONException {
+        JSONObject restaurantJSON = new JSONObject(jsonText);
+        String name = restaurantJSON.getString("title");
+        String shortDescription = restaurantJSON.getString("shortDescription");
+        String longDescription = restaurantJSON.getString("longDescription");
+        String address = restaurantJSON.getString("address");
+
+        JSONObject openingTimesObject = restaurantJSON.getJSONObject("openingTimes");
+        JSONArray mondayArray = openingTimesObject.getJSONArray("monday");
+        JSONArray tuesdayArray = openingTimesObject.getJSONArray("tuesday");
+        JSONArray wednesdayArray = openingTimesObject.getJSONArray("wednesday");
+        JSONArray thursdayArray = openingTimesObject.getJSONArray("thursday");
+        JSONArray fridayArray = openingTimesObject.getJSONArray("friday");
+        JSONArray saturdayArray = openingTimesObject.getJSONArray("saturday");
+        JSONArray sundayArray = openingTimesObject.getJSONArray("sunday");
+        Map<Integer, DateTime[]> openingTimes = new HashMap<>();
+        openingTimes.put(Calendar.MONDAY, convertToDateTimeArray(Calendar.MONDAY, mondayArray));
+        openingTimes.put(Calendar.TUESDAY, convertToDateTimeArray(Calendar.TUESDAY, tuesdayArray));
+        openingTimes.put(Calendar.WEDNESDAY, convertToDateTimeArray(Calendar.WEDNESDAY, wednesdayArray));
+        openingTimes.put(Calendar.THURSDAY, convertToDateTimeArray(Calendar.THURSDAY, thursdayArray));
+        openingTimes.put(Calendar.FRIDAY, convertToDateTimeArray(Calendar.FRIDAY, fridayArray));
+        openingTimes.put(Calendar.SATURDAY, convertToDateTimeArray(Calendar.SATURDAY, saturdayArray));
+        openingTimes.put(Calendar.SUNDAY, convertToDateTimeArray(Calendar.SUNDAY, sundayArray));
+
+        String parking = null;
+        if (restaurantJSON.has("parking")) {
+            parking = restaurantJSON.getString("parking");
+        }
+
+        String paying = "";
+        if (restaurantJSON.has("paying")) {
+            JSONArray payingArray = restaurantJSON.getJSONArray("paying");
+            for (int i = 0; i < payingArray.length(); i++) {
+                paying += i == 0 ? "" : ", ";
+                paying += payingArray.getString(i);
             }
-        };
-    }
-
-    private void stopTimeBasedRefresh() {
-        if (timer != null) {
-            timer.cancel();
         }
-        timer = null;
+
+        String phoneNumber = null;
+        if (restaurantJSON.has("phoneNumber")) {
+            phoneNumber = restaurantJSON.getString("phoneNumber");
+        }
+
+        String email = null;
+        if (restaurantJSON.has("email")) {
+            email = restaurantJSON.getString("email");
+        }
+
+        String website = null;
+        if (restaurantJSON.has("website")) {
+            website = restaurantJSON.getString("website");
+        }
+
+        String[] photoUrls = null;
+        if (restaurantJSON.has("photoUrls")) {
+            JSONArray photoUrlsObjects = restaurantJSON.getJSONArray("photoUrls");
+            photoUrls = convertToStringArray(photoUrlsObjects);
+        }
+
+        return new Restaurant(restaurantId, name, shortDescription, longDescription, address,
+                openingTimes, parking, paying, phoneNumber, email, website, photoUrls);
     }
 
-    @Override
-    public void loadingStarted() {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                IDashboardViewContainer view = getView();
-                if (view != null) {
-                    getView().clearOffers();
-                    getView().hideNoOffersView();
-                    getView().setProgressBarVisibility(true);
+    public RestaurantOffers parseRestaurantOffers(String jsonText) throws JSONException {
+        JSONObject restaurantObject = new JSONObject(jsonText);
+        final String restaurantId = restaurantObject.getString("restaurantID");
+        final String restaurantTitle = restaurantObject.getString("title");
+        final String restaurantDescription = restaurantObject.getString("description");
+        final JSONArray restaurantOffersArray = restaurantObject.getJSONArray("offers");
+        final List<Offer> offersNextDays = new ArrayList<>();
+        List<Offer> offersToday = new ArrayList<>();
+        for (int offerIndex = 0; offerIndex < restaurantOffersArray.length(); offerIndex++) {
+            final JSONObject offerObject = restaurantOffersArray.getJSONObject(offerIndex);
+            final String offerTitle = offerObject.getString("title");
+            final String offerDescription = offerObject.getString("description");
+            final int offerPrize = offerObject.getInt("prize");
+            final String starts = offerObject.getString("starts");
+            final String ends = offerObject.getString("ends");
+            final Offer.Category category = Offer.Category.valueOf(offerObject.getString("category").toUpperCase());
+            final JSONArray ingredientsArray = offerObject.getJSONArray("ingredients");
+            final Set<Offer.Ingredient> ingredients = new HashSet<>();
+            for (int ingrIndex = 0; ingrIndex < ingredientsArray.length(); ingrIndex++) {
+                try {
+                    ingredients.add(Offer.Ingredient.valueOf(ingredientsArray.getString(ingrIndex)));
+                } catch (IllegalArgumentException e) {
+                    throw new JSONException("Invalid offer " + offerTitle + " for " +restaurantTitle + ": " + e.getMessage());
                 }
             }
-        });
-    }
 
-    @Override
-    public void failed() {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                IDashboardViewContainer view = getView();
-                if (view != null) {
-                    view.setProgressBarVisibility(false);
-                    getView().enableNoOffersView(R.string.status_offer_sync_failed);
-                }
-            }
-        });
-    }
-
-    private List<RestaurantOffers> cachedOffers;
-
-    @Override
-    public void pickUp(Set<RestaurantOffers> allOffers) {
-        IDashboardViewContainer view = getView();
-        if (view == null) {
-            return;
-        }
-
-        /*
-         * The Java behaviour on Android is not correct here.
-         * If cachedOffers is of type Set, the dataSet change code
-         * is not working. From the first line on cachedOffers is
-         * the same object as allOffers although it is set at the
-         * end of this method.
-         */
-        boolean dataSetChanged = cachedOffers == null;
-        if (cachedOffers == null || cachedOffers.size() != allOffers.size()) {
-            dataSetChanged = true;
-            cachedOffers = new ArrayList<>();
-            for (RestaurantOffers offers : allOffers) {
-                cachedOffers.add(offers);
-            }
-        } else {
-            for (RestaurantOffers offers : cachedOffers) {
-                boolean contains = allOffers.contains(offers);
-                if (!contains) {
-                    dataSetChanged = true;
-                    break;
-                }
+            autoSearchForIngredients(ingredients, offerTitle);
+            autoSearchForIngredients(ingredients, offerDescription);
+            final Offer offer = new Offer(
+                    restaurantId,
+                    offerTitle,
+                    offerDescription,
+                    offerPrize,
+                    starts, ends,
+                    category,
+                    ingredients);
+            final Offer.ValidationState validationState = offer.getValidationState();
+            if (validationState.equals(Offer.ValidationState.NOW_VALID) ||
+                    validationState.equals(Offer.ValidationState.SOON_VALID)) {
+                offersToday.add(offer);
+            } else if (validationState.equals(Offer.ValidationState.TOMMORROW_VALID) ||
+                    (BuildConfig.DEBUG && validationState.equals(Offer.ValidationState.NEXT_DAYS_VALID))) {
+                offersNextDays.add(offer);
+            } else if (validationState.equals(Offer.ValidationState.INVALID)) {
+                throw new JSONException("Invalid offer " + offer.getTitle() + " for " + restaurantTitle + ": Check date format: " + starts + "," + ends);
             }
         }
 
-        if (!dataSetChanged) {
-            return;
-        }
+        return new RestaurantOffers(restaurantId, restaurantTitle, restaurantDescription, offersToday.isEmpty() ? offersNextDays : offersToday);
+    }
 
-        restartTimeBasedRefresh(allOffers);
 
-        boolean foundOffers = false;
-
-        view.setProgressBarVisibility(false);
-        view.hideNoOffersView();
-        view.clearOffers();
-
-        for (final RestaurantOffers nearbyRestaurantOffers : allOffers) {
-            final HorizontalSliderView.OnSliderItemClickListener onSliderItemClickListener = new HorizontalSliderView.OnSliderItemClickListener() {
-                @Override
-                public void onSliderItemClick(Offer offer, View view) {
-                    openDetailPage(offer.getRestaurantId(), nearbyRestaurantOffers.getIndex(offer));
-                }
-            };
-            if (nearbyRestaurantOffers.isEmpty()) {
-                continue;
+    private void autoSearchForIngredients(Set<Offer.Ingredient> ingredientList, String title) {
+        if (contains(title, "Mettenden", "Mettwurst", "schinken", "Cevapcici", "Wildbraten", "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
+            if (!title.contains("vom Rind") && !title.contains("vegetarisch")) {
+                ingredientList.add(Offer.Ingredient.PORK);
             }
-
-            foundOffers = true;
-
-            final String restaurantId = nearbyRestaurantOffers.getRestaurantId();
-            final HorizontalSliderView.OnSliderHeaderClickListener headerClickListener = new HorizontalSliderView.OnSliderHeaderClickListener() {
-                @Override
-                public void onSliderHeaderClick() {
-                    openDetailPage(restaurantId, -1);
-                }
-            };
-            view.addOffers(
-                    nearbyRestaurantOffers.getRestaurantName(),
-                    nearbyRestaurantOffers.getRestaurantDescription(),
-                    nearbyRestaurantOffers.getOffers(),
-                    headerClickListener,
-                    onSliderItemClickListener
-            );
         }
-
-        if (!foundOffers) {
-            final int[] noOffersMessages = new int[] {
-                    R.string.no_offers_today1,
-                    R.string.no_offers_today2,
-                    R.string.no_offers_today3,
-                    R.string.no_offers_today4,
-                    R.string.no_offers_today5
-            };
-            final int randomNumber = (int) (Math.random() * 5);
-            view.enableNoOffersView(noOffersMessages[randomNumber]);
+        if (contains(title, "Wildbraten", "Rumpsteak", "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Rindswurst", "Carne", "Hacksteak", "Bockwurst")) {
+            ingredientList.add(Offer.Ingredient.COW);
+        }
+        if (contains(title, "Coq", "Gans", "Geflügel", "Hähnchen", "Huhn", "Hühner", "Pute", "Truthahn")) {
+            ingredientList.add(Offer.Ingredient.CHICKEN);
+        }
+        if (contains(title, "Lasagne", "Rigatoni", "Pasta", "Futtuccine", "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
+            ingredientList.add(Offer.Ingredient.GLUTEN);
+        }
+        if (contains(title, "Mozzarella", "Feta", "Lasagne", "quark", "schmarrn", "Parmesan", "Käse", "käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand", "Frischkaese", "Kochkaese", "Frischkäse", "Kochkäs")) {
+            ingredientList.add(Offer.Ingredient.LACTOSE);
+        }
+        if (contains(title, "Wolfsbarsch", "Kabeljau", "Schlemmerfilet", "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {
+            ingredientList.add(Offer.Ingredient.FISH);
+        }
+        if (contains(title, "Omelett", " Ei", "Ei ", "Eier", "eier", "Spiegelei", "Majonese", "Eierknöpfle", "Tagliatelle", "Spaghetti", "Spätzle", "Nudel", "nudel")) {
+            ingredientList.add(Offer.Ingredient.EGG);
         }
     }
 
-    private void openDetailPage(String restaurantId, int index) {
-        Intent openFetchOrderActivityIntent = new Intent(activity, DetailPageActivity.class);
-        openFetchOrderActivityIntent.putExtra(KEY_RESTAURANT_ID, restaurantId);
-        if (index != -1) {
-            openFetchOrderActivityIntent.putExtra(KEY_OFFER_INDEX, index);
+    private boolean contains(String text, String... subtext) {
+        for (int i = 0; i < subtext.length; i++) {
+            if (text.contains(subtext[i])) {
+                return true;
+            }
         }
-        activity.startActivity(openFetchOrderActivityIntent);
+        return false;
     }
 
-    public void refreshOffers() {
-        ModelProvider.getInstance().getAllOffersAsync(this);
+    private String[] convertToStringArray(JSONArray array) throws JSONException {
+        if (array.length() == 0) {
+            return null;
+        }
+
+        String[] listOfStrings = new String[array.length()];
+        for (int i = 0; i < listOfStrings.length; i++) {
+            listOfStrings[i] = array.getString(i);
+        }
+        return listOfStrings;
     }
+
+    private DateTime[] convertToDateTimeArray(int weekDay, JSONArray array) throws JSONException {
+        if (array.length() == 0) {
+            return null;
+        }
+
+        DateTime[] listOfStrings = new DateTime[array.length()];
+        String[] openingValues;
+        for (int i = 0; i < listOfStrings.length; i++) {
+            openingValues = array.getString(i).split(":");
+            int hours = Integer.valueOf(openingValues[0]);
+            int minutes = Integer.valueOf(openingValues[1]);
+            listOfStrings[i] = DateUtils.getDate(hours, minutes).updateWeekDay(weekDay);
+        }
+        return listOfStrings;
+    }
+
 }

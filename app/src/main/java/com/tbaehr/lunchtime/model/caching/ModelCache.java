@@ -674,240 +674,99 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.presenter;
+package com.tbaehr.lunchtime.model.caching;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.view.View;
+import android.support.annotation.NonNull;
 
-import com.propaneapps.tomorrow.presenter.BasePresenter;
-import com.tbaehr.lunchtime.R;
-import com.tbaehr.lunchtime.controller.DashboardFragment;
-import com.tbaehr.lunchtime.controller.DetailPageActivity;
-import com.tbaehr.lunchtime.model.ModelProvider;
-import com.tbaehr.lunchtime.model.Offer;
-import com.tbaehr.lunchtime.model.RestaurantOffers;
 import com.tbaehr.lunchtime.utils.DateTime;
-import com.tbaehr.lunchtime.view.HorizontalSliderView;
-import com.tbaehr.lunchtime.view.IDashboardViewContainer;
+import com.tbaehr.lunchtime.utils.DateUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_OFFER_INDEX;
-import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_ID;
+import static com.tbaehr.lunchtime.utils.SharedPrefsHelper.getString;
+import static com.tbaehr.lunchtime.utils.SharedPrefsHelper.putString;
 
 /**
- * Created by timo.baehr@gmail.com on 31.12.16.
+ * Created by timo.baehr@gmail.com on 24.02.17.
  */
-public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
-        implements ModelProvider.NearbyOffersChangeListener {
+public class ModelCache {
 
-    private Activity activity;
+    private static final String KEY_NEARBY_OFFERS = "nearby_offers_%s";
 
-    private Timer timer;
+    private static final String KEY_RESTAURANT = "restaurant_%s";
 
-    public DashboardPresenter(DashboardFragment fragment) {
-        this.activity = fragment.getActivity();
+    private static final String KEY_OFFER = "offer_%s";
+
+    private static final String KEY_OFFER_UPDATED = "offer_updated_%s";
+
+    private static final String KEY_RESTAURANT_UPDATED = "restaurant_updated_%s";
+
+    private static ModelCache instance;
+
+    private ModelCache() {
+        // ;
     }
 
-    @Override
-    public void onDestroy() {
-        activity = null;
-        timer = null;
-        super.onDestroy();
-    }
-
-    @Override
-    public void bindView(IDashboardViewContainer view) {
-        super.bindView(view);
-        refreshOffers();
-    }
-
-    @Override
-    public void unbindView() {
-        stopTimeBasedRefresh();
-        super.unbindView();
-    }
-
-    public void onDestroyFragment() {
-        cachedOffers = null;
-    }
-
-    private void restartTimeBasedRefresh(Collection<RestaurantOffers> restaurantOffersList) {
-        stopTimeBasedRefresh();
-        startTimeBasedRefresh(restaurantOffersList);
-    }
-
-    private void startTimeBasedRefresh(Collection<RestaurantOffers> restaurantOffersList) {
-        Set<DateTime> refreshDates = new HashSet<>();
-        for (RestaurantOffers restaurantOffers : restaurantOffersList) {
-            refreshDates.addAll(restaurantOffers.getUiRefreshDates());
+    public static ModelCache getInstance() {
+        if (instance == null) {
+            instance = new ModelCache();
         }
-        startTimers(refreshDates);
+        return instance;
     }
 
-    private void startTimers(Set<DateTime> dates) {
-        if (timer == null) {
-            timer = new Timer();
-        }
-        for (DateTime date : dates) {
-            timer.schedule(createTimerTask(), date.toDate());
-        }
+    public void putNearby(String jsonText, String locationId) {
+        final String keySync = String.format(KEY_NEARBY_OFFERS, locationId.toLowerCase());
+        putString(keySync, jsonText);
     }
 
-    private TimerTask createTimerTask() {
-        return new TimerTask() {
-            @Override
-            public void run() {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshOffers();
-                    }
-                });
-            }
-        };
+    public void putRestaurant(String jsonText, String restaurantId, DateTime dateUpdated) {
+        final String keyRestaurant = String.format(KEY_RESTAURANT, restaurantId);
+        final String keyRestaurantUpdated = String.format(KEY_RESTAURANT_UPDATED, restaurantId);
+
+        String date = dateUpdated.toDate().toString();
+        putString(keyRestaurantUpdated, date);
+        putString(keyRestaurant, jsonText);
     }
 
-    private void stopTimeBasedRefresh() {
-        if (timer != null) {
-            timer.cancel();
-        }
-        timer = null;
+    public void putRestaurantOffers(String jsonText, String restaurantId, DateTime dateUpdated) {
+        final String keyRestaurant = String.format(KEY_OFFER, restaurantId);
+        final String keyRestaurantOffersUpdated = String.format(KEY_OFFER_UPDATED, restaurantId);
+
+        String date = dateUpdated.toDate().toString();
+        putString(keyRestaurantOffersUpdated, date);
+        putString(keyRestaurant, jsonText);
     }
 
-    @Override
-    public void loadingStarted() {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                IDashboardViewContainer view = getView();
-                if (view != null) {
-                    getView().clearOffers();
-                    getView().hideNoOffersView();
-                    getView().setProgressBarVisibility(true);
-                }
-            }
-        });
+    public DateTime getRestaurantLastUpdated(String restaurantId) {
+        final String keyRestaurantUpdated = String.format(KEY_RESTAURANT_UPDATED, restaurantId);
+        DateTime cachedDate = DateUtils.createDateFromString(getString(keyRestaurantUpdated));
+        return cachedDate;
     }
 
-    @Override
-    public void failed() {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                IDashboardViewContainer view = getView();
-                if (view != null) {
-                    view.setProgressBarVisibility(false);
-                    getView().enableNoOffersView(R.string.status_offer_sync_failed);
-                }
-            }
-        });
+    public DateTime getRestaurantOffersLastUpdated(String restaurantId) {
+        final String keyRestaurantOffersUpdated = String.format(KEY_OFFER_UPDATED, restaurantId);
+        DateTime cachedDate = DateUtils.createDateFromString(getString(keyRestaurantOffersUpdated));
+        return cachedDate;
     }
 
-    private List<RestaurantOffers> cachedOffers;
-
-    @Override
-    public void pickUp(Set<RestaurantOffers> allOffers) {
-        IDashboardViewContainer view = getView();
-        if (view == null) {
-            return;
-        }
-
-        /*
-         * The Java behaviour on Android is not correct here.
-         * If cachedOffers is of type Set, the dataSet change code
-         * is not working. From the first line on cachedOffers is
-         * the same object as allOffers although it is set at the
-         * end of this method.
-         */
-        boolean dataSetChanged = cachedOffers == null;
-        if (cachedOffers == null || cachedOffers.size() != allOffers.size()) {
-            dataSetChanged = true;
-            cachedOffers = new ArrayList<>();
-            for (RestaurantOffers offers : allOffers) {
-                cachedOffers.add(offers);
-            }
-        } else {
-            for (RestaurantOffers offers : cachedOffers) {
-                boolean contains = allOffers.contains(offers);
-                if (!contains) {
-                    dataSetChanged = true;
-                    break;
-                }
-            }
-        }
-
-        if (!dataSetChanged) {
-            return;
-        }
-
-        restartTimeBasedRefresh(allOffers);
-
-        boolean foundOffers = false;
-
-        view.setProgressBarVisibility(false);
-        view.hideNoOffersView();
-        view.clearOffers();
-
-        for (final RestaurantOffers nearbyRestaurantOffers : allOffers) {
-            final HorizontalSliderView.OnSliderItemClickListener onSliderItemClickListener = new HorizontalSliderView.OnSliderItemClickListener() {
-                @Override
-                public void onSliderItemClick(Offer offer, View view) {
-                    openDetailPage(offer.getRestaurantId(), nearbyRestaurantOffers.getIndex(offer));
-                }
-            };
-            if (nearbyRestaurantOffers.isEmpty()) {
-                continue;
-            }
-
-            foundOffers = true;
-
-            final String restaurantId = nearbyRestaurantOffers.getRestaurantId();
-            final HorizontalSliderView.OnSliderHeaderClickListener headerClickListener = new HorizontalSliderView.OnSliderHeaderClickListener() {
-                @Override
-                public void onSliderHeaderClick() {
-                    openDetailPage(restaurantId, -1);
-                }
-            };
-            view.addOffers(
-                    nearbyRestaurantOffers.getRestaurantName(),
-                    nearbyRestaurantOffers.getRestaurantDescription(),
-                    nearbyRestaurantOffers.getOffers(),
-                    headerClickListener,
-                    onSliderItemClickListener
-            );
-        }
-
-        if (!foundOffers) {
-            final int[] noOffersMessages = new int[] {
-                    R.string.no_offers_today1,
-                    R.string.no_offers_today2,
-                    R.string.no_offers_today3,
-                    R.string.no_offers_today4,
-                    R.string.no_offers_today5
-            };
-            final int randomNumber = (int) (Math.random() * 5);
-            view.enableNoOffersView(noOffersMessages[randomNumber]);
-        }
+    public String getNearby(@NonNull String locationId) {
+        final String keySync = String.format(KEY_NEARBY_OFFERS, locationId.toLowerCase());
+        return getString(keySync);
     }
 
-    private void openDetailPage(String restaurantId, int index) {
-        Intent openFetchOrderActivityIntent = new Intent(activity, DetailPageActivity.class);
-        openFetchOrderActivityIntent.putExtra(KEY_RESTAURANT_ID, restaurantId);
-        if (index != -1) {
-            openFetchOrderActivityIntent.putExtra(KEY_OFFER_INDEX, index);
+    public String getRestaurantOffers(@NonNull String restaurantKey) {
+        final String keyRestaurant = String.format(KEY_OFFER, restaurantKey);
+        String jsonOffers = getString(keyRestaurant);
+        if (jsonOffers != null) {
+            return jsonOffers;
         }
-        activity.startActivity(openFetchOrderActivityIntent);
+        return null;
     }
 
-    public void refreshOffers() {
-        ModelProvider.getInstance().getAllOffersAsync(this);
+    public String getRestaurant(@NonNull String keyRestaurant) {
+        String json = getString(String.format(KEY_RESTAURANT, keyRestaurant));
+        if (json != null) {
+            return json;
+        }
+        return null;
     }
+
 }

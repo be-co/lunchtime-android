@@ -1,15 +1,17 @@
 <resources>
     <string name="changelog_header">Versionshistorie</string>
-    <string name="changelog"><b>2017.02.22 (v12)</b>
-        \n•  Berechtigung \"Telefonanrufe\" hinzugefügt, erlaubt es Restaurants anzurufen
+    <string name="changelog"><b>2017.02.25 Alpha (v12)</b>
+        \n•  Berechtigung \"Telefonanrufe\" hinzugefügt, erlaubt es Restaurants anzurufen. Die Berechtigung ist optional. Alternativ öffnet sich die DIAL-App.
         \n•  Detailseite: Erweiterung um Parkmöglichkeiten, Bezahlmittel, Telefonnummer
         \n•  Dashboard: Auswahl des Standorts möglich - Darmstadt und Weiterstadt
         \n•  Dashboard: Karten-Layout anstelle grauer Box
+        \n•  Synchronisierung: Nur eine pro Minute
         \n•  Fehlerkorrektur: Stabilität für Geräte kleiner Android 6 Nougat verbessert
-        <b>2017.02.18 Alpha (v11)</b>
+        \n•  Fehlerkorrektur: Angebote aus dem Monat März können eingelesen werden
+        \n\n<b>2017.02.18 Alpha (v11)</b>
         \n•  Fehlerkorrektur: Optische Verbesserungen für Tablets (Layoutänderungen)
         \n•  Fehlerkorrektur: Stabilitätsverbesserungen (Verhindern von Crashes nach Öffnen von Links, Rotation des Geräts, …)
-        <b>2017.02.11 Alpha (v10)</b>
+        \n\n<b>2017.02.11 Alpha (v10)</b>
         \n&#8226;  Dashboard: Anzeige der Angebote vom nächsten Tag, falls heute nichts mehr verfügbar ist.
         \n&#8226;  Detailseite: Download von Restaurant-Bildern und Slideshow,
                    Restaurantbeschreibungen und Öffnungszeiten lassen sich aufklappen

@@ -689,21 +689,29 @@ import java.util.Locale;
 public class DateUtils {
 
     /**
-     * example for date: Jan 12 2017 11:30:00 GMT+0100
+     * example for date: Mon Jan 12 2017 11:30:00 GMT+0100
      */
     private static final String DATE_FORMAT = "MMM dd yyyy HH:mm:ss 'GMT'Z";
+
+    private static final String DATE_FORMAT_WEEKDAY = "EEE MMM dd HH:mm:ss 'GMT'Z yyyy";
 
     public static DateTime createDateFromString(String date) {
         if (date == null) {
             return null;
         }
 
-        DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH);
+        DateFormat dateFormat1 = new SimpleDateFormat(DATE_FORMAT_WEEKDAY, Locale.ENGLISH);
+        DateFormat dateFormat2 = new SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH);
         try {
-            Date dateTemp = dateFormat.parse(date);
+            Date dateTemp = dateFormat1.parse(date);
             return new DateTime(dateTemp.getTime());
-        } catch (ParseException e) {
-            e.printStackTrace();
+        } catch (ParseException e1) {
+            try {
+                Date dateTemp = dateFormat2.parse(date);
+                return new DateTime(dateTemp.getTime());
+            } catch (ParseException e2) {
+                e2.printStackTrace();
+            }
         }
 
         return null;

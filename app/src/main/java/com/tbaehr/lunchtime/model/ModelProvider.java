@@ -795,13 +795,15 @@ public class ModelProvider {
         return null;
     }
 
+    private int getAllOffersCounter = 0;
+
     public void getAllOffersAsync(@Nullable final NearbyOffersChangeListener callback) {
         final Set<RestaurantOffers> allOffers = new HashSet<>();
 
         getNearbyAsync(new NearbyChangeListener() {
             @Override
             public void loadingStarted() {
-                // ;
+                getAllOffersCounter = 0;
             }
 
             @Override
@@ -811,19 +813,21 @@ public class ModelProvider {
                     getRestaurantOffersAsync(restaurantId, new RestaurantOffersChangeListener() {
                         @Override
                         public void loadingStarted() {
-                            // ;
+                            callback.loadingStarted();
                         }
 
                         @Override
                         public void pickUp(RestaurantOffers model) {
+                            getAllOffersCounter++;
                             allOffers.add(model);
-                            if (allOffers.size() == restaurantKeys.size()) {
+                            if (restaurantKeys.size() == getAllOffersCounter) {
                                 callback.pickUp(allOffers);
                             }
                         }
 
                         @Override
                         public void failed() {
+                            getAllOffersCounter++;
                             callback.failed();
                         }
                     });
@@ -904,7 +908,7 @@ public class ModelProvider {
         getNearbyAsync(new NearbyChangeListener() {
             @Override
             public void loadingStarted() {
-                callback.loadingStarted();
+                // ;
             }
 
             @Override
@@ -935,7 +939,7 @@ public class ModelProvider {
                         }
                     });
                 } else {
-                    RestaurantOffers offers = getRestaurantOffers(restaurantId);
+                    RestaurantOffers offers = getRestaurantOffersFromCache(restaurantId);
                     if (offers != null) {
                         callback.pickUp(offers);
                     } else {
@@ -951,7 +955,7 @@ public class ModelProvider {
         });
     }
 
-    private RestaurantOffers getRestaurantOffers(@NonNull String restaurantId) {
+    private RestaurantOffers getRestaurantOffersFromCache(@NonNull String restaurantId) {
         String offersJson = ModelCache.getInstance().getRestaurantOffers(restaurantId);
         try {
             return ModelParser.getInstance().parseRestaurantOffers(offersJson);

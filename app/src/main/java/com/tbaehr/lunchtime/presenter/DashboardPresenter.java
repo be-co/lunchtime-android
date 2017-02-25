@@ -691,7 +691,9 @@ import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -730,6 +732,10 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     public void unbindView() {
         stopTimeBasedRefresh();
         super.unbindView();
+    }
+
+    public void onDestroyFragment() {
+        cachedOffers = null;
     }
 
     private void restartTimeBasedRefresh(Set<RestaurantOffers> restaurantOffersList) {
@@ -805,6 +811,8 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         });
     }
 
+    private List<RestaurantOffers> cachedOffers;
+
     @Override
     public void pickUp(Set<RestaurantOffers> allOffers) {
         IDashboardViewContainer view = getView();
@@ -812,15 +820,33 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
             return;
         }
 
-        // TODO: Check if dataset has changed
-        /*boolean datasetChanged = cachedOffers == null
-                || !cachedOffers.equals(allOffers);
+        /*
+         * The Java behaviour on Android is not correct here.
+         * If cachedOffers is of type Set, the dataset change code
+         * is not working. From the first line on cachedOffers is
+         * the same object as allOffers although it is set at the
+         * end of this method.
+         */
+        boolean datasetChanged = cachedOffers == null;
+        if (cachedOffers == null || cachedOffers.size() != allOffers.size()) {
+            datasetChanged = true;
+            cachedOffers = new ArrayList<>();
+            for (RestaurantOffers offers : allOffers) {
+                cachedOffers.add(offers);
+            }
+        } else {
+            for (RestaurantOffers offers : cachedOffers) {
+                boolean contains = allOffers.contains(offers);
+                if (!contains) {
+                    datasetChanged = true;
+                    break;
+                }
+            }
+        }
 
         if (!datasetChanged) {
             return;
         }
-
-        cachedOffers = allOffers;*/
 
         restartTimeBasedRefresh(allOffers);
 

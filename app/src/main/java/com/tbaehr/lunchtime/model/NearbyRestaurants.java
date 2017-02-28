@@ -1,5 +1,6 @@
 package com.tbaehr.lunchtime.model;
 
+import android.support.annotation.NonNull;
 import android.util.Pair;
 
 import com.tbaehr.lunchtime.utils.DateTime;
@@ -15,7 +16,7 @@ public class NearbyRestaurants {
 
     private Map<String, Pair<String, String>> lastUpdatedMap;
 
-    public NearbyRestaurants(Map<String, Pair<String, String>> map) {
+    public NearbyRestaurants(@NonNull Map<String, Pair<String, String>> map) {
         lastUpdatedMap = map;
     }
 
@@ -23,13 +24,13 @@ public class NearbyRestaurants {
         return lastUpdatedMap.keySet();
     }
 
-    public DateTime restaurantLastUpdated(String restrauntId) {
-        String dStr = lastUpdatedMap.get(restrauntId).first;
+    public DateTime restaurantLastUpdated(@NonNull String restaurantId) {
+        String dStr = lastUpdatedMap.get(restaurantId).first;
         return DateUtils.createDateFromString(dStr);
     }
 
-    public DateTime offersLastUpdated(String restrauntId) {
-        String dStr = lastUpdatedMap.get(restrauntId).second;
+    public DateTime offersLastUpdated(@NonNull String restaurantId) {
+        String dStr = lastUpdatedMap.get(restaurantId).second;
         return DateUtils.createDateFromString(dStr);
     }
 

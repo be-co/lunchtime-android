@@ -1,6 +1,9 @@
 <resources>
     <string name="changelog_header">Changelog</string>
-    <string name="changelog"><b>2017.02.25 Alpha (v12)</b>
+    <string name="changelog"><b>2017.03.05 Alpha (v13)</b>
+        \n•  Permisson  \"PHONE_CALL\" is now optional. Installation on tablets again possible.
+        \n•  Android 4.4 devices should be able to start
+        \n\n<b>2017.02.25 Alpha (v12)</b>
         \n•  New permission PHONE_CALL enables calling restaurants
         \n•  Detail page: Added parking, payment and phone number
         \n•  Dashboard: Select your restaurant location (Darmstadt or Weiterstadt)

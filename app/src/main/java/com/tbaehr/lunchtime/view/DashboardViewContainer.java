@@ -687,6 +687,7 @@ import android.widget.TextView;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.model.Offer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -700,6 +701,8 @@ public class DashboardViewContainer implements IDashboardViewContainer {
     private Context context;
 
     private View rootView;
+
+    private boolean hasOffers = false;
 
     @BindView(R.id.no_offers)
     TextView noOffersView;
@@ -720,10 +723,12 @@ public class DashboardViewContainer implements IDashboardViewContainer {
     public void addOffers(String sectionTitle, String shortDescription, List<Offer> offers, HorizontalSliderView.OnSliderHeaderClickListener headerClickListener, HorizontalSliderView.OnSliderItemClickListener sliderItemClickListener) {
         HorizontalSliderView sliderView = new HorizontalSliderView(context, sectionTitle, shortDescription, offers, headerClickListener, sliderItemClickListener);
         viewContainer.addView(sliderView, 0);
+        hasOffers = true;
     }
 
     @Override
-    public void enableNoOffersView(@StringRes int message) {
+    public void showNoOffersView(@StringRes int message) {
+        setProgressBarVisibility(false);
         noOffersView.setText(message);
         noOffersView.setVisibility(View.VISIBLE);
     }
@@ -733,12 +738,29 @@ public class DashboardViewContainer implements IDashboardViewContainer {
         noOffersView.setVisibility(View.GONE);
     }
 
+    @Override
+    public boolean hasOffers() {
+        return hasOffers;
+    }
+
+    @Override
+    public boolean isProgressBarVisible() {
+        return progressBarLoading.getVisibility() == View.VISIBLE;
+    }
+
+    @Override
     public void setProgressBarVisibility(boolean visible) {
+        if (visible) {
+            hideNoOffersView();
+        }
         progressBarLoading.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     @Override
     public void clearOffers() {
+        setProgressBarVisibility(false);
+        hideNoOffersView();
+        hasOffers = false;
         viewContainer.removeAllViews();
     }
 

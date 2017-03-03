@@ -803,7 +803,7 @@ public class ModelProvider {
         getNearbyAsync(new NearbyChangeListener() {
             @Override
             public void loadingStarted() {
-                // ;
+                callback.loadingStarted();
             }
 
             @Override

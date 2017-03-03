@@ -789,8 +789,6 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
             public void run() {
                 IDashboardViewContainer view = getView();
                 if (view != null) {
-                    getView().clearOffers();
-                    getView().hideNoOffersView();
                     getView().setProgressBarVisibility(true);
                 }
             }
@@ -805,7 +803,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
                 IDashboardViewContainer view = getView();
                 if (view != null) {
                     view.setProgressBarVisibility(false);
-                    getView().enableNoOffersView(R.string.status_offer_sync_failed);
+                    getView().showNoOffersView(R.string.status_offer_sync_failed);
                 }
             }
         });
@@ -813,13 +811,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
     private List<RestaurantOffers> cachedOffers;
 
-    @Override
-    public void pickUp(Set<RestaurantOffers> allOffers) {
-        IDashboardViewContainer view = getView();
-        if (view == null) {
-            return;
-        }
-
+    private boolean hasDataSetChanged(Set<RestaurantOffers> allOffers) {
         /*
          * The Java behaviour on Android is not correct here.
          * If cachedOffers is of type Set, the dataSet change code
@@ -843,26 +835,31 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
                 }
             }
         }
+        return dataSetChanged;
+    }
 
-        if (!dataSetChanged) {
+    @Override
+    public void pickUp(Set<RestaurantOffers> allOffers) {
+        IDashboardViewContainer view = getView();
+        if (view == null) {
             return;
         }
 
+        if (!hasDataSetChanged(allOffers)) {
+            if (!view.hasOffers()) {
+                showNoOfferView();
+                return;
+            } else if (!view.isProgressBarVisible()) {
+                return;
+            }
+        }
+
+        view.clearOffers();
         restartTimeBasedRefresh(allOffers);
 
         boolean foundOffers = false;
 
-        view.setProgressBarVisibility(false);
-        view.hideNoOffersView();
-        view.clearOffers();
-
         for (final RestaurantOffers nearbyRestaurantOffers : allOffers) {
-            final HorizontalSliderView.OnSliderItemClickListener onSliderItemClickListener = new HorizontalSliderView.OnSliderItemClickListener() {
-                @Override
-                public void onSliderItemClick(Offer offer, View view) {
-                    openDetailPage(offer.getRestaurantId(), nearbyRestaurantOffers.getIndex(offer));
-                }
-            };
             if (nearbyRestaurantOffers.isEmpty()) {
                 continue;
             }
@@ -876,6 +873,12 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
                     openDetailPage(restaurantId, -1);
                 }
             };
+            final HorizontalSliderView.OnSliderItemClickListener onSliderItemClickListener = new HorizontalSliderView.OnSliderItemClickListener() {
+                @Override
+                public void onSliderItemClick(Offer offer, View view) {
+                    openDetailPage(offer.getRestaurantId(), nearbyRestaurantOffers.getIndex(offer));
+                }
+            };
             view.addOffers(
                     nearbyRestaurantOffers.getRestaurantName(),
                     nearbyRestaurantOffers.getRestaurantDescription(),
@@ -886,16 +889,20 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         }
 
         if (!foundOffers) {
-            final int[] noOffersMessages = new int[] {
-                    R.string.no_offers_today1,
-                    R.string.no_offers_today2,
-                    R.string.no_offers_today3,
-                    R.string.no_offers_today4,
-                    R.string.no_offers_today5
-            };
-            final int randomNumber = (int) (Math.random() * 5);
-            view.enableNoOffersView(noOffersMessages[randomNumber]);
+            showNoOfferView();
         }
+    }
+
+    private void showNoOfferView() {
+        final int[] noOffersMessages = new int[] {
+                R.string.no_offers_today1,
+                R.string.no_offers_today2,
+                R.string.no_offers_today3,
+                R.string.no_offers_today4,
+                R.string.no_offers_today5
+        };
+        final int randomNumber = (int) (Math.random() * 5);
+        getView().showNoOffersView(noOffersMessages[randomNumber]);
     }
 
     private void openDetailPage(String restaurantId, int index) {

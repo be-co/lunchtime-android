@@ -854,6 +854,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
             }
         }
 
+        view.setProgressBarVisibility(false);
         view.clearOffers();
         restartTimeBasedRefresh(allOffers);
 

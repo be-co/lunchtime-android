@@ -838,6 +838,15 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         return dataSetChanged;
     }
 
+    private boolean areOffersAvailable(Set<RestaurantOffers> allOffers) {
+        for (RestaurantOffers offers : allOffers) {
+            if (!offers.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public void pickUp(Set<RestaurantOffers> allOffers) {
         IDashboardViewContainer view = getView();
@@ -847,8 +856,10 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
 
         if (!hasDataSetChanged(allOffers)) {
             if (!view.hasOffers()) {
-                showNoOfferView();
-                return;
+                if (!areOffersAvailable(allOffers)) {
+                    showNoOfferView();
+                    return;
+                }
             } else if (!view.isProgressBarVisible()) {
                 return;
             }

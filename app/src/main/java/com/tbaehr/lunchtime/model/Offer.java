@@ -712,7 +712,9 @@ public class Offer {
 
     public enum Tag {
         VEGETARIAN,
-        VEGAN
+        VEGAN,
+        // TODO: Use SPICY tag by parsing tags as part of an offer
+        SPICY;
     }
 
     public enum Ingredient {
@@ -721,7 +723,6 @@ public class Offer {
         EGG(R.drawable.ic_eggs),
         COW(R.drawable.ic_cow),
         PORK(R.drawable.ic_pork),
-        @Deprecated PIG(R.drawable.ic_pork),
         CHICKEN(R.drawable.ic_chicken),
         FISH(R.drawable.ic_fish);
 

@@ -702,7 +702,11 @@ public interface IDashboardViewContainer {
 
     void hideNoOffersView();
 
-    void enableNoOffersView(@StringRes int message);
+    void showNoOffersView(@StringRes int message);
+
+    boolean hasOffers();
+
+    boolean isProgressBarVisible();
 
     void setProgressBarVisibility(boolean visible);
 

@@ -1,6 +1,9 @@
 <resources>
     <string name="changelog_header">Versionshistorie</string>
-    <string name="changelog"><b>2017.02.25 Alpha (v12)</b>
+    <string name="changelog"><b>2017.03.05 Alpha (v13)</b>
+        \n•  Berechtigung \"Telefonanrufe\" ist optional. Installation auf Tablets wieder möglich
+        \n•  Android 4.4 sollte wieder startbar sein
+        \n\n<b>2017.02.25 Alpha (v12)</b>
         \n•  Berechtigung \"Telefonanrufe\" hinzugefügt, erlaubt es Restaurants anzurufen. Die Berechtigung ist optional. Alternativ öffnet sich die DIAL-App.
         \n•  Detailseite: Erweiterung um Parkmöglichkeiten, Bezahlmittel, Telefonnummer
         \n•  Dashboard: Auswahl des Standorts möglich - Darmstadt und Weiterstadt

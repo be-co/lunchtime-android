@@ -803,7 +803,7 @@ public class ModelProvider {
         getNearbyAsync(new NearbyChangeListener() {
             @Override
             public void loadingStarted() {
-                // ;
+                callback.loadingStarted();
             }
 
             @Override
@@ -837,7 +837,12 @@ public class ModelProvider {
 
             @Override
             public void failed() {
-                callback.failed();
+                NearbyRestaurants nearbyRestaurants = getNearby();
+                if (nearbyRestaurants != null) {
+                    pickUp(nearbyRestaurants);
+                } else {
+                    callback.failed();
+                }
             }
         });
     }
@@ -951,7 +956,12 @@ public class ModelProvider {
 
             @Override
             public void failed() {
-                callback.failed();
+                NearbyRestaurants nearbyRestaurants = getNearby();
+                if (nearbyRestaurants != null) {
+                    pickUp(nearbyRestaurants);
+                } else {
+                    callback.failed();
+                }
             }
         });
     }

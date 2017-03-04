@@ -171,7 +171,7 @@
                     style="@style/DetailPageItem"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/ic_time" />
+                    android:src="@drawable/ic_time" />
 
                 <TextView
                     style="@style/DetailPageItem"
@@ -204,8 +204,7 @@
                     android:paddingLeft="@dimen/activity_vertical_margin"
                     android:paddingRight="@dimen/card_margin"
                     android:paddingEnd="@dimen/card_margin"
-                    android:visibility="gone"
-                    android:text="geschlossen\n\n8:00 - 21:00\n\n8:00 - 21:00\n\n8:00 - 21:00\n\n8:00 - 21:00\n\n8:00 - 21:00" />
+                    android:visibility="gone" />
 
             </LinearLayout>
 

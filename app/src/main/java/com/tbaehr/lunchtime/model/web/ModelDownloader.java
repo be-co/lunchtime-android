@@ -739,6 +739,8 @@ public class ModelDownloader {
         new AsyncTask<Void, Void, Void>() {
             private String result;
 
+            private String errorMessage;
+
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
@@ -747,7 +749,7 @@ public class ModelDownloader {
 
             @Override
             protected Void doInBackground(Void... voids) {
-                Log.v("ModelDownloader", "Downloading JSON from "+uri);
+                Log.v("ModelDownloader", "Downloading JSON from " + uri);
                 try {
                     StringBuilder stringBuilder = new StringBuilder();
                     URL url = new URL(uri);
@@ -762,7 +764,7 @@ public class ModelDownloader {
                     in.close();
                     result = stringBuilder.toString();
                 } catch (IOException e) {
-                    callback.onDownloadFailed(e.getMessage());
+                    errorMessage = e.getMessage();
                     e.printStackTrace();
                 }
                 return null;
@@ -771,7 +773,11 @@ public class ModelDownloader {
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                callback.onDownloadFinished(result);
+                if (errorMessage != null) {
+                    callback.onDownloadFailed(errorMessage);
+                } else {
+                    callback.onDownloadFinished(result);
+                }
             }
         }.execute();
     }

@@ -695,7 +695,9 @@ public class DateUtils {
 
     private static final String DATE_FORMAT_WEEKDAY = "EEE MMM dd HH:mm:ss 'GMT'Z yyyy";
 
-    public static DateTime createWeekdayDateFromString(String date) {
+    private static final String PARSE_ERROR_MESSAGE = "Could not parse weekday date with value \"%1$s\"";
+
+    public static DateTime createWeekdayDateFromString(String date) throws ParseException {
         // Format: "EEE HH:mm:ss 'GMT'Z"
         String[] parsed = date.split(" ");
         String parsedWeekDay = parsed[0];
@@ -727,15 +729,14 @@ public class DateUtils {
                     weekDay = Calendar.SUNDAY;
                     break;
                 default:
-                    throw new IllegalArgumentException("Could not parse weekday date with value \"" + date + "\"");
+                    throw new ParseException(String.format(PARSE_ERROR_MESSAGE, date), 0);
             }
             return getDate(weekDay, hours, minutes);
-        } else {
-            return null;
         }
+        throw new ParseException(String.format(PARSE_ERROR_MESSAGE, date), 0);
     }
 
-    public static DateTime createDateFromString(String date) {
+    public static DateTime createDateFromString(String date) throws ParseException {
         if (date == null) {
             return null;
         }
@@ -746,15 +747,9 @@ public class DateUtils {
             Date dateTemp = dateFormat1.parse(date);
             return new DateTime(dateTemp.getTime());
         } catch (ParseException e1) {
-            try {
-                Date dateTemp = dateFormat2.parse(date);
-                return new DateTime(dateTemp.getTime());
-            } catch (ParseException e2) {
-                e2.printStackTrace();
-            }
+            Date dateTemp = dateFormat2.parse(date);
+            return new DateTime(dateTemp.getTime());
         }
-
-        return null;
     }
 
     /**

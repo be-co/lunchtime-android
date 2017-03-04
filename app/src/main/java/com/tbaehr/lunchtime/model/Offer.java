@@ -684,6 +684,7 @@ import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
 
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
@@ -759,20 +760,25 @@ public class Offer {
                  //@DrawableRes int drawableRes,
                  String title, String description, int prize,
                  String starts, String ends,
-                 Category category, Set<Ingredient> ingredients) {
+                 Category category, Set<Ingredient> ingredients) throws ParseException {
         //this.drawableRes = drawableRes;
         this.restaurantId = restaurantId;
         this.title = title;
         this.description = description;
         this.prize = prize;
 
-        startDate = DateUtils.createDateFromString(starts);
-        endDate = DateUtils.createDateFromString(ends);
-
-        if (startDate == null) {
-            startDate = DateUtils.createWeekdayDateFromString(starts);
-            endDate = DateUtils.createWeekdayDateFromString(ends);
-            // TODO: Mark this offer as "fix offer" that is offered periodically
+        try {
+            startDate = DateUtils.createDateFromString(starts);
+            endDate = DateUtils.createDateFromString(ends);
+        } catch (ParseException e) {
+            try {
+                startDate = DateUtils.createWeekdayDateFromString(starts);
+                endDate = DateUtils.createWeekdayDateFromString(ends);
+                // TODO: Mark this offer as "fix offer" that is offered periodically
+            } catch (ParseException parseException) {
+                String errorMessage = String.format("Invalid offer %1$s for restaurant %2$s, start date %3$s or end date %4$s could not be parsed.", title, restaurantId, starts, ends);
+                throw new ParseException(errorMessage, parseException.getErrorOffset());
+            }
         }
 
         this.category = category;
@@ -782,7 +788,7 @@ public class Offer {
     public Offer(String restaurantId,
                  String title, String description, int prize,
                  String starts, String ends,
-                 Category category) {
+                 Category category) throws ParseException {
         this(restaurantId, title, description, prize, starts, ends, category, new HashSet<Ingredient>());
     }
 

@@ -676,10 +676,15 @@
  */
 package com.tbaehr.lunchtime.model.caching;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.widget.Toast;
 
+import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
+
+import java.text.ParseException;
 
 import static com.tbaehr.lunchtime.utils.SharedPrefsHelper.getString;
 import static com.tbaehr.lunchtime.utils.SharedPrefsHelper.putString;
@@ -737,13 +742,33 @@ public class ModelCache {
 
     public DateTime getRestaurantLastUpdated(String restaurantId) {
         final String keyRestaurantUpdated = String.format(KEY_RESTAURANT_UPDATED, restaurantId);
-        DateTime cachedDate = DateUtils.createDateFromString(getString(keyRestaurantUpdated));
+        DateTime cachedDate = null;
+        try {
+            String date = getString(keyRestaurantUpdated);
+            if (date != null) {
+                cachedDate = DateUtils.createDateFromString(date);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Context context = LunchtimeApplication.getContext();
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
         return cachedDate;
     }
 
     public DateTime getRestaurantOffersLastUpdated(String restaurantId) {
         final String keyRestaurantOffersUpdated = String.format(KEY_OFFER_UPDATED, restaurantId);
-        DateTime cachedDate = DateUtils.createDateFromString(getString(keyRestaurantOffersUpdated));
+        DateTime cachedDate = null;
+        try {
+            String date = getString(keyRestaurantOffersUpdated);
+            if (date != null) {
+                cachedDate = DateUtils.createDateFromString(date);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Context context = LunchtimeApplication.getContext();
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
         return cachedDate;
     }
 

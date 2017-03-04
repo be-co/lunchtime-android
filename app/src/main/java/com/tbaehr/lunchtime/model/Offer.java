@@ -769,6 +769,12 @@ public class Offer {
         startDate = DateUtils.createDateFromString(starts);
         endDate = DateUtils.createDateFromString(ends);
 
+        if (startDate == null) {
+            startDate = DateUtils.createWeekdayDateFromString(starts);
+            endDate = DateUtils.createWeekdayDateFromString(ends);
+            // TODO: Mark this offer as "fix offer" that is offered periodically
+        }
+
         this.category = category;
         this.ingredients = ingredients;
     }

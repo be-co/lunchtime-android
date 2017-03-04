@@ -695,6 +695,28 @@ public class DateUtils {
 
     private static final String DATE_FORMAT_WEEKDAY = "EEE MMM dd HH:mm:ss 'GMT'Z yyyy";
 
+    public static DateTime createWeekdayDateFromString(String date) {
+        // Format: "EEE HH:mm:ss 'GMT'Z"
+        String[] parsed = date.split(" ");
+        String parsedWeekDay = parsed[0];
+        String[] parsedTime = parsed[1].split(":");
+        int hours = Integer.valueOf(parsedTime[0]);
+        int minutes = Integer.valueOf(parsedTime[1]);
+        int weekDay;
+        switch (parsedWeekDay) {
+            case "Mon": weekDay = Calendar.MONDAY; break;
+            case "Tue": weekDay = Calendar.TUESDAY; break;
+            case "Wed": weekDay = Calendar.WEDNESDAY; break;
+            case "Thu": weekDay = Calendar.THURSDAY; break;
+            case "Fri": weekDay = Calendar.FRIDAY; break;
+            case "Sat": weekDay = Calendar.SATURDAY; break;
+            case "Sun": weekDay = Calendar.SUNDAY; break;
+            default:
+                throw new IllegalArgumentException("Could not parse weekday date with value \"" + date + "\"");
+        }
+        return getDate(weekDay, hours, minutes);
+    }
+
     public static DateTime createDateFromString(String date) {
         if (date == null) {
             return null;

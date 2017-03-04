@@ -722,20 +722,20 @@ public class ModelDownloader {
     }
 
     public void downloadNearby(@NonNull final String locationId, @Nullable final LoadJobListener<String> callback) {
-        String uri = String.format(URI_NEARBY_RESTAURANTS, locationId, locationId.toLowerCase());
+        String uri = String.format(URI_NEARBY_RESTAURANTS, locationId.toLowerCase(), locationId.toLowerCase());
         downloadFromServer(uri, callback);
     }
 
     public void downloadRestaurantOffers(@NonNull final String restaurantId, @Nullable final LoadJobListener<String> callback) {
         // TODO: Use locationId of restaurant instead
-        String locationId = LocationHelper.getSelectedLocation();
+        String locationId = LocationHelper.getSelectedLocation().toLowerCase();
         String uri = String.format(URI_OFFER, locationId, restaurantId);
         downloadFromServer(uri, callback);
     }
 
     public void downloadRestaurant(@NonNull final String restaurantId, @Nullable final LoadJobListener<String> callback) {
         // TODO: Use locationId of restaurant instead
-        String locationId = LocationHelper.getSelectedLocation();
+        String locationId = LocationHelper.getSelectedLocation().toLowerCase();
         String uri = String.format(URI_RESTAURANT, locationId, restaurantId);
         downloadFromServer(uri, callback);
     }

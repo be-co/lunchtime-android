@@ -829,7 +829,11 @@ public class ModelProvider {
                         @Override
                         public void failed() {
                             getAllOffersCounter++;
-                            callback.failed();
+                            if (restaurantKeys.size() == getAllOffersCounter && allOffers.size() == 0) {
+                                callback.failed();
+                            } else {
+                                callback.pickUp(allOffers);
+                            }
                         }
                     });
                 }

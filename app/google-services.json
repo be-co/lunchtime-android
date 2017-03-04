@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "257582716015",
+    "project_id": "lunchtime-44976"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:257582716015:android:1fa8a90ea6fc9b02",
+        "android_client_info": {
+          "package_name": "com.tbaehr.lunchtime"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3NbbrTHnUGQp2Ds6wnw4eGBHxi4n6v_Q"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-93002948-1"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

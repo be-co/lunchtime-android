@@ -36,6 +36,8 @@
     <string name="no_offers_today5">Heute keine Angebote verfügbar, das Geheimnis einer sauberen Küche? Nicht kochen…</string>
     <string name="status_loading">Aktualisiere Angebote</string>
     <string name="status_offer_sync_failed">Beim Aktualisieren der Angebote ist leider ein Fehler aufgetreten.</string>
+    <string name="status_restaurant_download_failed">Beim Download der Restaurantdaten ist leider ein Fehler aufgetreten.</string>
+    <string name="status_title_restaurant_download_failed">Downloadfehler</string>
 
     <!-- Help page -->
     <string name="about_lunchtime">Lunchtime beantwortet die immer wiederkehrende Frage:

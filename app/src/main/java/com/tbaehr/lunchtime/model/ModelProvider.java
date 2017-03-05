@@ -678,6 +678,7 @@ package com.tbaehr.lunchtime.model;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.tbaehr.lunchtime.model.caching.ModelCache;
 import com.tbaehr.lunchtime.model.parsing.ModelParser;
@@ -688,6 +689,7 @@ import com.tbaehr.lunchtime.utils.LocationHelper;
 
 import org.json.JSONException;
 
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -746,7 +748,13 @@ public class ModelProvider {
 
     private void getNearbyAsync(@NonNull final NearbyChangeListener callback) {
         final String locationId = LocationHelper.getSelectedLocation();
-        final NearbyRestaurants nearby = getNearby();
+        NearbyRestaurants nearby = null;
+        try {
+            // try to reload if cached nearby has syntax errors
+            nearby = getNearby();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         long now = System.currentTimeMillis();
         if (nearby == null || lastSync + MINUTE < now) {
             lastSync = now;
@@ -773,24 +781,26 @@ public class ModelProvider {
                         callback.pickUp(nearbyRestaurants);
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        callback.failed();
                     }
                 }
             });
         } else {
-            callback.pickUp(getNearby());
+            try {
+                callback.pickUp(getNearby());
+            } catch (JSONException e) {
+                e.printStackTrace();
+                callback.failed();
+            }
         }
     }
 
-    private NearbyRestaurants getNearby() {
+    private NearbyRestaurants getNearby() throws JSONException {
         final String locationId = LocationHelper.getSelectedLocation();
         String nearbyJson = ModelCache.getInstance().getNearby(locationId);
         if (nearbyJson != null) {
-            try {
-                NearbyRestaurants nearbyRestaurants = ModelParser.getInstance().parseNearbyRestaurants(nearbyJson);
-                return nearbyRestaurants;
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            NearbyRestaurants nearbyRestaurants = ModelParser.getInstance().parseNearbyRestaurants(nearbyJson);
+            return nearbyRestaurants;
         }
         return null;
     }
@@ -841,7 +851,13 @@ public class ModelProvider {
 
             @Override
             public void failed() {
-                NearbyRestaurants nearbyRestaurants = getNearby();
+                NearbyRestaurants nearbyRestaurants = null;
+                try {
+                    nearbyRestaurants = getNearby();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    callback.failed();
+                }
                 if (nearbyRestaurants != null) {
                     pickUp(nearbyRestaurants);
                 } else {
@@ -883,15 +899,23 @@ public class ModelProvider {
                             } catch (JSONException e) {
                                 callback.failed();
                                 e.printStackTrace();
+                            } catch (ParseException parseException) {
+                                callback.failed();
+                                Log.e("ModelProvider", parseException.getMessage());
                             }
                         }
                     });
                 } else {
-                    Restaurant restaurant = getRestaurant(restaurantId);
-                    if (restaurant != null) {
-                        callback.pickUp(restaurant);
-                    } else {
+                    try {
+                        Restaurant restaurant = getRestaurant(restaurantId);
+                        if (restaurant != null) {
+                            callback.pickUp(restaurant);
+                        } else {
+                            callback.failed();
+                        }
+                    } catch (ParseException | JSONException parseException) {
                         callback.failed();
+                        Log.e("ModelProvider", parseException.getMessage());
                     }
                 }
             }
@@ -903,14 +927,9 @@ public class ModelProvider {
         });
     }
 
-    private Restaurant getRestaurant(String restaurantId) {
+    private Restaurant getRestaurant(String restaurantId) throws ParseException, JSONException {
         String restaurantJson = ModelCache.getInstance().getRestaurant(restaurantId);
-        try {
-            return ModelParser.getInstance().parseRestaurant(restaurantJson, restaurantId);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return ModelParser.getInstance().parseRestaurant(restaurantJson, restaurantId);
     }
 
     public void getRestaurantOffersAsync(final @NonNull String restaurantId, final @Nullable RestaurantOffersChangeListener callback) {
@@ -960,7 +979,13 @@ public class ModelProvider {
 
             @Override
             public void failed() {
-                NearbyRestaurants nearbyRestaurants = getNearby();
+                NearbyRestaurants nearbyRestaurants = null;
+                try {
+                    nearbyRestaurants = getNearby();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    callback.failed();
+                }
                 if (nearbyRestaurants != null) {
                     pickUp(nearbyRestaurants);
                 } else {

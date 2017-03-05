@@ -737,7 +737,7 @@ public class ModelParser {
         return new NearbyRestaurants(map);
     }
 
-    public Restaurant parseRestaurant(String jsonText, String restaurantId) throws JSONException {
+    public Restaurant parseRestaurant(String jsonText, String restaurantId) throws JSONException, ParseException {
         JSONObject restaurantJSON = new JSONObject(jsonText);
         String name = restaurantJSON.getString("title");
         String shortDescription = restaurantJSON.getString("shortDescription");
@@ -910,7 +910,7 @@ public class ModelParser {
         return listOfStrings;
     }
 
-    private DateTime[] convertToDateTimeArray(int weekDay, JSONArray array) throws JSONException {
+    private DateTime[] convertToDateTimeArray(int weekDay, JSONArray array) throws JSONException, ParseException {
         if (array.length() == 0) {
             return null;
         }
@@ -919,6 +919,9 @@ public class ModelParser {
         String[] openingValues;
         for (int i = 0; i < listOfStrings.length; i++) {
             openingValues = array.getString(i).split(":");
+            if (openingValues == null || openingValues.length != 2) {
+                throw new ParseException("Could not parse restaurant opening times (value = "+array.getString(i)+")", 0);
+            }
             int hours = Integer.valueOf(openingValues[0]);
             int minutes = Integer.valueOf(openingValues[1]);
             listOfStrings[i] = DateUtils.getDate(hours, minutes).updateWeekDay(weekDay);

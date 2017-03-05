@@ -687,6 +687,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
@@ -790,7 +791,22 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     private void syncRestaurantImages() {
         if (restaurant != null && retryImageSync) {
-            ModelDownloader.getInstance().syncRestaurantImages(restaurant.getPhotoUrls(), new LoadJobListener<List<Drawable>>() {
+            // Image urls are allowed to be null
+            String[] imgUrls = restaurant.getPhotoUrls();
+            if (imgUrls == null) {
+                retryImageSync = false;
+                IDetailPageViewContainer view = getView();
+                if (view != null) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        view.setBackgroundDrawable(activity.getDrawable(R.drawable.tomato_veggie));
+                    } else {
+                        view.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.tomato_veggie));
+                    }
+                }
+                return;
+            }
+
+            ModelDownloader.getInstance().syncRestaurantImages(imgUrls, new LoadJobListener<List<Drawable>>() {
                 @Override
                 public void onDownloadStarted() {
                     retryImageSync = false;
@@ -988,8 +1004,13 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     @Override
     public void failed() {
-        // TODO: User feedback, Downloading restaurant content failed
-        //Toast.makeText(activity, "Ein Fehler ist aufgetreten", Toast.LENGTH_SHORT).show();
+        // TODO: Optimize view if downloading restaurant content failed
+        Toast.makeText(activity, R.string.status_restaurant_download_failed, Toast.LENGTH_SHORT).show();
+        IDetailPageViewContainer view = getView();
+        if (view != null) {
+            String errorTitle = activity.getString(R.string.status_title_restaurant_download_failed);
+            view.setTitle(errorTitle);
+        }
     }
 
     @Override

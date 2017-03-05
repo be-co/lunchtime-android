@@ -748,7 +748,13 @@ public class ModelProvider {
 
     private void getNearbyAsync(@NonNull final NearbyChangeListener callback) {
         final String locationId = LocationHelper.getSelectedLocation();
-        final NearbyRestaurants nearby = getNearby();
+        NearbyRestaurants nearby = null;
+        try {
+            // try to reload if cached nearby has syntax errors
+            nearby = getNearby();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         long now = System.currentTimeMillis();
         if (nearby == null || lastSync + MINUTE < now) {
             lastSync = now;
@@ -775,24 +781,26 @@ public class ModelProvider {
                         callback.pickUp(nearbyRestaurants);
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        callback.failed();
                     }
                 }
             });
         } else {
-            callback.pickUp(getNearby());
+            try {
+                callback.pickUp(getNearby());
+            } catch (JSONException e) {
+                e.printStackTrace();
+                callback.failed();
+            }
         }
     }
 
-    private NearbyRestaurants getNearby() {
+    private NearbyRestaurants getNearby() throws JSONException {
         final String locationId = LocationHelper.getSelectedLocation();
         String nearbyJson = ModelCache.getInstance().getNearby(locationId);
         if (nearbyJson != null) {
-            try {
-                NearbyRestaurants nearbyRestaurants = ModelParser.getInstance().parseNearbyRestaurants(nearbyJson);
-                return nearbyRestaurants;
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            NearbyRestaurants nearbyRestaurants = ModelParser.getInstance().parseNearbyRestaurants(nearbyJson);
+            return nearbyRestaurants;
         }
         return null;
     }
@@ -843,7 +851,13 @@ public class ModelProvider {
 
             @Override
             public void failed() {
-                NearbyRestaurants nearbyRestaurants = getNearby();
+                NearbyRestaurants nearbyRestaurants = null;
+                try {
+                    nearbyRestaurants = getNearby();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    callback.failed();
+                }
                 if (nearbyRestaurants != null) {
                     pickUp(nearbyRestaurants);
                 } else {
@@ -965,7 +979,13 @@ public class ModelProvider {
 
             @Override
             public void failed() {
-                NearbyRestaurants nearbyRestaurants = getNearby();
+                NearbyRestaurants nearbyRestaurants = null;
+                try {
+                    nearbyRestaurants = getNearby();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    callback.failed();
+                }
                 if (nearbyRestaurants != null) {
                     pickUp(nearbyRestaurants);
                 } else {

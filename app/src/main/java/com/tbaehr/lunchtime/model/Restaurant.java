@@ -677,6 +677,7 @@
 package com.tbaehr.lunchtime.model;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.tbaehr.lunchtime.LunchtimeApplication;
@@ -721,12 +722,12 @@ public class Restaurant {
     private String[] photoUrls;
 
     public Restaurant(
-            String id,
-            String name,
-            String shortDescription,
-            String longDescription,
-            String locationDescription,
-            Map<Integer, DateTime[]> openingTimes,
+            @NonNull String id,
+            @NonNull String name,
+            @NonNull String shortDescription,
+            @NonNull String longDescription,
+            @NonNull String locationDescription,
+            @NonNull Map<Integer, DateTime[]> openingTimes,
             @Nullable String parking,
             @Nullable String paying,
             @Nullable String phoneNumber,

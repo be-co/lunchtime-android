@@ -678,6 +678,7 @@ package com.tbaehr.lunchtime.model;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.tbaehr.lunchtime.model.caching.ModelCache;
 import com.tbaehr.lunchtime.model.parsing.ModelParser;
@@ -688,6 +689,7 @@ import com.tbaehr.lunchtime.utils.LocationHelper;
 
 import org.json.JSONException;
 
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -883,15 +885,23 @@ public class ModelProvider {
                             } catch (JSONException e) {
                                 callback.failed();
                                 e.printStackTrace();
+                            } catch (ParseException parseException) {
+                                callback.failed();
+                                Log.e("ModelProvider", parseException.getMessage());
                             }
                         }
                     });
                 } else {
-                    Restaurant restaurant = getRestaurant(restaurantId);
-                    if (restaurant != null) {
-                        callback.pickUp(restaurant);
-                    } else {
+                    try {
+                        Restaurant restaurant = getRestaurant(restaurantId);
+                        if (restaurant != null) {
+                            callback.pickUp(restaurant);
+                        } else {
+                            callback.failed();
+                        }
+                    } catch (ParseException | JSONException parseException) {
                         callback.failed();
+                        Log.e("ModelProvider", parseException.getMessage());
                     }
                 }
             }
@@ -903,14 +913,9 @@ public class ModelProvider {
         });
     }
 
-    private Restaurant getRestaurant(String restaurantId) {
+    private Restaurant getRestaurant(String restaurantId) throws ParseException, JSONException {
         String restaurantJson = ModelCache.getInstance().getRestaurant(restaurantId);
-        try {
-            return ModelParser.getInstance().parseRestaurant(restaurantJson, restaurantId);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return ModelParser.getInstance().parseRestaurant(restaurantJson, restaurantId);
     }
 
     public void getRestaurantOffersAsync(final @NonNull String restaurantId, final @Nullable RestaurantOffersChangeListener callback) {

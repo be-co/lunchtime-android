@@ -679,10 +679,15 @@ package com.tbaehr.lunchtime;
 import android.app.Application;
 import android.content.Context;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
+
 /**
  * Created by timo.baehr@gmail.com on 07.01.17.
  */
 public class LunchtimeApplication extends Application {
+
+    private Tracker tracker;
 
     private static LunchtimeApplication instance;
 
@@ -704,6 +709,15 @@ public class LunchtimeApplication extends Application {
 
     public static Context getContext() {
         return instance.getApplicationContext();
+    }
+
+    synchronized public Tracker getDefaultTracker() {
+        if (tracker == null) {
+            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
+            // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
+            tracker = analytics.newTracker(R.xml.global_tracker);
+        }
+        return tracker;
     }
 
 }

@@ -695,7 +695,48 @@ public class DateUtils {
 
     private static final String DATE_FORMAT_WEEKDAY = "EEE MMM dd HH:mm:ss 'GMT'Z yyyy";
 
-    public static DateTime createDateFromString(String date) {
+    private static final String PARSE_ERROR_MESSAGE = "Could not parse weekday date with value \"%1$s\"";
+
+    public static DateTime createWeekdayDateFromString(String date) throws ParseException {
+        // Format: "EEE HH:mm:ss 'GMT'Z"
+        String[] parsed = date.split(" ");
+        String parsedWeekDay = parsed[0];
+        String[] parsedTime = parsed[1].split(":");
+        if (parsed.length == 3) {
+            int hours = Integer.valueOf(parsedTime[0]);
+            int minutes = Integer.valueOf(parsedTime[1]);
+            int weekDay;
+            switch (parsedWeekDay) {
+                case "Mon":
+                    weekDay = Calendar.MONDAY;
+                    break;
+                case "Tue":
+                    weekDay = Calendar.TUESDAY;
+                    break;
+                case "Wed":
+                    weekDay = Calendar.WEDNESDAY;
+                    break;
+                case "Thu":
+                    weekDay = Calendar.THURSDAY;
+                    break;
+                case "Fri":
+                    weekDay = Calendar.FRIDAY;
+                    break;
+                case "Sat":
+                    weekDay = Calendar.SATURDAY;
+                    break;
+                case "Sun":
+                    weekDay = Calendar.SUNDAY;
+                    break;
+                default:
+                    throw new ParseException(String.format(PARSE_ERROR_MESSAGE, date), 0);
+            }
+            return getDate(weekDay, hours, minutes);
+        }
+        throw new ParseException(String.format(PARSE_ERROR_MESSAGE, date), 0);
+    }
+
+    public static DateTime createDateFromString(String date) throws ParseException {
         if (date == null) {
             return null;
         }
@@ -706,15 +747,9 @@ public class DateUtils {
             Date dateTemp = dateFormat1.parse(date);
             return new DateTime(dateTemp.getTime());
         } catch (ParseException e1) {
-            try {
-                Date dateTemp = dateFormat2.parse(date);
-                return new DateTime(dateTemp.getTime());
-            } catch (ParseException e2) {
-                e2.printStackTrace();
-            }
+            Date dateTemp = dateFormat2.parse(date);
+            return new DateTime(dateTemp.getTime());
         }
-
-        return null;
     }
 
     /**

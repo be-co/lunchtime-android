@@ -6,6 +6,7 @@ import android.util.Pair;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
 
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -26,12 +27,22 @@ public class NearbyRestaurants {
 
     public DateTime restaurantLastUpdated(@NonNull String restaurantId) {
         String dStr = lastUpdatedMap.get(restaurantId).first;
-        return DateUtils.createDateFromString(dStr);
+        try {
+            return DateUtils.createDateFromString(dStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public DateTime offersLastUpdated(@NonNull String restaurantId) {
         String dStr = lastUpdatedMap.get(restaurantId).second;
-        return DateUtils.createDateFromString(dStr);
+        try {
+            return DateUtils.createDateFromString(dStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

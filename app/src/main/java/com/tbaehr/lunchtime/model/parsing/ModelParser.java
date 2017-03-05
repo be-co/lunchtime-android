@@ -676,10 +676,13 @@
  */
 package com.tbaehr.lunchtime.model.parsing;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Pair;
+import android.widget.Toast;
 
 import com.tbaehr.lunchtime.BuildConfig;
+import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.model.NearbyRestaurants;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Restaurant;
@@ -691,6 +694,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -733,7 +737,7 @@ public class ModelParser {
         return new NearbyRestaurants(map);
     }
 
-    public Restaurant parseRestaurant(String jsonText, String restaurantId) throws JSONException {
+    public Restaurant parseRestaurant(String jsonText, String restaurantId) throws JSONException, ParseException {
         JSONObject restaurantJSON = new JSONObject(jsonText);
         String name = restaurantJSON.getString("title");
         String shortDescription = restaurantJSON.getString("shortDescription");
@@ -824,14 +828,25 @@ public class ModelParser {
 
             autoSearchForIngredients(ingredients, offerTitle);
             autoSearchForIngredients(ingredients, offerDescription);
-            final Offer offer = new Offer(
-                    restaurantId,
-                    offerTitle,
-                    offerDescription,
-                    offerPrize,
-                    starts, ends,
-                    category,
-                    ingredients);
+
+            final Offer offer;
+            try {
+                offer = new Offer(
+                        restaurantId,
+                        offerTitle,
+                        offerDescription,
+                        offerPrize,
+                        starts, ends,
+                        category,
+                        ingredients);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                if (BuildConfig.DEBUG) {
+                    Context context = LunchtimeApplication.getContext();
+                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+                continue;
+            }
             final Offer.ValidationState validationState = offer.getValidationState();
             if (validationState.equals(Offer.ValidationState.NOW_VALID) ||
                     validationState.equals(Offer.ValidationState.SOON_VALID)) {
@@ -895,7 +910,7 @@ public class ModelParser {
         return listOfStrings;
     }
 
-    private DateTime[] convertToDateTimeArray(int weekDay, JSONArray array) throws JSONException {
+    private DateTime[] convertToDateTimeArray(int weekDay, JSONArray array) throws JSONException, ParseException {
         if (array.length() == 0) {
             return null;
         }
@@ -904,6 +919,9 @@ public class ModelParser {
         String[] openingValues;
         for (int i = 0; i < listOfStrings.length; i++) {
             openingValues = array.getString(i).split(":");
+            if (openingValues == null || openingValues.length != 2) {
+                throw new ParseException("Could not parse restaurant opening times (value = "+array.getString(i)+")", 0);
+            }
             int hours = Integer.valueOf(openingValues[0]);
             int minutes = Integer.valueOf(openingValues[1]);
             listOfStrings[i] = DateUtils.getDate(hours, minutes).updateWeekDay(weekDay);

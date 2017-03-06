@@ -20,6 +20,7 @@ ext {
     minSdkVersion = 15
 
     supportVersion = '25.1.0'
+    gServicesVersion = '10.2.0'
     butterknifeVersion = '8.4.0'
 }
 

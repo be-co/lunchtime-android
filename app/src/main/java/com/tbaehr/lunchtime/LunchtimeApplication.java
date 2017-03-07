@@ -680,12 +680,15 @@ import android.app.Application;
 import android.content.Context;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.StandardExceptionParser;
 import com.google.android.gms.analytics.Tracker;
+import com.tbaehr.lunchtime.tracking.ITracking;
 
 /**
  * Created by timo.baehr@gmail.com on 07.01.17.
  */
-public class LunchtimeApplication extends Application {
+public class LunchtimeApplication extends Application implements ITracking {
 
     private Tracker tracker;
 
@@ -711,13 +714,41 @@ public class LunchtimeApplication extends Application {
         return instance.getApplicationContext();
     }
 
-    synchronized public Tracker getDefaultTracker() {
+    private synchronized Tracker getGoogleAnalyticsTracker() {
         if (tracker == null) {
             GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
             // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
             tracker = analytics.newTracker(R.xml.global_tracker);
         }
         return tracker;
+    }
+
+    @Override
+    public void trackScreenView(String screenName) {
+        Tracker t = getGoogleAnalyticsTracker();
+        t.setScreenName(screenName);
+        t.send(new HitBuilders.ScreenViewBuilder().build());
+        GoogleAnalytics.getInstance(this).dispatchLocalHits();
+    }
+
+    @Override
+    public void trackException(Exception e) {
+        if (e != null) {
+            Tracker t = getGoogleAnalyticsTracker();
+            t.send(new HitBuilders.ExceptionBuilder()
+                    .setDescription(
+                            new StandardExceptionParser(this, null)
+                                    .getDescription(Thread.currentThread().getName(), e))
+                    .setFatal(false)
+                    .build()
+            );
+        }
+    }
+
+    @Override
+    public void trackEvent(String category, String action, String label) {
+        Tracker t = getGoogleAnalyticsTracker();
+        t.send(new HitBuilders.EventBuilder().setCategory(category).setAction(action).setLabel(label).build());
     }
 
 }

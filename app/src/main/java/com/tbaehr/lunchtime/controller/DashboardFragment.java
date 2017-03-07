@@ -699,6 +699,12 @@ public class DashboardFragment extends BaseFragment<IDashboardViewContainer, Das
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        trackScreenView("Fragment~" + DashboardFragment.this.getClass().getName());
+    }
+
+    @Override
     public IDashboardViewContainer getViewLayer() {
         return viewContainer;
     }

@@ -679,9 +679,6 @@ package com.tbaehr.lunchtime.controller;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.presenter.DetailPagePresenter;
 import com.tbaehr.lunchtime.view.DetailPageViewContainer;
 import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
@@ -695,24 +692,18 @@ public class DetailPageActivity extends BaseActivity<IDetailPageViewContainer, D
 
     public final static String KEY_OFFER_INDEX = "offer_index";
 
-    private Tracker tracker;
-
     private IDetailPageViewContainer view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         view = new DetailPageViewContainer(this);
-
-        LunchtimeApplication application = (LunchtimeApplication) getApplication();
-        tracker = application.getDefaultTracker();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        tracker.setScreenName("Image~" + this.getLocalClassName());
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        trackScreenView("Activity~" + this.getLocalClassName());
     }
 
     @Override

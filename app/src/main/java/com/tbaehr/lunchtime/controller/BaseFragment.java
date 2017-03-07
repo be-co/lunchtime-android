@@ -679,12 +679,14 @@ package com.tbaehr.lunchtime.controller;
 import com.propaneapps.tomorrow.base.BasePresenterFragment;
 import com.propaneapps.tomorrow.common.FactoryWithType;
 import com.propaneapps.tomorrow.presenter.Presenter;
+import com.tbaehr.lunchtime.LunchtimeApplication;
+import com.tbaehr.lunchtime.tracking.ITracking;
 
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
 public abstract class BaseFragment<V, P extends Presenter<V>> extends BasePresenterFragment<V, P>
-        implements FactoryWithType<P> {
+        implements FactoryWithType<P>, ITracking {
 
     private P presenter;
 
@@ -707,5 +709,24 @@ public abstract class BaseFragment<V, P extends Presenter<V>> extends BasePresen
     public void onDestroy() {
         presenter = null;
         super.onDestroy();
+    }
+
+    @Override
+    public void trackScreenView(String screenName) {
+        getLunchtimeApplication().trackScreenView(screenName);
+    }
+
+    @Override
+    public void trackException(Exception e) {
+        getLunchtimeApplication().trackException(e);
+    }
+
+    @Override
+    public void trackEvent(String category, String action, String label) {
+        getLunchtimeApplication().trackEvent(category, action, label);
+    }
+
+    private LunchtimeApplication getLunchtimeApplication() {
+        return (LunchtimeApplication) getActivity().getApplication();
     }
 }

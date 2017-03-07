@@ -679,9 +679,6 @@ package com.tbaehr.lunchtime.controller;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.presenter.MasterPagePresenter;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
 import com.tbaehr.lunchtime.view.MasterPageViewContainer;
@@ -690,28 +687,16 @@ public class MasterPageActivity extends BaseActivity<IMasterPageViewContainer, M
 
     private IMasterPageViewContainer view;
 
-    private Tracker tracker;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         view = new MasterPageViewContainer(this, getSupportFragmentManager());
-
-        LunchtimeApplication application = (LunchtimeApplication) getApplication();
-        tracker = application.getDefaultTracker();
     }
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         getPresenter().onPostCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        tracker.setScreenName("Image~" + this.getLocalClassName());
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     @Override

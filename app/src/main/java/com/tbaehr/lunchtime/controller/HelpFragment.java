@@ -699,6 +699,12 @@ public class HelpFragment extends BaseFragment<IHelpViewContainer, HelpPresenter
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        trackScreenView("Fragment~" + HelpFragment.this.getClass().getName());
+    }
+
+    @Override
     public HelpViewContainer getViewLayer() {
         return view;
     }

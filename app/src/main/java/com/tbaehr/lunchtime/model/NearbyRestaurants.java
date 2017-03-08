@@ -25,13 +25,21 @@ public class NearbyRestaurants {
         return lastUpdatedMap.keySet();
     }
 
+    /**
+     * @param restaurantId unique identifier of a restaurant
+     * @return null if restaurant is not cached
+     * @throws ParseException if the cached date cannot be parsed
+     */
     public DateTime restaurantLastUpdated(@NonNull String restaurantId) {
-        String dStr = lastUpdatedMap.get(restaurantId).first;
+        Pair<String, String> lastUpdated = lastUpdatedMap.get(restaurantId);
+        if (lastUpdated == null) {
+            throw new IllegalStateException("There should always be a non-null update pair for restaurants. (restaurant key = " + restaurantId + ")");
+        }
+        String restaurantLastUpdated = lastUpdated.first;
         try {
-            return DateUtils.createDateFromString(dStr);
+            return restaurantLastUpdated != null ? DateUtils.createDateFromString(restaurantLastUpdated) : null;
         } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
+            throw new IllegalStateException("The cached date should always be parsable. (restaurant key = " + restaurantId + ")");
         }
     }
 

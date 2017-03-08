@@ -917,6 +917,8 @@ public class ModelParser {
 
         DateTime[] listOfStrings = new DateTime[array.length()];
         String[] openingValues;
+        boolean nextDay = false;
+        int hourLast = -1;
         for (int i = 0; i < listOfStrings.length; i++) {
             openingValues = array.getString(i).split(":");
             if (openingValues == null || openingValues.length != 2) {
@@ -924,7 +926,17 @@ public class ModelParser {
             }
             int hours = Integer.valueOf(openingValues[0]);
             int minutes = Integer.valueOf(openingValues[1]);
-            listOfStrings[i] = DateUtils.getDate(hours, minutes).updateWeekDay(weekDay);
+
+            if (hourLast != -1 && hours < hourLast) {
+                nextDay = true;
+            }
+            hourLast = hours;
+
+            if (!nextDay) {
+                listOfStrings[i] = DateUtils.getDate(hours, minutes).updateWeekDay(weekDay);
+            } else {
+                listOfStrings[i] = DateUtils.getDate(hours, minutes).updateWeekDay(weekDay + 1);
+            }
         }
         return listOfStrings;
     }

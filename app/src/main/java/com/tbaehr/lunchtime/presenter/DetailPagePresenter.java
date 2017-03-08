@@ -1005,11 +1005,11 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     @Override
     public void failed() {
         // TODO: Optimize view if downloading restaurant content failed
-        Toast.makeText(activity, R.string.status_restaurant_download_failed, Toast.LENGTH_SHORT).show();
         IDetailPageViewContainer view = getView();
-        if (view != null) {
+        if (view != null && activity != null) {
             String errorTitle = activity.getString(R.string.status_title_restaurant_download_failed);
             view.setTitle(errorTitle);
+            Toast.makeText(activity, R.string.status_restaurant_download_failed, Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -695,13 +695,16 @@ import com.tbaehr.lunchtime.tracking.ITracking;
  * Created by timo.baehr@gmail.com on 30.12.16.
  */
 public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends BasePresenterActivity<V, P>
-implements FactoryWithType<P>, ITracking {
+implements FactoryWithType<P> {
 
     private P presenter;
+
+    protected ITracking tracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        tracker = ((LunchtimeApplication) getApplication()).getTracker();
     }
 
     public P getPresenter() {
@@ -763,25 +766,6 @@ implements FactoryWithType<P>, ITracking {
         }
         window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         window.addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-    }
-
-    @Override
-    public void trackScreenView(String screenName) {
-        getLunchtimeApplication().trackScreenView(screenName);
-    }
-
-    @Override
-    public void trackException(Exception e) {
-        getLunchtimeApplication().trackException(e);
-    }
-
-    @Override
-    public void trackEvent(String category, String action, String label) {
-        getLunchtimeApplication().trackEvent(category, action, label);
-    }
-
-    private LunchtimeApplication getLunchtimeApplication() {
-        return (LunchtimeApplication) getApplication();
     }
 
 }

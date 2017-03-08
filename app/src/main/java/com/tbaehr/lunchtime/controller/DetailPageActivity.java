@@ -680,6 +680,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.tbaehr.lunchtime.presenter.DetailPagePresenter;
+import com.tbaehr.lunchtime.tracking.ITracking;
 import com.tbaehr.lunchtime.view.DetailPageViewContainer;
 import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
 
@@ -703,7 +704,7 @@ public class DetailPageActivity extends BaseActivity<IDetailPageViewContainer, D
     @Override
     public void onResume() {
         super.onResume();
-        trackScreenView("Activity~" + this.getLocalClassName());
+        tracker.trackScreenView(ITracking.Screen.DETAIL);
     }
 
     @Override

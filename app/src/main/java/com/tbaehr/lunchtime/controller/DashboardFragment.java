@@ -682,6 +682,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.tbaehr.lunchtime.presenter.DashboardPresenter;
+import com.tbaehr.lunchtime.tracking.ITracking;
 import com.tbaehr.lunchtime.view.DashboardViewContainer;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
@@ -701,7 +702,7 @@ public class DashboardFragment extends BaseFragment<IDashboardViewContainer, Das
     @Override
     public void onResume() {
         super.onResume();
-        trackScreenView("Fragment~" + DashboardFragment.this.getClass().getName());
+        tracker.trackScreenView(ITracking.Screen.DASHBOARD);
     }
 
     @Override

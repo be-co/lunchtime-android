@@ -5,12 +5,18 @@ package com.tbaehr.lunchtime.tracking;
  */
 public interface ITracking {
 
+    enum Screen {
+        DASHBOARD,
+        HELP,
+        DETAIL;
+    }
+
     /***
      * Tracking screen view
      *
-     * @param screenName screen name to be displayed on dashboard
+     * @param screen screen name to be displayed on dashboard
      */
-    void trackScreenView(String screenName);
+    void trackScreenView(Screen screen);
 
     /***
      * Tracking an exception

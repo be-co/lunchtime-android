@@ -679,23 +679,21 @@ package com.tbaehr.lunchtime;
 import android.app.Application;
 import android.content.Context;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.StandardExceptionParser;
-import com.google.android.gms.analytics.Tracker;
 import com.tbaehr.lunchtime.tracking.ITracking;
+import com.tbaehr.lunchtime.tracking.LunchtimeTracker;
 
 /**
  * Created by timo.baehr@gmail.com on 07.01.17.
  */
-public class LunchtimeApplication extends Application implements ITracking {
+public class LunchtimeApplication extends Application {
 
-    private Tracker tracker;
+    private ITracking tracker;
 
     private static LunchtimeApplication instance;
 
     public LunchtimeApplication() {
         instance = this;
+        tracker = new LunchtimeTracker(this);
     }
 
     @Override
@@ -710,45 +708,11 @@ public class LunchtimeApplication extends Application implements ITracking {
         }*/
     }
 
-    public static Context getContext() {
+    public static synchronized Context getContext() {
         return instance.getApplicationContext();
     }
 
-    private synchronized Tracker getGoogleAnalyticsTracker() {
-        if (tracker == null) {
-            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
-            // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
-            tracker = analytics.newTracker(R.xml.global_tracker);
-        }
+    public ITracking getTracker() {
         return tracker;
     }
-
-    @Override
-    public void trackScreenView(String screenName) {
-        Tracker t = getGoogleAnalyticsTracker();
-        t.setScreenName(screenName);
-        t.send(new HitBuilders.ScreenViewBuilder().build());
-        GoogleAnalytics.getInstance(this).dispatchLocalHits();
-    }
-
-    @Override
-    public void trackException(Exception e) {
-        if (e != null) {
-            Tracker t = getGoogleAnalyticsTracker();
-            t.send(new HitBuilders.ExceptionBuilder()
-                    .setDescription(
-                            new StandardExceptionParser(this, null)
-                                    .getDescription(Thread.currentThread().getName(), e))
-                    .setFatal(false)
-                    .build()
-            );
-        }
-    }
-
-    @Override
-    public void trackEvent(String category, String action, String label) {
-        Tracker t = getGoogleAnalyticsTracker();
-        t.send(new HitBuilders.EventBuilder().setCategory(category).setAction(action).setLabel(label).build());
-    }
-
 }

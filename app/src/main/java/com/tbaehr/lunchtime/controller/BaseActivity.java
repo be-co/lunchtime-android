@@ -768,4 +768,7 @@ implements FactoryWithType<P> {
         window.addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
     }
 
+    public ITracking getTracker() {
+        return tracker;
+    }
 }

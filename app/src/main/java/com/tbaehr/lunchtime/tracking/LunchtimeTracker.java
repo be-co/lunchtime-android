@@ -38,7 +38,12 @@ public class LunchtimeTracker implements ITracking {
     public void trackScreenView(Screen screen) {
         Tracker t = getGoogleAnalyticsTracker();
         t.setScreenName(screen.name().toLowerCase());
+
+        // TODO: make custom dimensions visible on GAnalytics Dashboard
+        //t.set("&cd1", dimensionValue);
         t.send(new HitBuilders.ScreenViewBuilder()
+                //.set("&cd1", dimensionValue + 1)
+                //.setCustomDimension(1, dimensionValue + 2)
                 .build());
 
         GoogleAnalytics.getInstance(context).dispatchLocalHits();

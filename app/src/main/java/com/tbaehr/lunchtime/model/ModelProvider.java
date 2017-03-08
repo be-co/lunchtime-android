@@ -676,6 +676,7 @@
  */
 package com.tbaehr.lunchtime.model;
 
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -770,28 +771,64 @@ public class ModelProvider {
                 }
 
                 @Override
-                public void onDownloadFinished(String nearbyJson) {
+                public void onDownloadFinished(final String nearbyJson) {
                     if (nearbyJson == null) {
                         callback.failed();
                         return;
                     }
+
+                    new AsyncTask<Void, Void, Void>() {
+                        private NearbyRestaurants result;
+
+                        @Override
+                        protected Void doInBackground(Void... voids) {
+                            try {
+                                result = ModelParser.getInstance().parseNearbyRestaurants(nearbyJson);
+                                ModelCache.getInstance().putNearby(nearbyJson, locationId);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                callback.failed();
+                            }
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(Void aVoid) {
+                            super.onPostExecute(aVoid);
+                            if (result != null) {
+                                callback.pickUp(result);
+                            } else {
+                                callback.failed();
+                            }
+                        }
+                    }.execute();
+                }
+            });
+        } else {
+            new AsyncTask<Void, Void, Void>() {
+                private NearbyRestaurants result;
+
+                @Override
+                protected Void doInBackground(Void... voids) {
                     try {
-                        NearbyRestaurants nearbyRestaurants = ModelParser.getInstance().parseNearbyRestaurants(nearbyJson);
-                        ModelCache.getInstance().putNearby(nearbyJson, locationId);
-                        callback.pickUp(nearbyRestaurants);
+                        result = getNearby();
                     } catch (JSONException e) {
                         e.printStackTrace();
                         callback.failed();
                     }
+                    return null;
                 }
-            });
-        } else {
-            try {
-                callback.pickUp(getNearby());
-            } catch (JSONException e) {
-                e.printStackTrace();
-                callback.failed();
-            }
+
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    super.onPostExecute(aVoid);
+                    if (result != null) {
+                        callback.pickUp(result);
+                    } else {
+                        callback.failed();
+                    }
+                }
+            }.execute();
         }
     }
 
@@ -956,24 +993,53 @@ public class ModelProvider {
                         }
 
                         @Override
-                        public void onDownloadFinished(String offersJson) {
-                            try {
-                                RestaurantOffers offers = ModelParser.getInstance().parseRestaurantOffers(offersJson);
-                                ModelCache.getInstance().putRestaurantOffers(offersJson, restaurantId, onServerUpdated);
-                                callback.pickUp(offers);
-                            } catch (JSONException e) {
-                                callback.failed();
-                                e.printStackTrace();
-                            }
+                        public void onDownloadFinished(final String offersJson) {
+                            new AsyncTask<Void, Void, Void>() {
+                                private RestaurantOffers result;
+
+                                @Override
+                                protected Void doInBackground(Void... voids) {
+                                    try {
+                                        result = ModelParser.getInstance().parseRestaurantOffers(offersJson);
+                                        ModelCache.getInstance().putRestaurantOffers(offersJson, restaurantId, onServerUpdated);
+                                    } catch (JSONException jsonException) {
+                                        jsonException.printStackTrace();
+                                    }
+                                    return null;
+                                }
+
+                                @Override
+                                protected void onPostExecute(Void aVoid) {
+                                    super.onPostExecute(aVoid);
+                                    if (result != null) {
+                                        callback.pickUp(result);
+                                    } else {
+                                        callback.failed();
+                                    }
+                                }
+                            }.execute();
                         }
                     });
                 } else {
-                    RestaurantOffers offers = getRestaurantOffersFromCache(restaurantId);
-                    if (offers != null) {
-                        callback.pickUp(offers);
-                    } else {
-                        callback.failed();
-                    }
+                    new AsyncTask<Void, Void, Void>() {
+                        private RestaurantOffers result;
+
+                        @Override
+                        protected Void doInBackground(Void... voids) {
+                            result = getRestaurantOffersFromCache(restaurantId);
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(Void aVoid) {
+                            super.onPostExecute(aVoid);
+                            if (result != null) {
+                                callback.pickUp(result);
+                            } else {
+                                callback.failed();
+                            }
+                        }
+                    }.execute();
                 }
             }
 

@@ -925,7 +925,8 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     }
 
     private void updateRestaurantView() {
-        if (restaurant != null) {
+        IDetailPageViewContainer view = getView();
+        if (restaurant != null && view != null) {
             String shortDescription = restaurant.getShortDescription();
             String longDescription = restaurant.getLongDescription();
             String location = restaurant.getLocationDescription();
@@ -935,8 +936,8 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
             String paymentMethods = restaurant.getPaymentMethods();
             String phone = restaurant.getPhoneNumber();
             String url = restaurant.getUrl().replace("http://www.", "");
-            getView().setRestaurantData(this, shortDescription, longDescription, location, openingTimes, parking, paymentMethods, openingTimesExpanded, phone, url);
-            getView().setTitle(restaurant.getName());
+            view.setRestaurantData(this, shortDescription, longDescription, location, openingTimes, parking, paymentMethods, openingTimesExpanded, phone, url);
+            view.setTitle(restaurant.getName());
         }
     }
 
@@ -1005,11 +1006,11 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     @Override
     public void failed() {
         // TODO: Optimize view if downloading restaurant content failed
-        Toast.makeText(activity, R.string.status_restaurant_download_failed, Toast.LENGTH_SHORT).show();
         IDetailPageViewContainer view = getView();
-        if (view != null) {
+        if (view != null && activity != null) {
             String errorTitle = activity.getString(R.string.status_title_restaurant_download_failed);
             view.setTitle(errorTitle);
+            Toast.makeText(activity, R.string.status_restaurant_download_failed, Toast.LENGTH_SHORT).show();
         }
     }
 

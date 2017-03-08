@@ -828,10 +828,11 @@ public class DateTime implements Comparable<DateTime> {
     public String asHourMinute() {
         int hours = get(Calendar.HOUR_OF_DAY);
         int minutes = get(Calendar.MINUTE);
+        String sHours = hours < 10 ? "0" + hours : String.valueOf(hours);
         String sMinutes = minutes < 10 ? "0" + minutes : String.valueOf(minutes);
 
         StringBuilder sb = new StringBuilder("");
-        sb.append(hours).append(":").append(sMinutes);
+        sb.append(sHours).append(":").append(sMinutes);
         return sb.toString();
     }
 

@@ -863,29 +863,31 @@ public class ModelParser {
     }
 
 
-    private void autoSearchForIngredients(Set<Offer.Ingredient> ingredientList, String title) {
-        if (contains(title, "Mettenden", "Mettwurst", "schinken", "Cevapcici", "Wildbraten", "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
-            if (!title.contains("vom Rind") && !title.contains("vegetarisch")) {
-                ingredientList.add(Offer.Ingredient.PORK);
+    private void autoSearchForIngredients(Set<Offer.Ingredient> ingredientList, String offerText) {
+        if (!offerText.contains("Buffet")) {
+            if (contains(offerText, "Mettenden", "Mettwurst", "schinken", "Cevapcici", "Wildbraten", "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
+                if (!offerText.contains("vom Rind") && !offerText.contains("vegetarisch")) {
+                    ingredientList.add(Offer.Ingredient.PORK);
+                }
             }
-        }
-        if (contains(title, "Wildbraten", "Rumpsteak", "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Rindswurst", "Carne", "Hacksteak", "Bockwurst")) {
-            ingredientList.add(Offer.Ingredient.COW);
-        }
-        if (contains(title, "Coq", "Gans", "Geflügel", "Hähnchen", "Huhn", "Hühner", "Pute", "Truthahn")) {
-            ingredientList.add(Offer.Ingredient.CHICKEN);
-        }
-        if (contains(title, "Lasagne", "Rigatoni", "Pasta", "Futtuccine", "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
-            ingredientList.add(Offer.Ingredient.GLUTEN);
-        }
-        if (contains(title, "Mozzarella", "Feta", "Lasagne", "quark", "schmarrn", "Parmesan", "Käse", "käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand", "Frischkaese", "Kochkaese", "Frischkäse", "Kochkäs")) {
-            ingredientList.add(Offer.Ingredient.LACTOSE);
-        }
-        if (contains(title, "Wolfsbarsch", "Kabeljau", "Schlemmerfilet", "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {
-            ingredientList.add(Offer.Ingredient.FISH);
-        }
-        if (contains(title, "Omelett", " Ei", "Ei ", "Eier", "eier", "Spiegelei", "Majonese", "Eierknöpfle", "Tagliatelle", "Spaghetti", "Spätzle", "Nudel", "nudel")) {
-            ingredientList.add(Offer.Ingredient.EGG);
+            if (contains(offerText, "Ochse", "Wildbraten", "Rumpsteak", "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Rindswurst", "Carne", "Hacksteak", "Bockwurst")) {
+                ingredientList.add(Offer.Ingredient.COW);
+            }
+            if (contains(offerText, "Ente", "Coq", "Gans", "Geflügel", "Hähnchen", "Huhn", "Hühner", "Pute", "Truthahn")) {
+                ingredientList.add(Offer.Ingredient.CHICKEN);
+            }
+            if (contains(offerText, "Lasagne", "Rigatoni", "Pasta", "Futtuccine", "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
+                ingredientList.add(Offer.Ingredient.GLUTEN);
+            }
+            if (contains(offerText, "Mozzarella", "Feta", "Lasagne", "quark", "schmarrn", "Parmesan", "Käse", "käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand", "Frischkaese", "Kochkaese", "Frischkäse", "Kochkäs")) {
+                ingredientList.add(Offer.Ingredient.LACTOSE);
+            }
+            if (contains(offerText, "Pescatore", "Wolfsbarsch", "Kabeljau", "Schlemmerfilet", "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {
+                ingredientList.add(Offer.Ingredient.FISH);
+            }
+            if (contains(offerText, "Omelett", " Ei", "Ei ", "Eier", "eier", "Spiegelei", "Majonese", "Eierknöpfle", "Tagliatelle", "Spaghetti", "Spätzle", "Nudel", "nudel")) {
+                ingredientList.add(Offer.Ingredient.EGG);
+            }
         }
     }
 
@@ -917,6 +919,8 @@ public class ModelParser {
 
         DateTime[] listOfStrings = new DateTime[array.length()];
         String[] openingValues;
+        boolean nextDay = false;
+        int hourLast = -1;
         for (int i = 0; i < listOfStrings.length; i++) {
             openingValues = array.getString(i).split(":");
             if (openingValues == null || openingValues.length != 2) {
@@ -924,7 +928,17 @@ public class ModelParser {
             }
             int hours = Integer.valueOf(openingValues[0]);
             int minutes = Integer.valueOf(openingValues[1]);
-            listOfStrings[i] = DateUtils.getDate(hours, minutes).updateWeekDay(weekDay);
+
+            if (hourLast != -1 && hours < hourLast) {
+                nextDay = true;
+            }
+            hourLast = hours;
+
+            if (!nextDay) {
+                listOfStrings[i] = DateUtils.getDate(hours, minutes).updateWeekDay(weekDay);
+            } else {
+                listOfStrings[i] = DateUtils.getDate(hours, minutes).updateWeekDay(weekDay + 1);
+            }
         }
         return listOfStrings;
     }

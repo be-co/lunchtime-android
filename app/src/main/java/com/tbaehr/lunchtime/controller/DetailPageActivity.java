@@ -680,7 +680,6 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.tbaehr.lunchtime.presenter.DetailPagePresenter;
-import com.tbaehr.lunchtime.tracking.ITracking;
 import com.tbaehr.lunchtime.view.DetailPageViewContainer;
 import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
 
@@ -699,12 +698,6 @@ public class DetailPageActivity extends BaseActivity<IDetailPageViewContainer, D
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         view = new DetailPageViewContainer(this);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        tracker.trackScreenView(ITracking.Screen.DETAIL);
     }
 
     @Override

@@ -702,7 +702,7 @@ public class HelpFragment extends BaseFragment<IHelpViewContainer, HelpPresenter
     @Override
     public void onResume() {
         super.onResume();
-        tracker.trackScreenView(ITracking.Screen.HELP);
+        tracker.trackScreenView(ITracking.Screen.HELP, null);
     }
 
     @Override

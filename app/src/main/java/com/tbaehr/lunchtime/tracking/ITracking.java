@@ -16,7 +16,7 @@ public interface ITracking {
      *
      * @param screen screen name to be displayed on dashboard
      */
-    void trackScreenView(Screen screen);
+    void trackScreenView(Screen screen, String content);
 
     /***
      * Tracking an exception

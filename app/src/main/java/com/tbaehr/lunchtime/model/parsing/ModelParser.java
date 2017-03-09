@@ -826,8 +826,10 @@ public class ModelParser {
                 }
             }
 
-            autoSearchForIngredients(ingredients, offerTitle);
-            autoSearchForIngredients(ingredients, offerDescription);
+            if (!offerTitle.contains("Buffet")) {
+                autoSearchForIngredients(ingredients, offerTitle);
+                autoSearchForIngredients(ingredients, offerDescription);
+            }
 
             final Offer offer;
             try {
@@ -864,30 +866,28 @@ public class ModelParser {
 
 
     private void autoSearchForIngredients(Set<Offer.Ingredient> ingredientList, String offerText) {
-        if (!offerText.contains("Buffet")) {
-            if (contains(offerText, "Mettenden", "Mettwurst", "schinken", "Cevapcici", "Wildbraten", "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
-                if (!offerText.contains("vom Rind") && !offerText.contains("vegetarisch")) {
-                    ingredientList.add(Offer.Ingredient.PORK);
-                }
+        if (contains(offerText, "Mettenden", "Mettwurst", "schinken", "Cevapcici", "Wildbraten", "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
+            if (!offerText.contains("vom Rind") && !offerText.contains("vegetarisch")) {
+                ingredientList.add(Offer.Ingredient.PORK);
             }
-            if (contains(offerText, "Ochse", "Wildbraten", "Rumpsteak", "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Rindswurst", "Carne", "Hacksteak", "Bockwurst")) {
-                ingredientList.add(Offer.Ingredient.COW);
-            }
-            if (contains(offerText, "Ente", "Coq", "Gans", "Geflügel", "Hähnchen", "Huhn", "Hühner", "Pute", "Truthahn")) {
-                ingredientList.add(Offer.Ingredient.CHICKEN);
-            }
-            if (contains(offerText, "Lasagne", "Rigatoni", "Pasta", "Futtuccine", "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
-                ingredientList.add(Offer.Ingredient.GLUTEN);
-            }
-            if (contains(offerText, "Mozzarella", "Feta", "Lasagne", "quark", "schmarrn", "Parmesan", "Käse", "käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand", "Frischkaese", "Kochkaese", "Frischkäse", "Kochkäs")) {
-                ingredientList.add(Offer.Ingredient.LACTOSE);
-            }
-            if (contains(offerText, "Pescatore", "Wolfsbarsch", "Kabeljau", "Schlemmerfilet", "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {
-                ingredientList.add(Offer.Ingredient.FISH);
-            }
-            if (contains(offerText, "Omelett", " Ei", "Ei ", "Eier", "eier", "Spiegelei", "Majonese", "Eierknöpfle", "Tagliatelle", "Spaghetti", "Spätzle", "Nudel", "nudel")) {
-                ingredientList.add(Offer.Ingredient.EGG);
-            }
+        }
+        if (contains(offerText, "Ochse", "Wildbraten", "Rumpsteak", "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Rindswurst", "Carne", "Hacksteak", "Bockwurst")) {
+            ingredientList.add(Offer.Ingredient.COW);
+        }
+        if (contains(offerText, "Ente", "Coq", "Gans", "Geflügel", "Hähnchen", "Huhn", "Hühner", "Pute", "Truthahn")) {
+            ingredientList.add(Offer.Ingredient.CHICKEN);
+        }
+        if (contains(offerText, "Lasagne", "Rigatoni", "Pasta", "Futtuccine", "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
+            ingredientList.add(Offer.Ingredient.GLUTEN);
+        }
+        if (contains(offerText, "Mozzarella", "Feta", "Lasagne", "quark", "schmarrn", "Parmesan", "Käse", "käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand", "Frischkaese", "Kochkaese", "Frischkäse", "Kochkäs")) {
+            ingredientList.add(Offer.Ingredient.LACTOSE);
+        }
+        if (contains(offerText, "Pescatore", "Wolfsbarsch", "Kabeljau", "Schlemmerfilet", "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {
+            ingredientList.add(Offer.Ingredient.FISH);
+        }
+        if (contains(offerText, "Omelett", " Ei", "Ei ", "Eier", "eier", "Spiegelei", "Majonese", "Eierknöpfle", "Tagliatelle", "Spaghetti", "Spätzle", "Nudel", "nudel")) {
+            ingredientList.add(Offer.Ingredient.EGG);
         }
     }
 

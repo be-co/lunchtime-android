@@ -739,7 +739,7 @@ public class ModelProvider {
     public static ModelProvider getInstance() {
         if (instance == null) {
             instance = new ModelProvider();
-            tracker = new LunchtimeTracker(LunchtimeApplication.getContext());
+            tracker = new LunchtimeTracker(LunchtimeApplication.getContext(), false);
         }
         return instance;
     }

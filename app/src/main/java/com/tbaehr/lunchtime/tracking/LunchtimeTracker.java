@@ -18,18 +18,27 @@ public class LunchtimeTracker implements ITracking {
 
     private Context context;
 
+    private boolean optOut;
+
     private Tracker tracker;
 
-    public LunchtimeTracker(Context context) {
+    /**
+     * @param context application context
+     * @param optOut if true not hits will be sent. This should be set in application initialization code.
+     */
+    public LunchtimeTracker(Context context, boolean optOut) {
         this.context = context;
+        this.optOut = optOut;
     }
 
     private synchronized Tracker getGoogleAnalyticsTracker() {
         if (tracker == null) {
             GoogleAnalytics analytics = GoogleAnalytics.getInstance(context);
+            analytics.setAppOptOut(optOut);
+
             // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
             tracker = analytics.newTracker(R.xml.global_tracker);
-            tracker.enableExceptionReporting(true);
+            tracker.enableAdvertisingIdCollection(false);
 
             // remove the last octet of the IP address prior
             tracker.setAnonymizeIp(true);

@@ -693,7 +693,7 @@ public class LunchtimeApplication extends Application {
 
     public LunchtimeApplication() {
         instance = this;
-        tracker = new LunchtimeTracker(this);
+        tracker = new LunchtimeTracker(this, false);
     }
 
     @Override

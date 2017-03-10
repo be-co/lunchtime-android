@@ -39,9 +39,6 @@ public class LunchtimeTracker implements ITracking {
             // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
             tracker = analytics.newTracker(R.xml.global_tracker);
             tracker.enableAdvertisingIdCollection(false);
-
-            // remove the last octet of the IP address prior
-            tracker.setAnonymizeIp(true);
         }
         return tracker;
     }

@@ -8,6 +8,10 @@
          Default is false. -->
     <bool name="ga_reportUncaughtExceptions">true</bool>
 
+    <!-- remove the last octet of the IP address prior.
+         Default is false. -->
+    <bool name="ga_anonymizeIp">true</bool>
+
     <!-- Auto report of Activities.
          Default is false -->
     <bool name="ga_autoActivityTracking">false</bool>

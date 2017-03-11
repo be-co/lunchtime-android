@@ -682,7 +682,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.tbaehr.lunchtime.presenter.HelpPresenter;
-import com.tbaehr.lunchtime.tracking.ITracking;
+import com.tbaehr.lunchtime.tracking.TrackingScreen;
 import com.tbaehr.lunchtime.view.HelpViewContainer;
 import com.tbaehr.lunchtime.view.IHelpViewContainer;
 
@@ -702,7 +702,7 @@ public class HelpFragment extends BaseFragment<IHelpViewContainer, HelpPresenter
     @Override
     public void onResume() {
         super.onResume();
-        tracker.trackScreenView(ITracking.Screen.HELP, null);
+        tracker.trackScreenView(new TrackingScreen(TrackingScreen.Screen.HELP));
     }
 
     @Override

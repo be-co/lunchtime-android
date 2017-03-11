@@ -1,7 +1,6 @@
 package com.tbaehr.lunchtime.tracking;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
@@ -13,8 +12,6 @@ import com.tbaehr.lunchtime.R;
  * Created by baehrt on 07.03.2017.
  */
 public class LunchtimeTracker implements ITracking {
-
-    private static final int DIMEN_CONTENT = 1;
 
     private Context context;
 
@@ -44,13 +41,16 @@ public class LunchtimeTracker implements ITracking {
     }
 
     @Override
-    public void trackScreenView(Screen screen, @Nullable String content) {
+    public void trackScreenView(TrackingScreen screen) {
         Tracker t = getGoogleAnalyticsTracker();
-        t.setScreenName(screen.name().toLowerCase());
+        t.setScreenName(screen.getScreenName());
 
         HitBuilders.ScreenViewBuilder builder = new HitBuilders.ScreenViewBuilder();
-        if (content != null) {
-            builder.setCustomDimension(DIMEN_CONTENT, content);
+        CustomDimension[] customDimensions = screen.getCustomDimensions();
+        if (customDimensions != null) {
+            for (CustomDimension dimen : customDimensions) {
+                builder.setCustomDimension(dimen.key, dimen.value);
+            }
         }
         t.send(builder.build());
 

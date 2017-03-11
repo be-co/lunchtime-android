@@ -697,7 +697,9 @@ import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
 import com.tbaehr.lunchtime.model.web.LoadJobListener;
 import com.tbaehr.lunchtime.model.web.ModelDownloader;
+import com.tbaehr.lunchtime.tracking.CustomDimension;
 import com.tbaehr.lunchtime.tracking.ITracking;
+import com.tbaehr.lunchtime.tracking.TrackingScreen;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
 
@@ -761,7 +763,11 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     @Override
     public void onResume() {
         super.onResume();
-        tracker.trackScreenView(ITracking.Screen.DETAIL, restaurantId);
+        CustomDimension restaurantDimen = new CustomDimension(
+                CustomDimension.CustomDimensionIndex.KEY_RESTAURANT_ID,
+                restaurantId
+        );
+        tracker.trackScreenView(new TrackingScreen(TrackingScreen.Screen.DETAIL, restaurantDimen));
     }
 
     @Override

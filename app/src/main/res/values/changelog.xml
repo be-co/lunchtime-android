@@ -3,7 +3,7 @@
     <string name="changelog"><b>2017.03.12 Alpha (v14)</b>
         \n•  Usability statistics enabled by Google Analytics
         \n•  Added permission ACCESS_NETWORK_STATE for Google Analytics
-        \n•  Optimized offer loading
+        \n•  Optimized loading of restaurant offers
         \n\n<b>2017.03.05 Alpha (v13)</b>
         \n•  Permisson  \"PHONE_CALL\" is now optional. Installation on tablets again possible.
         \n•  Android 4.4 devices should be able to start

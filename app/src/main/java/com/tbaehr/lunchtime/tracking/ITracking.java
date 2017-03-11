@@ -10,7 +10,7 @@ public interface ITracking {
      *
      * @param screen screen name to be displayed on dashboard
      */
-    void trackScreenView(TrackingScreen screen);
+    void trackScreenView(TrackingScreen screen, CustomDimension... customDimensions);
 
     /***
      * Tracking an exception

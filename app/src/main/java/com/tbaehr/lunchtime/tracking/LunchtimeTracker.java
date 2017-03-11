@@ -42,15 +42,14 @@ public class LunchtimeTracker implements ITracking {
     }
 
     @Override
-    public void trackScreenView(TrackingScreen screen) {
+    public void trackScreenView(TrackingScreen screen, CustomDimension... customDimensions) {
         if (BuildConfig.DEBUG) {
             return;
         }
         Tracker t = getGoogleAnalyticsTracker();
-        t.setScreenName(screen.getScreenName());
+        t.setScreenName(screen.toString());
 
         HitBuilders.ScreenViewBuilder builder = new HitBuilders.ScreenViewBuilder();
-        CustomDimension[] customDimensions = screen.getCustomDimensions();
         if (customDimensions != null) {
             for (CustomDimension dimen : customDimensions) {
                 builder.setCustomDimension(dimen.key, dimen.value);

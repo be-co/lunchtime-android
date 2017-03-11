@@ -767,7 +767,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
                 CustomDimension.CustomDimensionIndex.KEY_RESTAURANT_ID,
                 restaurantId
         );
-        tracker.trackScreenView(new TrackingScreen(TrackingScreen.Screen.DETAIL, restaurantDimen));
+        tracker.trackScreenView(TrackingScreen.DETAIL, restaurantDimen);
     }
 
     @Override

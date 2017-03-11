@@ -708,7 +708,7 @@ public class DashboardFragment extends BaseFragment<IDashboardViewContainer, Das
                 CustomDimension.CustomDimensionIndex.KEY_LOCATION,
                 LocationHelper.getSelectedLocation()
         );
-        tracker.trackScreenView(new TrackingScreen(TrackingScreen.Screen.DASHBOARD, location));
+        tracker.trackScreenView(TrackingScreen.DASHBOARD, location);
     }
 
     @Override

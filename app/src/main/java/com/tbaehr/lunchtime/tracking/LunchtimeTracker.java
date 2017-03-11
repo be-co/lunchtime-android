@@ -6,6 +6,7 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.StandardExceptionParser;
 import com.google.android.gms.analytics.Tracker;
+import com.tbaehr.lunchtime.BuildConfig;
 import com.tbaehr.lunchtime.R;
 
 /**
@@ -42,6 +43,9 @@ public class LunchtimeTracker implements ITracking {
 
     @Override
     public void trackScreenView(TrackingScreen screen) {
+        if (BuildConfig.DEBUG) {
+            return;
+        }
         Tracker t = getGoogleAnalyticsTracker();
         t.setScreenName(screen.getScreenName());
 
@@ -75,6 +79,9 @@ public class LunchtimeTracker implements ITracking {
 
     @Override
     public void trackEvent(String category, String action, String label) {
+        if (BuildConfig.DEBUG) {
+            return;
+        }
         Tracker t = getGoogleAnalyticsTracker();
         t.send(new HitBuilders.EventBuilder().setCategory(category).setAction(action).setLabel(label).build());
 

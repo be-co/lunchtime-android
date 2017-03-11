@@ -679,15 +679,21 @@ package com.tbaehr.lunchtime;
 import android.app.Application;
 import android.content.Context;
 
+import com.tbaehr.lunchtime.tracking.ITracking;
+import com.tbaehr.lunchtime.tracking.LunchtimeTracker;
+
 /**
  * Created by timo.baehr@gmail.com on 07.01.17.
  */
 public class LunchtimeApplication extends Application {
 
+    private ITracking tracker;
+
     private static LunchtimeApplication instance;
 
     public LunchtimeApplication() {
         instance = this;
+        tracker = new LunchtimeTracker(this, false);
     }
 
     @Override
@@ -702,8 +708,11 @@ public class LunchtimeApplication extends Application {
         }*/
     }
 
-    public static Context getContext() {
+    public static synchronized Context getContext() {
         return instance.getApplicationContext();
     }
 
+    public ITracking getTracker() {
+        return tracker;
+    }
 }

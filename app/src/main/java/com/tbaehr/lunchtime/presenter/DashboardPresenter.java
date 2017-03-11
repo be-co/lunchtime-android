@@ -676,17 +676,18 @@
  */
 package com.tbaehr.lunchtime.presenter;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
 
 import com.propaneapps.tomorrow.presenter.BasePresenter;
 import com.tbaehr.lunchtime.R;
+import com.tbaehr.lunchtime.controller.BaseActivity;
 import com.tbaehr.lunchtime.controller.DashboardFragment;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
 import com.tbaehr.lunchtime.model.ModelProvider;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
+import com.tbaehr.lunchtime.tracking.ITracking;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
@@ -708,12 +709,15 @@ import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_
 public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         implements ModelProvider.NearbyOffersChangeListener {
 
-    private Activity activity;
+    private BaseActivity activity;
+
+    private ITracking tracker;
 
     private Timer timer;
 
     public DashboardPresenter(DashboardFragment fragment) {
-        this.activity = fragment.getActivity();
+        this.activity = (BaseActivity) fragment.getActivity();
+        this.tracker = activity.getTracker();
     }
 
     @Override
@@ -922,6 +926,9 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         openFetchOrderActivityIntent.putExtra(KEY_RESTAURANT_ID, restaurantId);
         if (index != -1) {
             openFetchOrderActivityIntent.putExtra(KEY_OFFER_INDEX, index);
+            tracker.trackEvent("openPage", "clickOnOffer", restaurantId);
+        } else {
+            tracker.trackEvent("openPage", "clickOnRestaurant", restaurantId);
         }
         activity.startActivity(openFetchOrderActivityIntent);
     }

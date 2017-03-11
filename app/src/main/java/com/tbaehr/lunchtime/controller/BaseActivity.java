@@ -687,7 +687,9 @@ import android.view.WindowManager;
 
 import com.propaneapps.tomorrow.base.BasePresenterActivity;
 import com.propaneapps.tomorrow.common.FactoryWithType;
+import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.presenter.CustomBasePresenter;
+import com.tbaehr.lunchtime.tracking.ITracking;
 
 /**
  * Created by timo.baehr@gmail.com on 30.12.16.
@@ -697,9 +699,12 @@ implements FactoryWithType<P> {
 
     private P presenter;
 
+    protected ITracking tracker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        tracker = ((LunchtimeApplication) getApplication()).getTracker();
     }
 
     public P getPresenter() {
@@ -763,4 +768,7 @@ implements FactoryWithType<P> {
         window.addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
     }
 
+    public ITracking getTracker() {
+        return tracker;
+    }
 }

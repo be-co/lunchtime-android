@@ -697,6 +697,9 @@ import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
 import com.tbaehr.lunchtime.model.web.LoadJobListener;
 import com.tbaehr.lunchtime.model.web.ModelDownloader;
+import com.tbaehr.lunchtime.tracking.CustomDimension;
+import com.tbaehr.lunchtime.tracking.ITracking;
+import com.tbaehr.lunchtime.tracking.TrackingScreen;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.view.IDetailPageViewContainer;
 
@@ -724,6 +727,8 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     private DetailPageActivity activity;
 
+    private ITracking tracker;
+
     private String restaurantId;
 
     private Restaurant restaurant;
@@ -744,6 +749,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     public DetailPagePresenter(DetailPageActivity activity) {
         this.activity = activity;
+        this.tracker = activity.getTracker();
         this.index = activity.getIntent().getIntExtra(KEY_OFFER_INDEX, -1);
         this.restaurantId = activity.getIntent().getStringExtra(KEY_RESTAURANT_ID);
     }
@@ -755,8 +761,19 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        CustomDimension restaurantDimen = new CustomDimension(
+                CustomDimension.CustomDimensionIndex.KEY_RESTAURANT_ID,
+                restaurantId
+        );
+        tracker.trackScreenView(TrackingScreen.DETAIL, restaurantDimen);
+    }
+
+    @Override
     public void onDestroy() {
         activity = null;
+        tracker = null;
         restaurantId = null;
         restaurant = null;
         restaurantOffers = null;

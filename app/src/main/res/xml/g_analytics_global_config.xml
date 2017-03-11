@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <!-- The dispatching period in seconds when Google Play services is unavailable.
+         Default period is 1800 seconds -->
+    <integer name="ga_dispatchPeriod">1800</integer>
+
+    <!-- Catch and report uncaught exceptions from the app.
+         Default is false. -->
+    <bool name="ga_reportUncaughtExceptions">true</bool>
+
+    <!-- remove the last octet of the IP address prior.
+         Default is false. -->
+    <bool name="ga_anonymizeIp">true</bool>
+
+    <!-- Auto report of Activities.
+         Default is false -->
+    <bool name="ga_autoActivityTracking">false</bool>
+
+    <!-- Enable dry run mode.
+         Default is false -->
+    <bool name="ga_dryRun">false</bool>
+</resources>

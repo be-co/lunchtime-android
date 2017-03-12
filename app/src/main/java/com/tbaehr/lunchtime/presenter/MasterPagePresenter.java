@@ -692,6 +692,7 @@ import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
 
 import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_DASHBOARD_FRAGMENT;
 import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_HELP_FRAGMENT;
+import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_PREFERENCES_FRAGMENT;
 
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.
@@ -762,6 +763,9 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
             case R.id.nav_dashboard:
                 presentDashboard();
                 break;
+            case R.id.nav_preferences:
+                presentPreferencesPage();
+                break;
             case R.id.nav_help:
                 presentHelpPage();
                 break;
@@ -793,6 +797,16 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
             }
         });
         view.showDashboardFragment();
+    }
+
+    private void presentPreferencesPage() {
+        activeFragment = TAG_PREFERENCES_FRAGMENT;
+
+        IMasterPageViewContainer view = getView();
+        toolbarTitle = getString(R.string.nav_item_preferences);
+        view.setToolbarTitle(toolbarTitle);
+        view.setOnTitleClickListener(null);
+        view.showPreferencesFragment();
     }
 
     private void presentHelpPage() {

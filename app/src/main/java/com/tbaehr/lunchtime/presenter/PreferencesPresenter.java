@@ -674,65 +674,57 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.utils;
+package com.tbaehr.lunchtime.presenter;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import com.propaneapps.tomorrow.presenter.BasePresenter;
+import com.tbaehr.lunchtime.tracking.ITracking;
+import com.tbaehr.lunchtime.utils.SharedPrefsHelper;
+import com.tbaehr.lunchtime.view.IPreferencesViewContainer;
 
-import com.tbaehr.lunchtime.LunchtimeApplication;
-
-import static android.content.Context.MODE_PRIVATE;
+import static com.tbaehr.lunchtime.tracking.ITracking.KEY_TRACKING_ENABLED;
 
 /**
- * Created by timo.baehr@gmail.com on 21.02.17.
+ * Created by timo.baehr@gmail.com on 12.03.17.
  */
-public class SharedPrefsHelper {
+public class PreferencesPresenter extends BasePresenter<IPreferencesViewContainer> implements IPreferencesViewContainer.ClickListener {
 
-    private static final String KEY_STORAGE = "cache";
+    private boolean trackingEnabled;
 
-    public static String getString(String key) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
+    private ITracking tracker;
 
-        return sharedPreferences.getString(key, null);
+    public PreferencesPresenter(ITracking tracker) {
+        this.tracker = tracker;
     }
 
-    public static void putString(String key, String value) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putString(key, value).apply();
+    @Override
+    public void bindView(IPreferencesViewContainer view) {
+        super.bindView(view);
+        trackingEnabled = SharedPrefsHelper.getBoolean(KEY_TRACKING_ENABLED, true);
+        setClickListeners();
+        view.setOptOutStatus(trackingEnabled);
     }
 
-    public static int getInt(String key, int defaultValue) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-
-        return sharedPreferences.getInt(key, defaultValue);
+    @Override
+    public void unbindView() {
+        getView().removeOnClickListeners();
+        super.unbindView();
     }
 
-    public static void putInt(String key, int value) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putInt(key, value).apply();
+    private void setClickListeners() {
+        IPreferencesViewContainer view = getView();
+        if (view != null) {
+            view.setClickListener(this);
+        }
     }
 
-    public static boolean getBoolean(String key, boolean defaultValue) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-
-        return sharedPreferences.getBoolean(key, defaultValue);
+    @Override
+    public void onOptOutClicked() {
+        IPreferencesViewContainer view = getView();
+        trackingEnabled = !trackingEnabled;
+        SharedPrefsHelper.putBoolean(KEY_TRACKING_ENABLED, trackingEnabled);
+        tracker.trackEvent("config_change", "opt_out", trackingEnabled ? "enabled" : "disabled");
+        if (view != null) {
+            view.setOptOutStatus(trackingEnabled);
+        }
     }
-
-    public static void putBoolean(String key, boolean value) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putBoolean(key, value).apply();
-    }
-
 }

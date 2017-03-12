@@ -681,6 +681,9 @@ import android.content.Context;
 
 import com.tbaehr.lunchtime.tracking.ITracking;
 import com.tbaehr.lunchtime.tracking.LunchtimeTracker;
+import com.tbaehr.lunchtime.utils.SharedPrefsHelper;
+
+import static com.tbaehr.lunchtime.tracking.ITracking.KEY_TRACKING_ENABLED;
 
 /**
  * Created by timo.baehr@gmail.com on 07.01.17.
@@ -693,12 +696,14 @@ public class LunchtimeApplication extends Application {
 
     public LunchtimeApplication() {
         instance = this;
-        tracker = new LunchtimeTracker(this, false);
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        boolean optOut = !SharedPrefsHelper.getBoolean(KEY_TRACKING_ENABLED, true);
+        tracker = new LunchtimeTracker(this, optOut);
 
         /*if (BuildConfig.DEBUG) {
             if (LeakCanary.isInAnalyzerProcess(this)) {

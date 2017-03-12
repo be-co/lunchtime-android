@@ -22,7 +22,7 @@ public class LunchtimeTracker implements ITracking {
 
     /**
      * @param context application context
-     * @param optOut if true not hits will be sent. This should be set in application initialization code.
+     * @param optOut if true no hits will be sent. This should be set in application initialization code.
      */
     public LunchtimeTracker(Context context, boolean optOut) {
         this.context = context;

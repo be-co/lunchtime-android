@@ -5,6 +5,8 @@ package com.tbaehr.lunchtime.tracking;
  */
 public interface ITracking {
 
+    String KEY_TRACKING_ENABLED = "optOut";
+
     /***
      * Tracking screen view
      *

@@ -674,65 +674,65 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.utils;
+package com.tbaehr.lunchtime.view;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.support.design.widget.Snackbar;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Switch;
+import android.widget.TextView;
 
-import com.tbaehr.lunchtime.LunchtimeApplication;
+import com.tbaehr.lunchtime.R;
 
-import static android.content.Context.MODE_PRIVATE;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
- * Created by timo.baehr@gmail.com on 21.02.17.
+ * Created by timo.baehr@gmail.com on 12.03.17.
  */
-public class SharedPrefsHelper {
+public class PreferencesViewContainer implements IPreferencesViewContainer {
 
-    private static final String KEY_STORAGE = "cache";
+    private IPreferencesViewContainer.ClickListener clickListener;
 
-    public static String getString(String key) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
+    private View rootView;
 
-        return sharedPreferences.getString(key, null);
+    @BindView(R.id.preferences_opt_out_value)
+    TextView value;
+
+    @BindView(R.id.preferences_toggle_button)
+    Switch switchToogle;
+
+    public PreferencesViewContainer(LayoutInflater inflater, ViewGroup container) {
+        rootView = inflater.inflate(R.layout.content_preferences, container, false);
+        ButterKnife.bind(this, rootView);
     }
 
-    public static void putString(String key, String value) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putString(key, value).apply();
+    @Override
+    public View getRootView() {
+        return rootView;
     }
 
-    public static int getInt(String key, int defaultValue) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-
-        return sharedPreferences.getInt(key, defaultValue);
+    @Override
+    public void setOptOutStatus(boolean enabled) {
+        value.setText(enabled ? R.string.preferences_tracking_on : R.string.preferences_tracking_off);
+        switchToogle.setChecked(enabled);
     }
 
-    public static void putInt(String key, int value) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putInt(key, value).apply();
+    @OnClick(R.id.preferences_opt_out)
+    public void onOptOutClicked() {
+        clickListener.onOptOutClicked();
+        Snackbar.make(rootView, R.string.preferences_tracking_message, Snackbar.LENGTH_SHORT).show();
     }
 
-    public static boolean getBoolean(String key, boolean defaultValue) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-
-        return sharedPreferences.getBoolean(key, defaultValue);
+    @Override
+    public void setClickListener(IPreferencesViewContainer.ClickListener clickListener) {
+        this.clickListener = clickListener;
     }
 
-    public static void putBoolean(String key, boolean value) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putBoolean(key, value).apply();
+    @Override
+    public void removeOnClickListeners() {
+        clickListener = null;
     }
-
 }

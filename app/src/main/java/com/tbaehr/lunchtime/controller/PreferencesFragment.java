@@ -674,65 +674,49 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.utils;
+package com.tbaehr.lunchtime.controller;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
-import com.tbaehr.lunchtime.LunchtimeApplication;
-
-import static android.content.Context.MODE_PRIVATE;
+import com.tbaehr.lunchtime.presenter.PreferencesPresenter;
+import com.tbaehr.lunchtime.tracking.TrackingScreen;
+import com.tbaehr.lunchtime.view.IPreferencesViewContainer;
+import com.tbaehr.lunchtime.view.PreferencesViewContainer;
 
 /**
- * Created by timo.baehr@gmail.com on 21.02.17.
+ * Created by timo.baehr@gmail.com on 12.03.17.
  */
-public class SharedPrefsHelper {
+public class PreferencesFragment extends BaseFragment<IPreferencesViewContainer, PreferencesPresenter> {
 
-    private static final String KEY_STORAGE = "cache";
+    private IPreferencesViewContainer view;
 
-    public static String getString(String key) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-
-        return sharedPreferences.getString(key, null);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        view = new PreferencesViewContainer(inflater, container);
+        return view.getRootView();
     }
 
-    public static void putString(String key, String value) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putString(key, value).apply();
+    @Override
+    public void onResume() {
+        super.onResume();
+        tracker.trackScreenView(TrackingScreen.PREFERENCES);
     }
 
-    public static int getInt(String key, int defaultValue) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-
-        return sharedPreferences.getInt(key, defaultValue);
+    @Override
+    public IPreferencesViewContainer getViewLayer() {
+        return view;
     }
 
-    public static void putInt(String key, int value) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putInt(key, value).apply();
+    @Override
+    public Class<? extends PreferencesPresenter> getTypeClazz() {
+        return PreferencesPresenter.class;
     }
 
-    public static boolean getBoolean(String key, boolean defaultValue) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-
-        return sharedPreferences.getBoolean(key, defaultValue);
+    @Override
+    public PreferencesPresenter create() {
+        return new PreferencesPresenter( ((BaseActivity) getActivity()).getTracker() );
     }
-
-    public static void putBoolean(String key, boolean value) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putBoolean(key, value).apply();
-    }
-
 }

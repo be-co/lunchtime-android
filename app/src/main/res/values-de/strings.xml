@@ -22,7 +22,9 @@
     <string name="dinner_time">Heute abend essen gehen?</string>
 
     <string name="nav_item_dashboard">Startseite</string>
+    <string name="nav_item_preferences">Einstellungen</string>
     <string name="nav_item_help">Hilfe</string>
+
     <string name="more">Mehr</string>
     <string name="starts">Ab </string>
     <string name="ends">Bis </string>
@@ -38,6 +40,13 @@
     <string name="status_offer_sync_failed">Beim Aktualisieren der Angebote ist leider ein Fehler aufgetreten.</string>
     <string name="status_restaurant_download_failed">Beim Download der Restaurantdaten ist leider ein Fehler aufgetreten.</string>
     <string name="status_title_restaurant_download_failed">Downloadfehler</string>
+
+    <!-- Preferences page -->
+    <string name="preferences_your_date_headline">Verwendung Deiner Daten</string>
+    <string name="preferences_tracking">Übermittlung anonymisierter Nutzungsstatistiken</string>
+    <string name="preferences_tracking_on">Aktiviert</string>
+    <string name="preferences_tracking_off">Deaktiviert</string>
+    <string name="preferences_tracking_message">App neustarten damit Änderungen wirksam werden</string>
 
     <!-- Help page -->
     <string name="about_lunchtime">Lunchtime beantwortet die immer wiederkehrende Frage:

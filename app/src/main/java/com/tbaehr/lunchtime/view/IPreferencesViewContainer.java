@@ -674,65 +674,25 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.utils;
+package com.tbaehr.lunchtime.view;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
-import com.tbaehr.lunchtime.LunchtimeApplication;
-
-import static android.content.Context.MODE_PRIVATE;
+import android.view.View;
 
 /**
- * Created by timo.baehr@gmail.com on 21.02.17.
+ * Created by timo.baehr@gmail.com on 12.03.17.
  */
-public class SharedPrefsHelper {
+public interface IPreferencesViewContainer {
 
-    private static final String KEY_STORAGE = "cache";
-
-    public static String getString(String key) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-
-        return sharedPreferences.getString(key, null);
+    interface ClickListener {
+        void onOptOutClicked();
     }
 
-    public static void putString(String key, String value) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+    View getRootView();
 
-        editor.putString(key, value).apply();
-    }
+    void setClickListener(ClickListener clickListener);
 
-    public static int getInt(String key, int defaultValue) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
+    void setOptOutStatus(boolean enabled);
 
-        return sharedPreferences.getInt(key, defaultValue);
-    }
-
-    public static void putInt(String key, int value) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putInt(key, value).apply();
-    }
-
-    public static boolean getBoolean(String key, boolean defaultValue) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-
-        return sharedPreferences.getBoolean(key, defaultValue);
-    }
-
-    public static void putBoolean(String key, boolean value) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putBoolean(key, value).apply();
-    }
+    void removeOnClickListeners();
 
 }

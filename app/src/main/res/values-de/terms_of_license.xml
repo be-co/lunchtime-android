@@ -60,14 +60,21 @@
         \n* <b>Internetkommunikation:</b> Die App benötigt Zugriff auf das Internet über W-LAN oder Mobilfunk für die Aktualisierung der Inhalte (z.B. Aktualisierung/Update der Angebote)
         \n* <b>Standortabfrage:</b> Die App benötigt Zugriff auf Ihren Standort, um Ihnen passende Speisekarten anzuzeigen.
         \n\n<b>2. Wo werden meine Daten verarbeitet?</b>
-        \nIhre Daten werden nur in Deutschland verarbeitet.
+        \nIhre Daten werden bevorzugt in Deutschland verarbeitet. Nutzungsstatistiken werden an Google im Rahmen der Privacy-Shield-Zertifizierung (ISO 27001) übermittelt. Die Server von Google stehe in der Regel in den USA.
         \n\n<b>3. Wie sicher sind meine Daten? </b>
         \nZum Schutz Ihrer Daten vor unberechtigtem Zugriff und Missbrauch haben wir umfangreiche technische und betriebliche Sicherheitsvorkehrungen nach deutschem Recht getroffen.
         \n\n<b>4. Werden meine Daten an Dritte weitergegeben, zum Beispiel an Behörden? </b>
         \nIn bestimmten Fällen sind wir gesetzlich verpflichtet, Daten an eine anfragende staatliche Stelle zu übermitteln. Darüber hinaus geben wir keine Daten an Dritte weiter, es sei denn, Sie haben ausdrücklich eingewilligt.
         \n\n<b>5. Wird mein Nutzungsverhalten ausgewertet, z. B. für Werbung?</b>
         \nIm Rahmen der gesetzlichen Regelungen legen wir, oder von uns beauftragte Unternehmen, Nutzungsprofile unter einem Pseudonym an.
-        \nDiese können für Werbung und Marktforschung oder zur bedarfsgerechten Gestaltung der App ausgewertet werden. Ein unmittelbarer Rückschluss auf Sie ist dabei nicht möglich. Eine Verknüpfung der Profildaten mit weiteren Informationen über Ihre Person findet nicht statt.
+        \nDiese können für Werbung und Marktforschung oder zur bedarfsgerechten Gestaltung der App ausgewertet werden.
+        Ein unmittelbarer Rückschluss auf Sie ist dabei nicht möglich.
+        Eine Verknüpfung der Profildaten mit weiteren Informationen über Ihre Person findet nicht statt.\n
+        \nWir setzen Google Analytics, einen Webanalysedienst der Google Inc. („Google“) ein. Google verwendet Cookies. Die durch das Cookie erzeugten Informationen über die Benutzung des Onlineangebotes durch die Nutzer werden in der Regel an einen Server von Google in den USA übertragen und dort gespeichert.
+        \nGoogle wird diese Informationen in unserem Auftrag benutzen, um die Nutzung unseres Onlineangebotes durch die Nutzer auszuwerten, um Reports über die Aktivitäten innerhalb dieses Onlineangebotes zusammenzustellen und um weitere mit der Nutzung dieses Onlineangebotes und der Internetnutzung verbundene Dienstleistungen uns gegenüber zu erbringen. Dabei können aus den verarbeiteten Daten pseudonyme Nutzungsprofile der Nutzer erstellt werden.
+        \nWir setzen Google Analytics nur mit aktivierter IP-Anonymisierung ein. Das bedeutet, die IP-Adresse der Nutzer wird von Google innerhalb von Mitgliedstaaten der Europäischen Union oder in anderen Vertragsstaaten des Abkommens über den Europäischen Wirtschaftsraum gekürzt. Nur in Ausnahmefällen wird die volle IP-Adresse an einen Server von Google in den USA übertragen und dort gekürzt. Die von dem Browser des Nutzers übermittelte IP-Adresse wird nicht mit anderen Daten von Google zusammengeführt.
+        \nDie Nutzer können die Speicherung der Cookies durch eine entsprechende Einstellung ihrer Browser-Software verhindern; die Nutzer können darüber hinaus die Erfassung der durch das Cookie erzeugten und auf ihre Nutzung des Onlineangebotes bezogenen Daten an Google sowie die Verarbeitung dieser Daten durch Google verhindern, indem sie das unter dem folgenden Link verfügbare Browser-Plugin herunterladen und installieren: http://tools.google.com/dlpage/gaoptout?hl=de.
+        \nWeitere Informationen zur Datennutzung zu Werbezwecken durch Google, Einstellungs- und Widerspruchsmöglichkeiten erfahren Sie auf den Webseiten von Google: https://www.google.com/intl/de/policies/privacy/partners/ („Datennutzung durch Google bei Ihrer Nutzung von Websites oder Apps unserer Partner“), http://www.google.com/policies/technologies/ads („Datennutzung zu Werbezwecken“), http://www.google.de/settings/ads („Informationen verwalten, die Google verwendet, um Ihnen Werbung einzublenden“) und http://www.google.com/ads/preferences/ („Bestimmen Sie, welche Werbung Google Ihnen zeigt“).
         \n\n<b>6. Sendet die App Push-Benachrichtigungen?</b>
         \nDie App verwendet Push-Benachrichtigungen, falls Sie die entsprechenden Einstellungen in der Lunchtime-Software vornehmen. In den Standardeinstellungen sind Push-Benachrichtigungen deaktiviert.
         \n\n<b>7. Werde ich über Änderungen dieser Datenschutzhinweise informiert?</b>

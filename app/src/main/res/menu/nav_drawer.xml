@@ -16,7 +16,7 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_preferences"
-            android:icon="@drawable/ic_menu_help"
+            android:icon="@drawable/ic_menu_preferences"
             android:title="@string/nav_item_preferences" />
         <item
             android:id="@+id/nav_help"

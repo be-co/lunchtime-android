@@ -678,6 +678,7 @@ package com.tbaehr.lunchtime;
 
 import android.app.Application;
 import android.content.Context;
+import android.provider.Settings;
 
 import com.tbaehr.lunchtime.tracking.ITracking;
 import com.tbaehr.lunchtime.tracking.LunchtimeTracker;
@@ -702,7 +703,14 @@ public class LunchtimeApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
+        // restore optOut setting
         boolean optOut = !SharedPrefsHelper.getBoolean(KEY_TRACKING_ENABLED, true);
+
+        // disable analytics for Google PlayStore pre-launch reports
+        String testLabSetting = Settings.System.getString(getContentResolver(), "firebase.test.lab");
+        if ("true".equals(testLabSetting)) {
+            optOut = true;
+        }
         tracker = new LunchtimeTracker(this, optOut);
 
         /*if (BuildConfig.DEBUG) {

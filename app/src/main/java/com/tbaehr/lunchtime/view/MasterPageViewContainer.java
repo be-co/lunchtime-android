@@ -697,12 +697,14 @@ import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DashboardFragment;
 import com.tbaehr.lunchtime.controller.HelpFragment;
 import com.tbaehr.lunchtime.controller.MasterPageActivity;
+import com.tbaehr.lunchtime.controller.PreferencesFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_DASHBOARD_FRAGMENT;
 import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_HELP_FRAGMENT;
+import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_PREFERENCES_FRAGMENT;
 
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.
@@ -712,6 +714,8 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     public static final String TAG_DASHBOARD_FRAGMENT = DashboardFragment.class.getCanonicalName();
 
     public static final String TAG_HELP_FRAGMENT = HelpFragment.class.getCanonicalName();
+
+    public static final String TAG_PREFERENCES_FRAGMENT = PreferencesFragment.class.getCanonicalName();
 
     @BindView(R.id.drawer_layout)
     DrawerLayout drawer;
@@ -805,6 +809,11 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     }
 
     @Override
+    public void showPreferencesFragment() {
+        fragmentHolder.showPreferencesFragment();
+    }
+
+    @Override
     public void showHelpFragment() {
         fragmentHolder.showHelpFragment();
     }
@@ -834,6 +843,7 @@ class FragmentHolder {
 
     private DashboardFragment dashboard;
     private HelpFragment help;
+    private PreferencesFragment preferences;
 
     private Fragment previousFragment, activeFragment;
 
@@ -853,6 +863,11 @@ class FragmentHolder {
         if (help == null) {
             help = new HelpFragment();
         }
+
+        preferences = (PreferencesFragment) fragmentManager.findFragmentByTag(TAG_PREFERENCES_FRAGMENT);
+        if (preferences == null) {
+            preferences = new PreferencesFragment();
+        }
     }
 
     void refreshDashboardFragment() {
@@ -868,6 +883,12 @@ class FragmentHolder {
     void showHelpFragment() {
         previousFragment = activeFragment;
         activeFragment = help;
+        showFragment();
+    }
+
+    void showPreferencesFragment() {
+        previousFragment = activeFragment;
+        activeFragment = preferences;
         showFragment();
     }
 

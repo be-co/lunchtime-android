@@ -689,6 +689,7 @@ import com.tbaehr.lunchtime.tracking.ITracking;
 import com.tbaehr.lunchtime.tracking.LunchtimeTracker;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.LocationHelper;
+import com.tbaehr.lunchtime.utils.SharedPrefsHelper;
 
 import org.json.JSONException;
 
@@ -696,6 +697,9 @@ import java.text.ParseException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import static com.tbaehr.lunchtime.tracking.ITracking.KEY_ERROR_REPORTING_ENABLED;
+import static com.tbaehr.lunchtime.tracking.ITracking.KEY_TRACKING_ENABLED;
 
 /**
  * Created by timo.baehr@gmail.com on 24.02.17.
@@ -739,7 +743,10 @@ public class ModelProvider {
     public static ModelProvider getInstance() {
         if (instance == null) {
             instance = new ModelProvider();
-            tracker = new LunchtimeTracker(LunchtimeApplication.getContext(), false);
+
+            boolean usabilityTrackingEnabled = SharedPrefsHelper.getBoolean(KEY_TRACKING_ENABLED, true);
+            boolean errorReportingEnabled = SharedPrefsHelper.getBoolean(KEY_ERROR_REPORTING_ENABLED, true);
+            tracker = new LunchtimeTracker(LunchtimeApplication.getContext(), usabilityTrackingEnabled, errorReportingEnabled);
         }
         return instance;
     }

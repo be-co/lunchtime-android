@@ -5,6 +5,10 @@ package com.tbaehr.lunchtime.tracking;
  */
 public interface ITracking {
 
+    String KEY_TRACKING_ENABLED = "tracking";
+
+    String KEY_ERROR_REPORTING_ENABLED = "errorReporting";
+
     /***
      * Tracking screen view
      *

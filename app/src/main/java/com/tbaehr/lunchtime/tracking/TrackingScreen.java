@@ -7,7 +7,8 @@ public enum TrackingScreen {
 
     DASHBOARD,
     HELP,
-    DETAIL;
+    DETAIL,
+    PREFERENCES;
 
     @Override
     public String toString() {

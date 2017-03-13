@@ -22,7 +22,9 @@
     <string name="dinner_time">A dinner tonight?</string>
 
     <string name="nav_item_dashboard">Dashboard</string>
+    <string name="nav_item_preferences">Preferences</string>
     <string name="nav_item_help">Help</string>
+
     <string name="more">More</string>
     <string name="starts">Starts </string>
     <string name="ends">Ends </string>
@@ -38,6 +40,16 @@
     <string name="status_offer_sync_failed">Updating offers unfortunately failed.</string>
     <string name="status_restaurant_download_failed">Downloading restaurant data  unfortunately failed.</string>
     <string name="status_title_restaurant_download_failed">Failed to download</string>
+
+    <!-- Preferences page -->
+    <string name="preferences_your_date_headline">Your personal data</string>
+    <string name="preferences_tracking">Usability tracking</string>
+    <string name="preferences_tracking_on">Enabled</string>
+    <string name="preferences_tracking_off">Disabled</string>
+    <string name="preferences_tracking_of_exceptions">Report errors</string>
+    <string name="preferences_tracking_of_exceptions_on">Enabled</string>
+    <string name="preferences_tracking_of_exceptions_off">Disabled</string>
+    <string name="preferences_tracking_message">Restart app to apply changes</string>
 
     <!-- Help page -->
     <string name="about_lunchtime">Always the same question… <b>\"<i>What can </i> I <i>eat?</i>\"</b> Lunchtime helps out.

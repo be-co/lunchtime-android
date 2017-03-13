@@ -674,65 +674,83 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.utils;
+package com.tbaehr.lunchtime.view;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.support.design.widget.Snackbar;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Switch;
+import android.widget.TextView;
 
-import com.tbaehr.lunchtime.LunchtimeApplication;
+import com.tbaehr.lunchtime.R;
 
-import static android.content.Context.MODE_PRIVATE;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
- * Created by timo.baehr@gmail.com on 21.02.17.
+ * Created by timo.baehr@gmail.com on 12.03.17.
  */
-public class SharedPrefsHelper {
+public class PreferencesViewContainer implements IPreferencesViewContainer {
 
-    private static final String KEY_STORAGE = "cache";
+    private IPreferencesViewContainer.ClickListener clickListener;
 
-    public static String getString(String key) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
+    private View rootView;
 
-        return sharedPreferences.getString(key, null);
+    @BindView(R.id.preferences_tracking_value)
+    TextView trackingValue;
+
+    @BindView(R.id.preferences_error_reporting_value)
+    TextView errorReportingValue;
+
+    @BindView(R.id.preferences_toggle_button)
+    Switch switchTrackingToogle;
+
+    @BindView(R.id.preferences_error_reporting_toggle_button)
+    Switch switchErrorReporting;
+
+    public PreferencesViewContainer(LayoutInflater inflater, ViewGroup container) {
+        rootView = inflater.inflate(R.layout.content_preferences, container, false);
+        ButterKnife.bind(this, rootView);
     }
 
-    public static void putString(String key, String value) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putString(key, value).apply();
+    @Override
+    public View getRootView() {
+        return rootView;
     }
 
-    public static int getInt(String key, int defaultValue) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-
-        return sharedPreferences.getInt(key, defaultValue);
+    @Override
+    public void setTrackingStatus(boolean enabled) {
+        trackingValue.setText(enabled ? R.string.preferences_tracking_on : R.string.preferences_tracking_off);
+        switchTrackingToogle.setChecked(enabled);
     }
 
-    public static void putInt(String key, int value) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putInt(key, value).apply();
+    @Override
+    public void setErrorReportingStatus(boolean enabled) {
+        errorReportingValue.setText(enabled ? R.string.preferences_tracking_of_exceptions_on : R.string.preferences_tracking_of_exceptions_off);
+        switchErrorReporting.setChecked(enabled);
     }
 
-    public static boolean getBoolean(String key, boolean defaultValue) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-
-        return sharedPreferences.getBoolean(key, defaultValue);
+    @OnClick(R.id.preferences_error_reporting)
+    public void onErrorReportingPreferenceClicked() {
+        clickListener.onErrorReportingPreferenceClicked();
+        Snackbar.make(rootView, R.string.preferences_tracking_message, Snackbar.LENGTH_SHORT).show();
     }
 
-    public static void putBoolean(String key, boolean value) {
-        Context context = LunchtimeApplication.getContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putBoolean(key, value).apply();
+    @OnClick(R.id.preferences_tracking)
+    public void onTrackingPreferenceClicked() {
+        clickListener.onTrackingPreferenceClicked();
+        Snackbar.make(rootView, R.string.preferences_tracking_message, Snackbar.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void setClickListener(IPreferencesViewContainer.ClickListener clickListener) {
+        this.clickListener = clickListener;
+    }
+
+    @Override
+    public void removeOnClickListeners() {
+        clickListener = null;
+    }
 }

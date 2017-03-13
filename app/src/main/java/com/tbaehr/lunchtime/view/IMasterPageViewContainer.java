@@ -694,6 +694,8 @@ public interface IMasterPageViewContainer {
 
     void showDashboardFragment();
 
+    void showPreferencesFragment();
+
     void showHelpFragment();
 
     void closeDrawer();

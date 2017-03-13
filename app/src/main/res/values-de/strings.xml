@@ -43,9 +43,12 @@
 
     <!-- Preferences page -->
     <string name="preferences_your_date_headline">Verwendung Deiner Daten</string>
-    <string name="preferences_tracking">Übermittlung anonymisierter Nutzungsstatistiken</string>
+    <string name="preferences_tracking">Anonymisierte Nutzungsstatistiken übermitteln</string>
     <string name="preferences_tracking_on">Aktiviert</string>
     <string name="preferences_tracking_off">Deaktiviert</string>
+    <string name="preferences_tracking_of_exceptions">Fehlerberichte übermitteln</string>
+    <string name="preferences_tracking_of_exceptions_on">Aktiviert</string>
+    <string name="preferences_tracking_of_exceptions_off">Deaktiviert</string>
     <string name="preferences_tracking_message">App neustarten damit Änderungen wirksam werden</string>
 
     <!-- Help page -->

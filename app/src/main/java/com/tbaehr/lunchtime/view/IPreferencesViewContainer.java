@@ -684,14 +684,18 @@ import android.view.View;
 public interface IPreferencesViewContainer {
 
     interface ClickListener {
-        void onOptOutClicked();
+        void onTrackingPreferenceClicked();
+
+        void onErrorReportingPreferenceClicked();
     }
 
     View getRootView();
 
     void setClickListener(ClickListener clickListener);
 
-    void setOptOutStatus(boolean enabled);
+    void setTrackingStatus(boolean enabled);
+
+    void setErrorReportingStatus(boolean enabled);
 
     void removeOnClickListeners();
 

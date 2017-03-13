@@ -684,6 +684,7 @@ import com.tbaehr.lunchtime.tracking.ITracking;
 import com.tbaehr.lunchtime.tracking.LunchtimeTracker;
 import com.tbaehr.lunchtime.utils.SharedPrefsHelper;
 
+import static com.tbaehr.lunchtime.tracking.ITracking.KEY_ERROR_REPORTING_ENABLED;
 import static com.tbaehr.lunchtime.tracking.ITracking.KEY_TRACKING_ENABLED;
 
 /**
@@ -704,14 +705,15 @@ public class LunchtimeApplication extends Application {
         super.onCreate();
 
         // restore optOut setting
-        boolean optOut = !SharedPrefsHelper.getBoolean(KEY_TRACKING_ENABLED, true);
+        boolean usabilityTrackingEnabled = SharedPrefsHelper.getBoolean(KEY_TRACKING_ENABLED, true);
+        boolean errorReportingEnabled = SharedPrefsHelper.getBoolean(KEY_ERROR_REPORTING_ENABLED, true);
 
         // disable analytics for Google PlayStore pre-launch reports
         String testLabSetting = Settings.System.getString(getContentResolver(), "firebase.test.lab");
         if ("true".equals(testLabSetting)) {
-            optOut = true;
+            usabilityTrackingEnabled = false;
         }
-        tracker = new LunchtimeTracker(this, optOut);
+        tracker = new LunchtimeTracker(this, usabilityTrackingEnabled, errorReportingEnabled);
 
         /*if (BuildConfig.DEBUG) {
             if (LeakCanary.isInAnalyzerProcess(this)) {

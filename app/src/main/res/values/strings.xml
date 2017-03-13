@@ -46,6 +46,9 @@
     <string name="preferences_tracking">Usability tracking</string>
     <string name="preferences_tracking_on">Enabled</string>
     <string name="preferences_tracking_off">Disabled</string>
+    <string name="preferences_tracking_of_exceptions">Report errors</string>
+    <string name="preferences_tracking_of_exceptions_on">Enabled</string>
+    <string name="preferences_tracking_of_exceptions_off">Disabled</string>
     <string name="preferences_tracking_message">Restart app to apply changes</string>
 
     <!-- Help page -->

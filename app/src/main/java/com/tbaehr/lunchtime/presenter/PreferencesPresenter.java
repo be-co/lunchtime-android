@@ -681,6 +681,7 @@ import com.tbaehr.lunchtime.tracking.ITracking;
 import com.tbaehr.lunchtime.utils.SharedPrefsHelper;
 import com.tbaehr.lunchtime.view.IPreferencesViewContainer;
 
+import static com.tbaehr.lunchtime.tracking.ITracking.KEY_ERROR_REPORTING_ENABLED;
 import static com.tbaehr.lunchtime.tracking.ITracking.KEY_TRACKING_ENABLED;
 
 /**
@@ -688,7 +689,7 @@ import static com.tbaehr.lunchtime.tracking.ITracking.KEY_TRACKING_ENABLED;
  */
 public class PreferencesPresenter extends BasePresenter<IPreferencesViewContainer> implements IPreferencesViewContainer.ClickListener {
 
-    private boolean trackingEnabled;
+    private boolean trackingEnabled, errorReportingEnabled;
 
     private ITracking tracker;
 
@@ -700,8 +701,11 @@ public class PreferencesPresenter extends BasePresenter<IPreferencesViewContaine
     public void bindView(IPreferencesViewContainer view) {
         super.bindView(view);
         trackingEnabled = SharedPrefsHelper.getBoolean(KEY_TRACKING_ENABLED, true);
+        errorReportingEnabled = SharedPrefsHelper.getBoolean(KEY_TRACKING_ENABLED, true);
         setClickListeners();
-        view.setOptOutStatus(trackingEnabled);
+        view.setTrackingStatus(trackingEnabled);
+        view.setErrorReportingStatus(errorReportingEnabled);
+
     }
 
     @Override
@@ -718,13 +722,24 @@ public class PreferencesPresenter extends BasePresenter<IPreferencesViewContaine
     }
 
     @Override
-    public void onOptOutClicked() {
+    public void onErrorReportingPreferenceClicked() {
+        IPreferencesViewContainer view = getView();
+        errorReportingEnabled = !errorReportingEnabled;
+        SharedPrefsHelper.putBoolean(KEY_ERROR_REPORTING_ENABLED, errorReportingEnabled);
+        tracker.trackEvent("config_change", "error_reporting", errorReportingEnabled ? "enabled" : "disabled");
+        if (view != null) {
+            view.setErrorReportingStatus(errorReportingEnabled);
+        }
+    }
+
+    @Override
+    public void onTrackingPreferenceClicked() {
         IPreferencesViewContainer view = getView();
         trackingEnabled = !trackingEnabled;
         SharedPrefsHelper.putBoolean(KEY_TRACKING_ENABLED, trackingEnabled);
-        tracker.trackEvent("config_change", "opt_out", trackingEnabled ? "enabled" : "disabled");
+        tracker.trackEvent("config_change", "tracking", trackingEnabled ? "enabled" : "disabled");
         if (view != null) {
-            view.setOptOutStatus(trackingEnabled);
+            view.setTrackingStatus(trackingEnabled);
         }
     }
 }

@@ -698,11 +698,17 @@ public class PreferencesViewContainer implements IPreferencesViewContainer {
 
     private View rootView;
 
-    @BindView(R.id.preferences_opt_out_value)
-    TextView value;
+    @BindView(R.id.preferences_tracking_value)
+    TextView trackingValue;
+
+    @BindView(R.id.preferences_error_reporting_value)
+    TextView errorReportingValue;
 
     @BindView(R.id.preferences_toggle_button)
-    Switch switchToogle;
+    Switch switchTrackingToogle;
+
+    @BindView(R.id.preferences_error_reporting_toggle_button)
+    Switch switchErrorReporting;
 
     public PreferencesViewContainer(LayoutInflater inflater, ViewGroup container) {
         rootView = inflater.inflate(R.layout.content_preferences, container, false);
@@ -715,14 +721,26 @@ public class PreferencesViewContainer implements IPreferencesViewContainer {
     }
 
     @Override
-    public void setOptOutStatus(boolean enabled) {
-        value.setText(enabled ? R.string.preferences_tracking_on : R.string.preferences_tracking_off);
-        switchToogle.setChecked(enabled);
+    public void setTrackingStatus(boolean enabled) {
+        trackingValue.setText(enabled ? R.string.preferences_tracking_on : R.string.preferences_tracking_off);
+        switchTrackingToogle.setChecked(enabled);
     }
 
-    @OnClick(R.id.preferences_opt_out)
-    public void onOptOutClicked() {
-        clickListener.onOptOutClicked();
+    @Override
+    public void setErrorReportingStatus(boolean enabled) {
+        errorReportingValue.setText(enabled ? R.string.preferences_tracking_of_exceptions_on : R.string.preferences_tracking_of_exceptions_off);
+        switchErrorReporting.setChecked(enabled);
+    }
+
+    @OnClick(R.id.preferences_error_reporting)
+    public void onErrorReportingPreferenceClicked() {
+        clickListener.onErrorReportingPreferenceClicked();
+        Snackbar.make(rootView, R.string.preferences_tracking_message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.preferences_tracking)
+    public void onTrackingPreferenceClicked() {
+        clickListener.onTrackingPreferenceClicked();
         Snackbar.make(rootView, R.string.preferences_tracking_message, Snackbar.LENGTH_SHORT).show();
     }
 

@@ -791,13 +791,13 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
 
     private void setupLocationProvider() {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        // Define the criteria how to select the locatioin provider -> use default
+        // Define the criteria how to select the location provider -> use default
         Criteria criteria = new Criteria();
         provider = locationManager.getBestProvider(criteria, false);
     }
 
 
-    protected Location getLastKnownLocation() {
+    public Location getLastKnownLocation() {
         if (locationManager == null || provider == null) {
             setupLocationProvider();
         }
@@ -805,7 +805,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                this.requestPermissions(new String[] { Manifest.permission.CALL_PHONE }, PERMISSION_REQUEST_CODE_LOCATION);
+                this.requestPermissions(new String[] { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION }, PERMISSION_REQUEST_CODE_LOCATION);
             }
             return null;
         }
@@ -818,7 +818,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     /**
      * Usually called inside onResume()
      */
-    protected void requestLocationUpdates() {
+    public void requestLocationUpdates() {
         if (locationManager == null || provider == null) {
             setupLocationProvider();
         }
@@ -826,7 +826,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                this.requestPermissions(new String[] { Manifest.permission.CALL_PHONE }, PERMISSION_REQUEST_CODE_LOCATION);
+                this.requestPermissions(new String[] { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION }, PERMISSION_REQUEST_CODE_LOCATION);
             }
             return;
         }
@@ -842,21 +842,33 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-        // Implementation is optional
+        CustomBasePresenter presenter = getPresenter();
+        if (presenter != null && presenter instanceof LocationListener) {
+            ((LocationListener) presenter).onStatusChanged(provider, status, extras);
+        }
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-        // Implementation is optional
+        CustomBasePresenter presenter = getPresenter();
+        if (presenter != null && presenter instanceof LocationListener) {
+            ((LocationListener) presenter).onProviderEnabled(provider);
+        }
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-        // Implementation is optional
+        CustomBasePresenter presenter = getPresenter();
+        if (presenter != null && presenter instanceof LocationListener) {
+            ((LocationListener) presenter).onProviderDisabled(provider);
+        }
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        // Implementation is optional
+        CustomBasePresenter presenter = getPresenter();
+        if (presenter != null && presenter instanceof LocationListener) {
+            ((LocationListener) presenter).onLocationChanged(location);
+        }
     }
 }

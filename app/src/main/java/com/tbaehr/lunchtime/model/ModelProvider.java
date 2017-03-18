@@ -857,8 +857,7 @@ public class ModelProvider {
 
     private int getAllOffersCounter = 0;
 
-    public void getAllOffersAsync(@Nullable final NearbyOffersChangeListener callback, Location currentLocation) {
-        // TODO: Use currentLocation
+    public void getAllOffersAsync(@Nullable final NearbyOffersChangeListener callback, @Nullable Location location) {
         final List<RestaurantOffers> allOffers = new ArrayList<>();
 
         getNearbyAsync(new NearbyChangeListener() {
@@ -898,7 +897,7 @@ public class ModelProvider {
                         }
 
                         private void publishOffers() {
-                            // TODO: Sort all offers
+                            // TODO: if (currentLocation != null) then Sort all offers
                             //float distance = locationA.distanceTo(locationB);
                             callback.pickUp(allOffers);
                         }

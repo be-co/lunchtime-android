@@ -676,6 +676,7 @@
  */
 package com.tbaehr.lunchtime.controller;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -737,6 +738,7 @@ public class DashboardFragment extends BaseFragment<IDashboardViewContainer, Das
     }
 
     public void refresh() {
-        getPresenter().refreshOffers();
+        Location lastKnownLocation = ((BaseActivity) getActivity()).getLastKnownLocation();
+        getPresenter().refreshOffers(lastKnownLocation);
     }
 }

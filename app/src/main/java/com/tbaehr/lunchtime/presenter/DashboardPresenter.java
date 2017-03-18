@@ -677,10 +677,14 @@
 package com.tbaehr.lunchtime.presenter;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 
-import com.propaneapps.tomorrow.presenter.BasePresenter;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.BaseActivity;
 import com.tbaehr.lunchtime.controller.DashboardFragment;
@@ -700,14 +704,15 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.tbaehr.lunchtime.controller.BaseActivity.PERMISSION_REQUEST_CODE_LOCATION;
 import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_OFFER_INDEX;
 import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_ID;
 
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
-public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
-        implements ModelProvider.NearbyOffersChangeListener {
+public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContainer>
+        implements ModelProvider.NearbyOffersChangeListener, LocationListener {
 
     private BaseActivity activity;
 
@@ -730,7 +735,9 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     @Override
     public void bindView(IDashboardViewContainer view) {
         super.bindView(view);
-        refreshOffers();
+        activity.requestLocationUpdates();
+        Location lastKnownLocation = activity.getLastKnownLocation();
+        refreshOffers(lastKnownLocation);
     }
 
     @Override
@@ -769,10 +776,11 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         return new TimerTask() {
             @Override
             public void run() {
+                final Location lastKnownLocation = activity.getLastKnownLocation();
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        refreshOffers();
+                        refreshOffers(lastKnownLocation);
                     }
                 });
             }
@@ -933,8 +941,35 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         activity.startActivity(openFetchOrderActivityIntent);
     }
 
-    public void refreshOffers() {
-        Location currentLocation = null;
-        ModelProvider.getInstance().getAllOffersAsync(this, currentLocation);
+    public void refreshOffers(@Nullable Location location) {
+        ModelProvider.getInstance().getAllOffersAsync(this, location);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSION_REQUEST_CODE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Location lastKnownLocation = activity.getLastKnownLocation();
+            refreshOffers(lastKnownLocation);
+        }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        refreshOffers(location);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        // ;
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        // ;
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        // ;
     }
 }

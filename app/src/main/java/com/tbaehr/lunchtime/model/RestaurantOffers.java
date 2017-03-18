@@ -676,6 +676,8 @@
  */
 package com.tbaehr.lunchtime.model;
 
+import android.location.Location;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.tbaehr.lunchtime.utils.DateTime;
@@ -688,7 +690,7 @@ import java.util.Set;
 /**
  * Created by timo.baehr@gmail.com on 08.01.17.
  */
-public class RestaurantOffers {
+public class RestaurantOffers implements Comparable<RestaurantOffers> {
 
     private String restaurantId;
 
@@ -698,11 +700,24 @@ public class RestaurantOffers {
 
     private List<Offer> offers;
 
-    public RestaurantOffers(String restaurantId, String title, String description, List<Offer> offers) {
+    private Location location;
+
+    private Location lastKnownLocation;
+
+    public RestaurantOffers(String restaurantId, Location location, String title, String description, List<Offer> offers) {
         this.restaurantId = restaurantId;
+        this.location = location;
         this.title = title;
         this.description = description;
         this.offers = offers;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLastKnownLocation(Location lastKnownLocation) {
+        this.lastKnownLocation = lastKnownLocation;
     }
 
     @Override
@@ -793,5 +808,15 @@ public class RestaurantOffers {
 
     public Offer getOffer(int index) {
         return offers.get(index);
+    }
+
+    @Override
+    public int compareTo(@NonNull RestaurantOffers other) {
+        if (lastKnownLocation == null || this.getLocation() == null) {
+            return -1;
+        }
+        float distanceThisRestaurant = lastKnownLocation.distanceTo(this.getLocation());
+        float distanceOtherRestaurant = lastKnownLocation.distanceTo(other.getLocation());
+        return distanceThisRestaurant < distanceOtherRestaurant ? 1 : -1;
     }
 }

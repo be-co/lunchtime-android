@@ -920,7 +920,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     }
 
     private void refreshRestaurantOffers() {
-        ModelProvider.getInstance().getRestaurantOffersAsync(restaurantId, new ModelProvider.RestaurantOffersChangeListener() {
+        ModelProvider.getInstance().getRestaurantOffersAsync(restaurantId, null, new ModelProvider.RestaurantOffersChangeListener() {
             @Override
             public void loadingStarted() {
 

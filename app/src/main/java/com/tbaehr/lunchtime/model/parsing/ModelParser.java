@@ -677,6 +677,7 @@
 package com.tbaehr.lunchtime.model.parsing;
 
 import android.content.Context;
+import android.location.Location;
 import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.widget.Toast;
@@ -744,6 +745,17 @@ public class ModelParser {
         String longDescription = restaurantJSON.getString("longDescription");
         String address = restaurantJSON.getString("address");
 
+        String sLat = restaurantJSON.getString("lat");
+        String sLong = restaurantJSON.getString("long");
+        Location location = null;
+        if (sLat != null) {
+            double latitude = Double.valueOf(sLat);
+            double longitude = Double.valueOf(sLong);
+            location = new Location(restaurantId);
+            location.setLatitude(latitude);
+            location.setLatitude(longitude);
+        }
+
         JSONObject openingTimesObject = restaurantJSON.getJSONObject("openingTimes");
         JSONArray mondayArray = openingTimesObject.getJSONArray("monday");
         JSONArray tuesdayArray = openingTimesObject.getJSONArray("tuesday");
@@ -796,13 +808,25 @@ public class ModelParser {
             photoUrls = convertToStringArray(photoUrlsObjects);
         }
 
-        return new Restaurant(restaurantId, name, shortDescription, longDescription, address,
+        return new Restaurant(restaurantId, name, shortDescription, longDescription, address, location,
                 openingTimes, parking, paying, phoneNumber, email, website, photoUrls);
     }
 
     public RestaurantOffers parseRestaurantOffers(String jsonText) throws JSONException {
         JSONObject restaurantObject = new JSONObject(jsonText);
         final String restaurantId = restaurantObject.getString("restaurantID");
+
+        final String sLat = restaurantObject.getString("lat");
+        final String sLong = restaurantObject.getString("long");
+        Location location = null;
+        if (sLat != null) {
+            double latitude = Double.valueOf(sLat);
+            double longitude = Double.valueOf(sLong);
+            location = new Location(restaurantId);
+            location.setLatitude(latitude);
+            location.setLongitude(longitude);
+        }
+
         final String restaurantTitle = restaurantObject.getString("title");
         final String restaurantDescription = restaurantObject.getString("description");
         final JSONArray restaurantOffersArray = restaurantObject.getJSONArray("offers");
@@ -861,7 +885,7 @@ public class ModelParser {
             }
         }
 
-        return new RestaurantOffers(restaurantId, restaurantTitle, restaurantDescription, offersToday.isEmpty() ? offersNextDays : offersToday);
+        return new RestaurantOffers(restaurantId, location, restaurantTitle, restaurantDescription, offersToday.isEmpty() ? offersNextDays : offersToday);
     }
 
 

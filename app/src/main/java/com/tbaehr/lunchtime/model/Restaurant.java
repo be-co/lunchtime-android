@@ -677,6 +677,7 @@
 package com.tbaehr.lunchtime.model;
 
 import android.content.Context;
+import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -707,6 +708,8 @@ public class Restaurant {
 
     private String locationDescription;
 
+    private Location location;
+
     private Map<Integer, DateTime[]> openingTimes;
 
     private String parking;
@@ -727,6 +730,7 @@ public class Restaurant {
             @NonNull String shortDescription,
             @NonNull String longDescription,
             @NonNull String locationDescription,
+            @NonNull Location location,
             @NonNull Map<Integer, DateTime[]> openingTimes,
             @Nullable String parking,
             @Nullable String paying,
@@ -739,6 +743,7 @@ public class Restaurant {
         this.shortDescription = shortDescription;
         this.longDescription = longDescription;
         this.locationDescription = locationDescription;
+        this.location = location;
         this.openingTimes = openingTimes;
         this.parking = parking;
         this.paying = paying;
@@ -766,6 +771,10 @@ public class Restaurant {
 
     public String getLocationDescription() {
         return locationDescription;
+    }
+
+    public Location getLocation() {
+        return location;
     }
 
     private DateTime[] getOpeningTimes(int dayOfWeek) {

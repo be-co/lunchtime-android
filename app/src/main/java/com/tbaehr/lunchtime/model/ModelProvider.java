@@ -697,6 +697,7 @@ import org.json.JSONException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static com.tbaehr.lunchtime.tracking.ITracking.KEY_ERROR_REPORTING_ENABLED;
@@ -857,7 +858,7 @@ public class ModelProvider {
 
     private int getAllOffersCounter = 0;
 
-    public void getAllOffersAsync(@Nullable final NearbyOffersChangeListener callback, @Nullable Location location) {
+    public void getAllOffersAsync(@Nullable final NearbyOffersChangeListener callback, @Nullable final Location location) {
         final List<RestaurantOffers> allOffers = new ArrayList<>();
 
         getNearbyAsync(new NearbyChangeListener() {
@@ -871,7 +872,7 @@ public class ModelProvider {
                 final Collection<String> restaurantKeys = nearby.getRestaurantKeys();
                 getAllOffersCounter = 0;
                 for (String restaurantId : restaurantKeys) {
-                    getRestaurantOffersAsync(restaurantId, new RestaurantOffersChangeListener() {
+                    getRestaurantOffersAsync(restaurantId, location, new RestaurantOffersChangeListener() {
                         @Override
                         public void loadingStarted() {
                             callback.loadingStarted();
@@ -897,8 +898,7 @@ public class ModelProvider {
                         }
 
                         private void publishOffers() {
-                            // TODO: if (currentLocation != null) then Sort all offers
-                            //float distance = locationA.distanceTo(locationB);
+                            Collections.sort(allOffers);
                             callback.pickUp(allOffers);
                         }
                     });
@@ -986,7 +986,7 @@ public class ModelProvider {
         return ModelParser.getInstance().parseRestaurant(restaurantJson, restaurantId);
     }
 
-    public void getRestaurantOffersAsync(final @NonNull String restaurantId, final @Nullable RestaurantOffersChangeListener callback) {
+    public void getRestaurantOffersAsync(final @NonNull String restaurantId, final @Nullable Location location, final @Nullable RestaurantOffersChangeListener callback) {
         final DateTime locallyUpdated = ModelCache.getInstance().getRestaurantOffersLastUpdated(restaurantId);
         getNearbyAsync(new NearbyChangeListener() {
             @Override
@@ -1018,6 +1018,7 @@ public class ModelProvider {
                                 protected Void doInBackground(Void... voids) {
                                     try {
                                         result = ModelParser.getInstance().parseRestaurantOffers(offersJson);
+                                        result.setLastKnownLocation(location);
                                         ModelCache.getInstance().putRestaurantOffers(offersJson, restaurantId, onServerUpdated);
                                     } catch (JSONException jsonException) {
                                         jsonException.printStackTrace();
@@ -1045,6 +1046,7 @@ public class ModelProvider {
                         @Override
                         protected Void doInBackground(Void... voids) {
                             result = getRestaurantOffersFromCache(restaurantId);
+                            result.setLastKnownLocation(location);
                             return null;
                         }
 

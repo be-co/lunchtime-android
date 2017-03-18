@@ -676,6 +676,7 @@
  */
 package com.tbaehr.lunchtime.model;
 
+import android.location.Location;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -694,9 +695,9 @@ import com.tbaehr.lunchtime.utils.SharedPrefsHelper;
 import org.json.JSONException;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import static com.tbaehr.lunchtime.tracking.ITracking.KEY_ERROR_REPORTING_ENABLED;
 import static com.tbaehr.lunchtime.tracking.ITracking.KEY_TRACKING_ENABLED;
@@ -724,7 +725,7 @@ public class ModelProvider {
         // ;
     }
 
-    public interface NearbyOffersChangeListener extends ModelChangeListener<Set<RestaurantOffers>> {
+    public interface NearbyOffersChangeListener extends ModelChangeListener<List<RestaurantOffers>> {
         // ;
     }
 
@@ -856,8 +857,9 @@ public class ModelProvider {
 
     private int getAllOffersCounter = 0;
 
-    public void getAllOffersAsync(@Nullable final NearbyOffersChangeListener callback) {
-        final Set<RestaurantOffers> allOffers = new HashSet<>();
+    public void getAllOffersAsync(@Nullable final NearbyOffersChangeListener callback, Location currentLocation) {
+        // TODO: Use currentLocation
+        final List<RestaurantOffers> allOffers = new ArrayList<>();
 
         getNearbyAsync(new NearbyChangeListener() {
             @Override

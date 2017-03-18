@@ -677,6 +677,7 @@
 package com.tbaehr.lunchtime.presenter;
 
 import android.content.Intent;
+import android.location.Location;
 import android.view.View;
 
 import com.propaneapps.tomorrow.presenter.BasePresenter;
@@ -692,7 +693,6 @@ import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -813,9 +813,9 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         });
     }
 
-    private List<RestaurantOffers> cachedOffers;
+    private Set<RestaurantOffers> cachedOffers;
 
-    private boolean hasDataSetChanged(Set<RestaurantOffers> allOffers) {
+    private boolean hasDataSetChanged(Collection<RestaurantOffers> allOffers) {
         /*
          * The Java behaviour on Android is not correct here.
          * If cachedOffers is of type Set, the dataSet change code
@@ -826,7 +826,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         boolean dataSetChanged = cachedOffers == null;
         if (cachedOffers == null || cachedOffers.size() != allOffers.size()) {
             dataSetChanged = true;
-            cachedOffers = new ArrayList<>();
+            cachedOffers = new HashSet<>();
             for (RestaurantOffers offers : allOffers) {
                 cachedOffers.add(offers);
             }
@@ -842,7 +842,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         return dataSetChanged;
     }
 
-    private boolean areOffersAvailable(Set<RestaurantOffers> allOffers) {
+    private boolean areOffersAvailable(Collection<RestaurantOffers> allOffers) {
         for (RestaurantOffers offers : allOffers) {
             if (!offers.isEmpty()) {
                 return true;
@@ -852,7 +852,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     }
 
     @Override
-    public void pickUp(Set<RestaurantOffers> allOffers) {
+    public void pickUp(List<RestaurantOffers> allOffers) {
         IDashboardViewContainer view = getView();
         if (view == null) {
             return;
@@ -934,6 +934,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     }
 
     public void refreshOffers() {
-        ModelProvider.getInstance().getAllOffersAsync(this);
+        Location currentLocation = null;
+        ModelProvider.getInstance().getAllOffersAsync(this, currentLocation);
     }
 }

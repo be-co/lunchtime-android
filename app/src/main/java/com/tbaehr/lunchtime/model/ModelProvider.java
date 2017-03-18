@@ -883,7 +883,7 @@ public class ModelProvider {
                             getAllOffersCounter++;
                             allOffers.add(model);
                             if (restaurantKeys.size() == getAllOffersCounter) {
-                                callback.pickUp(allOffers);
+                                publishOffers();
                             }
                         }
 
@@ -893,8 +893,14 @@ public class ModelProvider {
                             if (restaurantKeys.size() == getAllOffersCounter && allOffers.size() == 0) {
                                 callback.failed();
                             } else {
-                                callback.pickUp(allOffers);
+                                publishOffers();
                             }
+                        }
+
+                        private void publishOffers() {
+                            // TODO: Sort all offers
+                            //float distance = locationA.distanceTo(locationB);
+                            callback.pickUp(allOffers);
                         }
                     });
                 }

@@ -1,6 +1,8 @@
 <resources>
     <string name="changelog_header">Versionshistorie</string>
-    <string name="changelog"><b>2017.03.12 Alpha (v14)</b>
+    <string name="changelog"><b>2017.03.19 Alpha (v15)</b>
+        \n•  Fehlerberichte und Nutzungsstatistiken lassen sich einzeln an-/ausschalten
+        \n\n<b>2017.03.12 Alpha (v14)</b>
         \n•  Nutzungsstatistiken über Google Analytics
         \n•  Neue Berechtigung für Google Analytics: ACCESS_NETWORK_STATE
         \n•  Einstellungsseite zum Ausschalten der Nutzungsstatistiken

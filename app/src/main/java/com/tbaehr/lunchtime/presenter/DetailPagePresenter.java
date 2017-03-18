@@ -711,6 +711,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.tbaehr.lunchtime.controller.BaseActivity.PERMISSION_REQUEST_CODE_PHONE_CALL;
 import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_OFFER_INDEX;
 import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_ID;
 import static com.tbaehr.lunchtime.utils.DateTime.SECOND_IN_MILLIS;
@@ -720,8 +721,6 @@ import static com.tbaehr.lunchtime.utils.DateTime.SECOND_IN_MILLIS;
  */
 public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewContainer>
         implements ModelProvider.RestaurantChangeListener, IDetailPageViewContainer.ClickListener {
-
-    private static final int PERMISSION_REQUEST_CODE = 42;
 
     private static final int IMAGE_DURATION = 8000;
 
@@ -1069,7 +1068,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
         Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(uri));
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                activity.requestPermissions(new String[] { Manifest.permission.CALL_PHONE }, PERMISSION_REQUEST_CODE);
+                activity.requestPermissions(new String[] { Manifest.permission.CALL_PHONE }, PERMISSION_REQUEST_CODE_PHONE_CALL);
             }
             return;
         }
@@ -1078,7 +1077,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull int[] grantResults) {
-        if (requestCode != PERMISSION_REQUEST_CODE) {
+        if (requestCode != PERMISSION_REQUEST_CODE_PHONE_CALL) {
             return;
         }
 

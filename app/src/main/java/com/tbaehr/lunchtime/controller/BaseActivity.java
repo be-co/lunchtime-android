@@ -676,12 +676,20 @@
  */
 package com.tbaehr.lunchtime.controller;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -695,11 +703,19 @@ import com.tbaehr.lunchtime.tracking.ITracking;
  * Created by timo.baehr@gmail.com on 30.12.16.
  */
 public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends BasePresenterActivity<V, P>
-implements FactoryWithType<P> {
+        implements FactoryWithType<P>, LocationListener {
+
+    public static final int PERMISSION_REQUEST_CODE_PHONE_CALL = 42;
+
+    public static final int PERMISSION_REQUEST_CODE_LOCATION = 111;
 
     private P presenter;
 
     protected ITracking tracker;
+
+    private LocationManager locationManager;
+
+    private String provider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -732,6 +748,7 @@ implements FactoryWithType<P> {
     protected void onPause() {
         super.onPause();
         presenter.onPause();
+        unsubscribeFromLocationUpdates();
     }
 
     @Override
@@ -770,5 +787,76 @@ implements FactoryWithType<P> {
 
     public ITracking getTracker() {
         return tracker;
+    }
+
+    private void setupLocationProvider() {
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        // Define the criteria how to select the locatioin provider -> use default
+        Criteria criteria = new Criteria();
+        provider = locationManager.getBestProvider(criteria, false);
+    }
+
+
+    protected Location getLastKnownLocation() {
+        if (locationManager == null || provider == null) {
+            setupLocationProvider();
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                this.requestPermissions(new String[] { Manifest.permission.CALL_PHONE }, PERMISSION_REQUEST_CODE_LOCATION);
+            }
+            return null;
+        }
+
+        Location location = locationManager.getLastKnownLocation(provider);
+
+        return location;
+    }
+
+    /**
+     * Usually called inside onResume()
+     */
+    protected void requestLocationUpdates() {
+        if (locationManager == null || provider == null) {
+            setupLocationProvider();
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                this.requestPermissions(new String[] { Manifest.permission.CALL_PHONE }, PERMISSION_REQUEST_CODE_LOCATION);
+            }
+            return;
+        }
+
+        locationManager.requestLocationUpdates(provider, 400, 1, this);
+    }
+
+    private void unsubscribeFromLocationUpdates() {
+        if (locationManager != null) {
+            locationManager.removeUpdates(this);
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        // Implementation is optional
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        // Implementation is optional
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        // Implementation is optional
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        // Implementation is optional
     }
 }

@@ -740,6 +740,7 @@ public class LunchtimeTracker implements ITracking {
 
     @Override
     public void trackException(Exception e) {
+        e.printStackTrace();
         if (!errorReportingEnabled) {
             return;
         }

@@ -802,6 +802,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
             setupLocationProvider();
         }
 
+        // TODO: Infos for user dialog
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -823,6 +824,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
             setupLocationProvider();
         }
 
+        // TODO: Infos for user dialog
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

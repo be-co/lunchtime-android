@@ -745,15 +745,20 @@ public class ModelParser {
         String longDescription = restaurantJSON.getString("longDescription");
         String address = restaurantJSON.getString("address");
 
-        String sLat = restaurantJSON.getString("lat");
-        String sLong = restaurantJSON.getString("long");
         Location location = null;
-        if (sLat != null) {
-            double latitude = Double.valueOf(sLat);
-            double longitude = Double.valueOf(sLong);
-            location = new Location(restaurantId);
-            location.setLatitude(latitude);
-            location.setLatitude(longitude);
+        // TODO: Can be removed once all files have these mandatory values
+        if (restaurantJSON.has("lat") && restaurantJSON.has("long")) {
+            String sLat = restaurantJSON.getString("lat");
+            String sLong = restaurantJSON.getString("long");
+            if (sLat != null) {
+                double latitude = Double.valueOf(sLat);
+                double longitude = Double.valueOf(sLong);
+                location = new Location(restaurantId);
+                location.setLatitude(latitude);
+                location.setLatitude(longitude);
+            }
+        } else {
+            Toast.makeText(LunchtimeApplication.getContext(), "restaurant_" + restaurantId+".json hat noch kein Längen- und Breitengrad", Toast.LENGTH_SHORT).show();
         }
 
         JSONObject openingTimesObject = restaurantJSON.getJSONObject("openingTimes");
@@ -816,15 +821,20 @@ public class ModelParser {
         JSONObject restaurantObject = new JSONObject(jsonText);
         final String restaurantId = restaurantObject.getString("restaurantID");
 
-        final String sLat = restaurantObject.getString("lat");
-        final String sLong = restaurantObject.getString("long");
         Location location = null;
-        if (sLat != null) {
-            double latitude = Double.valueOf(sLat);
-            double longitude = Double.valueOf(sLong);
-            location = new Location(restaurantId);
-            location.setLatitude(latitude);
-            location.setLongitude(longitude);
+        // TODO: Can be removed once all files have these mandatory values
+        if (restaurantObject.has("lat") && restaurantObject.has("long")) {
+            final String sLat = restaurantObject.getString("lat");
+            final String sLong = restaurantObject.getString("long");
+            if (sLat != null) {
+                double latitude = Double.valueOf(sLat);
+                double longitude = Double.valueOf(sLong);
+                location = new Location(restaurantId);
+                location.setLatitude(latitude);
+                location.setLongitude(longitude);
+            }
+        } else {
+            Toast.makeText(LunchtimeApplication.getContext(), "offers_"+restaurantId+".json hat noch kein Längen- und Breitengrad", Toast.LENGTH_SHORT).show();
         }
 
         final String restaurantTitle = restaurantObject.getString("title");

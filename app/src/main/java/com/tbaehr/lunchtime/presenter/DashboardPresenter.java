@@ -831,7 +831,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
          * the same object as allOffers although it is set at the
          * end of this method.
          */
-        boolean dataSetChanged = cachedOffers == null;
+        boolean dataSetChanged = false;
         if (cachedOffers == null || cachedOffers.size() != allOffers.size()) {
             dataSetChanged = true;
             cachedOffers = new HashSet<>();
@@ -839,8 +839,8 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
                 cachedOffers.add(offers);
             }
         } else {
-            for (RestaurantOffers offers : cachedOffers) {
-                boolean contains = allOffers.contains(offers);
+            for (RestaurantOffers offers : allOffers) {
+                boolean contains = cachedOffers.contains(offers);
                 if (!contains) {
                     dataSetChanged = true;
                     break;

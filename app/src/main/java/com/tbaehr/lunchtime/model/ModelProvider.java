@@ -875,7 +875,7 @@ public class ModelProvider {
                     getRestaurantOffersAsync(restaurantId, location, new RestaurantOffersChangeListener() {
                         @Override
                         public void loadingStarted() {
-                            callback.loadingStarted();
+                            // ;
                         }
 
                         @Override

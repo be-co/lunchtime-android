@@ -82,8 +82,8 @@
     <string name="closed">closed</string>
     <string name="now_closed">Now closed</string>
 
-    <string name="available_at">Disponsable in %s$1</string>
-    <string name="available_since">Disponsable for %s$1</string>
+    <string name="available_at">Disponsable in %1$s</string>
+    <string name="available_since">Disponsable for %1$s</string>
 
     <string name="hours">hours</string>
     <string name="hour">hour</string>

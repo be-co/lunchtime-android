@@ -25,6 +25,8 @@
     <string name="nav_item_preferences">Einstellungen</string>
     <string name="nav_item_help">Hilfe</string>
 
+    <string name="permission_location_title">Standortfreigabe</string>
+    <string name="permission_location_message">Lunchtimme kann das Angebot nach Entfernung zu Deinem aktuellen Standort sortieren. Um das Feature zu nutzen, klicke im nächsten Dialog auf \"Zulassen\".</string>
     <string name="more">Mehr</string>
     <string name="starts">Ab </string>
     <string name="ends">Bis </string>

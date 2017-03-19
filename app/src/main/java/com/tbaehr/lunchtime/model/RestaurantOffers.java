@@ -679,6 +679,7 @@ package com.tbaehr.lunchtime.model;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
@@ -812,11 +813,17 @@ public class RestaurantOffers implements Comparable<RestaurantOffers> {
 
     @Override
     public int compareTo(@NonNull RestaurantOffers other) {
-        if (lastKnownLocation == null || this.getLocation() == null) {
+        if (lastKnownLocation == null) {
+            Log.e("RestaurantOffers", "Last known location is null (" + restaurantId + ")");
+            return -1;
+        }
+        if (this.getLocation() == null) {
+            Log.e("RestaurantOffers", "Location for " + restaurantId + " is null");
             return -1;
         }
         float distanceThisRestaurant = lastKnownLocation.distanceTo(this.getLocation());
         float distanceOtherRestaurant = lastKnownLocation.distanceTo(other.getLocation());
+        Log.v("TimoTimo", restaurantId + ": " + distanceThisRestaurant + "m");
         return distanceThisRestaurant < distanceOtherRestaurant ? 1 : -1;
     }
 }

@@ -796,18 +796,34 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         provider = locationManager.getBestProvider(criteria, false);
     }
 
+    private void alertDialogRequestingLocationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            BaseActivity.this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_CODE_LOCATION);
+        }
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.permission_location_title)
+                    .setMessage(R.string.permission_location_message)
+                    .setPositiveButton(R.string._continue, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                BaseActivity.this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_CODE_LOCATION);
+                            }
+                        }
+                    })
+                    .show();
+        }*/
+    }
 
     public Location getLastKnownLocation() {
         if (locationManager == null || provider == null) {
             setupLocationProvider();
         }
 
-        // TODO: Infos for user dialog
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                this.requestPermissions(new String[] { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION }, PERMISSION_REQUEST_CODE_LOCATION);
-            }
+            alertDialogRequestingLocationPermission();
             return null;
         }
 
@@ -824,16 +840,13 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
             setupLocationProvider();
         }
 
-        // TODO: Infos for user dialog
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                this.requestPermissions(new String[] { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION }, PERMISSION_REQUEST_CODE_LOCATION);
-            }
+            alertDialogRequestingLocationPermission();
             return;
         }
 
-        locationManager.requestLocationUpdates(provider, 400, 1, this);
+        locationManager.requestLocationUpdates(provider, 60000, 25, this);
     }
 
     private void unsubscribeFromLocationUpdates() {

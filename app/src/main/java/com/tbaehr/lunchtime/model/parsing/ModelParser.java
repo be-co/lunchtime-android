@@ -758,7 +758,7 @@ public class ModelParser {
                 location.setLatitude(longitude);
             }
         } else {
-            Toast.makeText(LunchtimeApplication.getContext(), "restaurant_" + restaurantId+".json hat noch kein Längen- und Breitengrad", Toast.LENGTH_SHORT).show();
+            System.err.print("restaurant_" + restaurantId+".json hat noch kein Längen- und Breitengrad");
         }
 
         JSONObject openingTimesObject = restaurantJSON.getJSONObject("openingTimes");
@@ -834,7 +834,7 @@ public class ModelParser {
                 location.setLongitude(longitude);
             }
         } else {
-            Toast.makeText(LunchtimeApplication.getContext(), "offers_"+restaurantId+".json hat noch kein Längen- und Breitengrad", Toast.LENGTH_SHORT).show();
+            System.err.print("restaurant_" + restaurantId+".json hat noch kein Längen- und Breitengrad");
         }
 
         final String restaurantTitle = restaurantObject.getString("title");

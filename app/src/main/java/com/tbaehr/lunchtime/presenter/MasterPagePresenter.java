@@ -775,6 +775,14 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         return true;
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        final IMasterPageViewContainer view = getView();
+        view.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
     private void presentDashboard() {
         activeFragment = TAG_DASHBOARD_FRAGMENT;
 

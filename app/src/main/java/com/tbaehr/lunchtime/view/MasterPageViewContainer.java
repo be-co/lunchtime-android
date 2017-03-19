@@ -678,6 +678,7 @@ package com.tbaehr.lunchtime.view;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
@@ -799,6 +800,11 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        fragmentHolder.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
     public void refreshDashboardFragment() {
         fragmentHolder.refreshDashboardFragment();
     }
@@ -868,6 +874,10 @@ class FragmentHolder {
         if (preferences == null) {
             preferences = new PreferencesFragment();
         }
+    }
+
+    void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        activeFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     void refreshDashboardFragment() {

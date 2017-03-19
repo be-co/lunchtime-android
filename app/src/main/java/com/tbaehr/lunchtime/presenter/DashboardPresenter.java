@@ -737,7 +737,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         super.bindView(view);
         activity.requestLocationUpdates();
         Location lastKnownLocation = activity.getLastKnownLocation();
-        refreshOffers(lastKnownLocation);
+        refreshOffers(lastKnownLocation, false);
     }
 
     @Override
@@ -780,7 +780,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        refreshOffers(lastKnownLocation);
+                        refreshOffers(lastKnownLocation, false);
                     }
                 });
             }
@@ -941,21 +941,22 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         activity.startActivity(openFetchOrderActivityIntent);
     }
 
-    public void refreshOffers(@Nullable Location location) {
-        ModelProvider.getInstance().getAllOffersAsync(this, location);
+    public void refreshOffers(@Nullable Location location, boolean forceUpdate) {
+        ModelProvider.getInstance().getAllOffersAsync(this, location, forceUpdate);
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_REQUEST_CODE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Location lastKnownLocation = activity.getLastKnownLocation();
-            refreshOffers(lastKnownLocation);
+            cachedOffers = null;
+            refreshOffers(lastKnownLocation, true);
         }
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        refreshOffers(location);
+        refreshOffers(location, true);
     }
 
     @Override

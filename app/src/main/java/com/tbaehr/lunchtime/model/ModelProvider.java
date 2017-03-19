@@ -761,7 +761,7 @@ public class ModelProvider {
         lastSync = -1;
     }
 
-    private void getNearbyAsync(@NonNull final NearbyChangeListener callback) {
+    private void getNearbyAsync(@NonNull final NearbyChangeListener callback, boolean forceUpdate) {
         final String locationId = LocationHelper.getSelectedLocation();
         NearbyRestaurants nearby = null;
         try {
@@ -771,7 +771,7 @@ public class ModelProvider {
             // ;
         }
         long now = System.currentTimeMillis();
-        if (nearby == null || lastSync + MINUTE < now) {
+        if (nearby == null || lastSync + MINUTE < now || forceUpdate) {
             lastSync = now;
             ModelDownloader.getInstance().downloadNearby(locationId, new LoadJobListener<String>() {
                 @Override
@@ -858,7 +858,7 @@ public class ModelProvider {
 
     private int getAllOffersCounter = 0;
 
-    public void getAllOffersAsync(@Nullable final NearbyOffersChangeListener callback, @Nullable final Location location) {
+    public void getAllOffersAsync(@Nullable final NearbyOffersChangeListener callback, @Nullable final Location location, boolean forceUpdate) {
         final List<RestaurantOffers> allOffers = new ArrayList<>();
 
         getNearbyAsync(new NearbyChangeListener() {
@@ -921,7 +921,7 @@ public class ModelProvider {
                     callback.failed();
                 }
             }
-        });
+        }, forceUpdate);
     }
 
     public void getRestaurantAsync(@NonNull final String restaurantId, @Nullable final RestaurantChangeListener callback) {
@@ -978,7 +978,7 @@ public class ModelProvider {
             public void failed() {
                 callback.failed();
             }
-        });
+        }, false);
     }
 
     private Restaurant getRestaurant(String restaurantId) throws ParseException, JSONException {
@@ -1078,7 +1078,7 @@ public class ModelProvider {
                     callback.failed();
                 }
             }
-        });
+        }, false);
     }
 
     private RestaurantOffers getRestaurantOffersFromCache(@NonNull String restaurantId) {

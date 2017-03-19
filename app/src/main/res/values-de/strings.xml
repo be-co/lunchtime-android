@@ -3,8 +3,8 @@
 
     <!-- 1:1 translations -->
     <string name="_cancel">@android:string/cancel</string>
-    <string name="_no">@android:string/no</string>
-    <string name="_yes">@android:string/yes</string>
+    <string name="_no">Nein</string>
+    <string name="_yes">Ja</string>
     <string name="_settings">Einstellungen</string>
     <string name="_continue">Fortsetzen</string>
     <string name="_close">Schließen</string>
@@ -25,8 +25,10 @@
     <string name="nav_item_preferences">Einstellungen</string>
     <string name="nav_item_help">Hilfe</string>
 
-    <string name="permission_location_title">Standortfreigabe</string>
-    <string name="permission_location_message">Lunchtimme kann das Angebot nach Entfernung zu Deinem aktuellen Standort sortieren. Um das Feature zu nutzen, klicke im nächsten Dialog auf \"Zulassen\".</string>
+    <string name="permission_location_title">Standortsortierung</string>
+    <string name="permission_location_message"><b>Soll Lunchtime für Dich die Angebote nach Entfernung zu Deinem aktuellen Standort sortieren?</b>
+        \n\nKlicke im nächsten Dialog auf \"Zulassen\".
+    </string>
     <string name="more">Mehr</string>
     <string name="starts">Ab </string>
     <string name="ends">Bis </string>

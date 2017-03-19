@@ -678,6 +678,7 @@ package com.tbaehr.lunchtime.controller;
 
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -737,8 +738,14 @@ public class DashboardFragment extends BaseFragment<IDashboardViewContainer, Das
         super.onDestroy();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        getPresenter().onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
     public void refresh() {
         Location lastKnownLocation = ((BaseActivity) getActivity()).getLastKnownLocation();
-        getPresenter().refreshOffers(lastKnownLocation);
+        getPresenter().refreshOffers(lastKnownLocation, false);
     }
 }

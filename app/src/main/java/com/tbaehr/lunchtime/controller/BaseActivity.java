@@ -678,7 +678,9 @@ package com.tbaehr.lunchtime.controller;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
@@ -696,6 +698,7 @@ import android.view.WindowManager;
 import com.propaneapps.tomorrow.base.BasePresenterActivity;
 import com.propaneapps.tomorrow.common.FactoryWithType;
 import com.tbaehr.lunchtime.LunchtimeApplication;
+import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.presenter.CustomBasePresenter;
 import com.tbaehr.lunchtime.tracking.ITracking;
 
@@ -716,6 +719,8 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     private LocationManager locationManager;
 
     private String provider;
+
+    private boolean permissionDialogVisible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -773,7 +778,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        getPresenter().onRequestPermissionsResult(requestCode, grantResults);
+        getPresenter().onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     public void setAsFullScreenActivity() {
@@ -797,23 +802,26 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     }
 
     private void alertDialogRequestingLocationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            BaseActivity.this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_CODE_LOCATION);
-        }
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (!permissionDialogVisible && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            permissionDialogVisible = true;
             new AlertDialog.Builder(this)
                     .setTitle(R.string.permission_location_title)
                     .setMessage(R.string.permission_location_message)
-                    .setPositiveButton(R.string._continue, new DialogInterface.OnClickListener() {
+                    .setPositiveButton(R.string._yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                                 BaseActivity.this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_CODE_LOCATION);
                             }
-                        }
-                    })
+                            permissionDialogVisible = false;
+                        }})
+                    .setNegativeButton(R.string._no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            permissionDialogVisible = false;
+                        }})
                     .show();
-        }*/
+        }
     }
 
     public Location getLastKnownLocation() {

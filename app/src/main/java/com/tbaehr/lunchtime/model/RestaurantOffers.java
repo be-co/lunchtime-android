@@ -823,7 +823,6 @@ public class RestaurantOffers implements Comparable<RestaurantOffers> {
         }
         float distanceThisRestaurant = lastKnownLocation.distanceTo(this.getLocation());
         float distanceOtherRestaurant = lastKnownLocation.distanceTo(other.getLocation());
-        Log.v("TimoTimo", restaurantId + ": " + distanceThisRestaurant + "m");
         return distanceThisRestaurant < distanceOtherRestaurant ? 1 : -1;
     }
 }

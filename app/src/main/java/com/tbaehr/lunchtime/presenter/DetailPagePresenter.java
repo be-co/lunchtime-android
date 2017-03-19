@@ -1076,7 +1076,7 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode != PERMISSION_REQUEST_CODE_PHONE_CALL) {
             return;
         }

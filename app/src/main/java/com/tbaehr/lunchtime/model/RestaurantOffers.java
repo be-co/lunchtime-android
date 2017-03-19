@@ -821,6 +821,10 @@ public class RestaurantOffers implements Comparable<RestaurantOffers> {
             Log.e("RestaurantOffers", "Location for " + restaurantId + " is null");
             return -1;
         }
+        if (other.getLocation() == null) {
+            Log.e("RestaurantOffers", "Location for " + other.restaurantId + " is null");
+            return -1;
+        }
         float distanceThisRestaurant = lastKnownLocation.distanceTo(this.getLocation());
         float distanceOtherRestaurant = lastKnownLocation.distanceTo(other.getLocation());
         return distanceThisRestaurant < distanceOtherRestaurant ? 1 : -1;

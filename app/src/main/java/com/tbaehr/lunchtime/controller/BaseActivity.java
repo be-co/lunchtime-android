@@ -712,13 +712,19 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
 
     public static final int PERMISSION_REQUEST_CODE_LOCATION = 111;
 
+    /**
+     * Name of the network location provider. This provider determines location based on
+     * availability of cell tower and WiFi access points. Results are retrieved by means
+     * of a network lookup.
+     */
+    private static final String PROVIDER_NETWORK = "network";
+
+
     private P presenter;
 
     protected ITracking tracker;
 
     private LocationManager locationManager;
-
-    private static final String PROVIDER_NETWORK = "network";
 
     private boolean permissionDialogVisible = false;
 

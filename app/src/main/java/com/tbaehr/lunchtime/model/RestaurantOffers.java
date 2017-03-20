@@ -693,6 +693,10 @@ import java.util.Set;
  */
 public class RestaurantOffers implements Comparable<RestaurantOffers> {
 
+    public class DistanceNotAvailableException extends Exception {
+        // ;
+    }
+
     private String restaurantId;
 
     private String title;
@@ -713,12 +717,20 @@ public class RestaurantOffers implements Comparable<RestaurantOffers> {
         this.offers = offers;
     }
 
-    public Location getLocation() {
+    private Location getLocation() {
         return location;
     }
 
-    public void setLastKnownLocation(Location lastKnownLocation) {
+    void setLastKnownLocation(Location lastKnownLocation) {
         this.lastKnownLocation = lastKnownLocation;
+    }
+
+    public float getDistanceInMeters() throws DistanceNotAvailableException {
+        if (lastKnownLocation != null && location != null) {
+            return lastKnownLocation.distanceTo(location);
+        } else {
+            throw new DistanceNotAvailableException();
+        }
     }
 
     @Override
@@ -813,20 +825,27 @@ public class RestaurantOffers implements Comparable<RestaurantOffers> {
 
     @Override
     public int compareTo(@NonNull RestaurantOffers other) {
+        final int FALLBACK = -1;
         if (lastKnownLocation == null) {
             Log.e("RestaurantOffers", "Last known location is null (" + restaurantId + ")");
-            return -1;
+            return FALLBACK;
         }
         if (this.getLocation() == null) {
             Log.e("RestaurantOffers", "Location for " + restaurantId + " is null");
-            return -1;
+            return FALLBACK;
         }
         if (other.getLocation() == null) {
             Log.e("RestaurantOffers", "Location for " + other.restaurantId + " is null");
-            return -1;
+            return FALLBACK;
         }
-        float distanceThisRestaurant = lastKnownLocation.distanceTo(this.getLocation());
-        float distanceOtherRestaurant = lastKnownLocation.distanceTo(other.getLocation());
-        return distanceThisRestaurant < distanceOtherRestaurant ? 1 : -1;
+        try {
+            float distanceThisRestaurant = this.getDistanceInMeters();
+            float distanceOtherRestaurant = other.getDistanceInMeters();
+
+            return distanceThisRestaurant < distanceOtherRestaurant ? 1 : -1;
+        } catch (DistanceNotAvailableException e) {
+            // This should never happen
+            return FALLBACK;
+        }
     }
 }

@@ -30,7 +30,7 @@
         \n\nKlicke im nächsten Dialog auf \"Zulassen\".
     </string>
     <string name="error_location">Standort nicht verfügbar</string>
-    <string name="more">Mehr</string>
+    <string name="distance_not_available">\?\?m</string>
     <string name="starts">Ab </string>
     <string name="ends">Bis </string>
     <string name="expired">Abgelaufen</string>

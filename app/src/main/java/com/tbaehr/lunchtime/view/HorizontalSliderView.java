@@ -710,7 +710,7 @@ public class HorizontalSliderView extends LinearLayout {
 
     private View rootView;
 
-    private TextView titleTextView, descriptionTextView;
+    private TextView titleTextView, descriptionTextView, distanceTextView;
 
     private LinearLayout sliderViewContainer;
 
@@ -728,17 +728,17 @@ public class HorizontalSliderView extends LinearLayout {
         void onSliderItemClick(Offer offer, View view);
     }
 
-    public HorizontalSliderView(Context context, String title, String shortDescription, List<Offer> offers, OnSliderHeaderClickListener headerClickListener, OnSliderItemClickListener listener) {
+    public HorizontalSliderView(Context context, String title, String shortDescription, String distance, List<Offer> offers, OnSliderHeaderClickListener headerClickListener, OnSliderItemClickListener listener) {
         super(context);
-        init(context, title, shortDescription, offers, headerClickListener, listener);
+        init(context, title, shortDescription, offers, distance, headerClickListener, listener);
     }
 
-    public HorizontalSliderView(Context context, String title, String shortDescription, List<Offer> offers, AttributeSet attrs, OnSliderHeaderClickListener headerClickListener, OnSliderItemClickListener listener) {
+    public HorizontalSliderView(Context context, String title, String shortDescription, String distance, List<Offer> offers, AttributeSet attrs, OnSliderHeaderClickListener headerClickListener, OnSliderItemClickListener listener) {
         super(context, attrs);
-        init(context, title, shortDescription, offers, headerClickListener, listener);
+        init(context, title, shortDescription, offers, distance, headerClickListener, listener);
     }
 
-    private void init(Context context, String title, String shortDescription, List<Offer> offers, final OnSliderHeaderClickListener headerClickListener, OnSliderItemClickListener listener) {
+    private void init(Context context, String title, String shortDescription, List<Offer> offers, String distance, final OnSliderHeaderClickListener headerClickListener, OnSliderItemClickListener listener) {
         rootView = inflate(context, R.layout.horizontal_slider_view, this);
         this.setOrientation(LinearLayout.VERTICAL);
 
@@ -749,6 +749,9 @@ public class HorizontalSliderView extends LinearLayout {
 
         descriptionTextView = (TextView) rootView.findViewById(R.id.short_description);
         descriptionTextView.setText(shortDescription);
+
+        distanceTextView = (TextView) rootView.findViewById(R.id.distance);
+        distanceTextView.setText(distance);
 
         setOffers(context, offers);
 

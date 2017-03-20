@@ -903,9 +903,11 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
                     openDetailPage(offer.getRestaurantId(), nearbyRestaurantOffers.getIndex(offer));
                 }
             };
+
             view.addOffers(
                     nearbyRestaurantOffers.getRestaurantName(),
                     nearbyRestaurantOffers.getRestaurantDescription(),
+                    getDistance(nearbyRestaurantOffers),
                     nearbyRestaurantOffers.getOffers(),
                     headerClickListener,
                     onSliderItemClickListener
@@ -914,6 +916,21 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
         if (!foundOffers) {
             showNoOfferView();
+        }
+    }
+
+    private String getDistance(RestaurantOffers offers) {
+        try {
+            int distanceInMeters = (int) offers.getDistanceInMeters();
+            if (distanceInMeters < 1000) {
+                return distanceInMeters + " m";
+            } else {
+                int kilometers = distanceInMeters/1000;
+                int meters = (distanceInMeters - (kilometers * 1000)) / 10;
+                return kilometers + "," + meters + " km";
+            }
+        } catch (RestaurantOffers.DistanceNotAvailableException e) {
+            return activity.getString(R.string.distance_not_available);
         }
     }
 

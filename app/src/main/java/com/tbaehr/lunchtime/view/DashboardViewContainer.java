@@ -687,7 +687,6 @@ import android.widget.TextView;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.model.Offer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -720,8 +719,8 @@ public class DashboardViewContainer implements IDashboardViewContainer {
     }
 
     @Override
-    public void addOffers(String sectionTitle, String shortDescription, List<Offer> offers, HorizontalSliderView.OnSliderHeaderClickListener headerClickListener, HorizontalSliderView.OnSliderItemClickListener sliderItemClickListener) {
-        HorizontalSliderView sliderView = new HorizontalSliderView(context, sectionTitle, shortDescription, offers, headerClickListener, sliderItemClickListener);
+    public void addOffers(String sectionTitle, String shortDescription, String distance, List<Offer> offers, HorizontalSliderView.OnSliderHeaderClickListener headerClickListener, HorizontalSliderView.OnSliderItemClickListener sliderItemClickListener) {
+        HorizontalSliderView sliderView = new HorizontalSliderView(context, sectionTitle, shortDescription, distance, offers, headerClickListener, sliderItemClickListener);
         viewContainer.addView(sliderView, 0);
         hasOffers = true;
     }

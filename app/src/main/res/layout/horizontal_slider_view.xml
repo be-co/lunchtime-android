@@ -38,14 +38,12 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/button_more"
+            android:id="@+id/distance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|center"
-            android:textStyle="bold"
-            android:textAllCaps="true"
             android:textColor="@color/colorPrimaryDark"
-            android:text="@string/more" />
+            android:text="@string/distance_not_available" />
 
     </FrameLayout>
 

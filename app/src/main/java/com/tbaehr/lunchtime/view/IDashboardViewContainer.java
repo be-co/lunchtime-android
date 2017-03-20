@@ -695,6 +695,7 @@ public interface IDashboardViewContainer {
     void addOffers(
             String sectionTitle,
             String shortDescription,
+            String distance,
             List<Offer> offers,
             HorizontalSliderView.OnSliderHeaderClickListener headerClickListener,
             HorizontalSliderView.OnSliderItemClickListener sliderItemClickListener

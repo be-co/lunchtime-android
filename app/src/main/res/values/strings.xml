@@ -30,7 +30,7 @@
         \n\nClick \"Accept\" inside the upcoming dialog.
     </string>
     <string name="error_location">Location not available</string>
-    <string name="more">More</string>
+    <string name="distance_not_available">\?m</string>
     <string name="starts">Starts </string>
     <string name="ends">Ends </string>
     <string name="expired">Expired</string>

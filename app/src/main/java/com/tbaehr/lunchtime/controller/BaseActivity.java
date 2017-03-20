@@ -683,7 +683,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -694,6 +693,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.propaneapps.tomorrow.base.BasePresenterActivity;
 import com.propaneapps.tomorrow.common.FactoryWithType;
@@ -718,7 +718,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
 
     private LocationManager locationManager;
 
-    private String provider;
+    private static final String PROVIDER_NETWORK = "network";
 
     private boolean permissionDialogVisible = false;
 
@@ -796,9 +796,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
 
     private void setupLocationProvider() {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        // Define the criteria how to select the location provider -> use default
-        Criteria criteria = new Criteria();
-        provider = locationManager.getBestProvider(criteria, false);
     }
 
     private void alertDialogRequestingLocationPermission() {
@@ -825,7 +822,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     }
 
     public Location getLastKnownLocation() {
-        if (locationManager == null || provider == null) {
+        if (locationManager == null) {
             setupLocationProvider();
         }
 
@@ -835,7 +832,10 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
             return null;
         }
 
-        Location location = locationManager.getLastKnownLocation(provider);
+        Location location = locationManager.getLastKnownLocation(PROVIDER_NETWORK);
+        if (location == null) {
+            Toast.makeText(this, R.string.error_location, Toast.LENGTH_SHORT).show();
+        }
 
         return location;
     }
@@ -844,7 +844,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * Usually called inside onResume()
      */
     public void requestLocationUpdates() {
-        if (locationManager == null || provider == null) {
+        if (locationManager == null) {
             setupLocationProvider();
         }
 
@@ -854,7 +854,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
             return;
         }
 
-        locationManager.requestLocationUpdates(provider, 60000, 25, this);
+        locationManager.requestLocationUpdates(PROVIDER_NETWORK, 60000, 25, this);
     }
 
     private void unsubscribeFromLocationUpdates() {

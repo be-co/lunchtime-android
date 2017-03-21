@@ -701,7 +701,7 @@ public class PreferencesPresenter extends BasePresenter<IPreferencesViewContaine
     public void bindView(IPreferencesViewContainer view) {
         super.bindView(view);
         trackingEnabled = SharedPrefsHelper.getBoolean(KEY_TRACKING_ENABLED, true);
-        errorReportingEnabled = SharedPrefsHelper.getBoolean(KEY_TRACKING_ENABLED, true);
+        errorReportingEnabled = SharedPrefsHelper.getBoolean(KEY_ERROR_REPORTING_ENABLED, true);
         setClickListeners();
         view.setTrackingStatus(trackingEnabled);
         view.setErrorReportingStatus(errorReportingEnabled);

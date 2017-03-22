@@ -922,12 +922,20 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     private String getDistance(RestaurantOffers offers) {
         try {
             int distanceInMeters = (int) offers.getDistanceInMeters();
+            String sMeters;
             if (distanceInMeters < 1000) {
-                return distanceInMeters + " m";
+                int roundedMeters = (int) Math.ceil(distanceInMeters / 10d);
+                //sMeters = "," + ((roundedMeters < 10) ? "0" + roundedMeters : roundedMeters);
+                return (roundedMeters * 10) + " m";
             } else {
-                int kilometers = distanceInMeters/1000;
-                int meters = (distanceInMeters - (kilometers * 1000)) / 10;
-                return kilometers + "," + meters + " km";
+                int kilometers = distanceInMeters / 1000;
+                int meters = (distanceInMeters - (kilometers * 1000));
+                if (meters < 50) {
+                    sMeters = "";
+                } else {
+                    sMeters = "," + (int) Math.ceil(meters / 100d);
+                }
+                return kilometers +sMeters + " km";
             }
         } catch (RestaurantOffers.DistanceNotAvailableException e) {
             return activity.getString(R.string.distance_not_available);

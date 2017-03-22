@@ -676,11 +676,10 @@
  */
 package com.tbaehr.lunchtime.model.parsing;
 
-import android.content.Context;
 import android.location.Location;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.util.Pair;
-import android.widget.Toast;
 
 import com.tbaehr.lunchtime.BuildConfig;
 import com.tbaehr.lunchtime.LunchtimeApplication;
@@ -688,8 +687,11 @@ import com.tbaehr.lunchtime.model.NearbyRestaurants;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
+import com.tbaehr.lunchtime.tracking.ITracking;
+import com.tbaehr.lunchtime.tracking.LunchtimeTracker;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
+import com.tbaehr.lunchtime.utils.SharedPrefsHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -703,6 +705,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.tbaehr.lunchtime.tracking.ITracking.KEY_ERROR_REPORTING_ENABLED;
+import static com.tbaehr.lunchtime.tracking.ITracking.KEY_TRACKING_ENABLED;
 
 /**
  * Created by timo.baehr@gmail.com on 24.02.17.
@@ -878,8 +883,12 @@ public class ModelParser {
             } catch (ParseException e) {
                 e.printStackTrace();
                 if (BuildConfig.DEBUG) {
-                    Context context = LunchtimeApplication.getContext();
-                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("ModelParser", e.getMessage());
+                    e.printStackTrace();
+                    boolean usabilityTrackingEnabled = SharedPrefsHelper.getBoolean(KEY_TRACKING_ENABLED, true);
+                    boolean errorReportingEnabled = SharedPrefsHelper.getBoolean(KEY_ERROR_REPORTING_ENABLED, true);
+                    ITracking tracker = new LunchtimeTracker(LunchtimeApplication.getContext(), usabilityTrackingEnabled, errorReportingEnabled);
+                    tracker.trackException(e);
                 }
                 continue;
             }

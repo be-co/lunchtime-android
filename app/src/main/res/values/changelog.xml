@@ -1,6 +1,9 @@
 <resources>
     <string name="changelog_header">Changelog</string>
-    <string name="changelog"><b>2017.03.19 Alpha (v15)</b>
+    <string name="changelog"><b>2017.03.26 Alpha (v16)</b>
+        \n•  (Fix) Error reports and usability reports can be independently enabled/disabled
+        \n•  Distance is now shown inside restaurant offer sections (work in progress)
+        \n\n<b>2017.03.19 Alpha (v15)</b>
         \n•  Error reports and usability reports can be independently enabled/disabled
         \n•  Sort restaurant\'s offers by distance to the current location
         \n\n<b>2017.03.12 Alpha (v14)</b>

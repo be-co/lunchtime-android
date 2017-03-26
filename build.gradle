@@ -19,8 +19,9 @@ ext {
     targetSdkVersion = 25
     minSdkVersion = 15
 
+    // in case of upgrade fragments are not shown after going back to dashboard
     supportVersion = '25.1.0'
-    gServicesVersion = '10.2.0'
+    gServicesVersion = '10.2.1'
     butterknifeVersion = '8.4.0'
 }
 

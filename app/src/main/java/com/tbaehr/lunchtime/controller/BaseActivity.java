@@ -1247,6 +1247,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     @Override
     public void onLocationChanged(Location location) {
+        Toast.makeText(this, "onLocationChanged("+location+")", Toast.LENGTH_SHORT).show();
         Log.i(TAG, "onLocationChanged("+location+")");
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());

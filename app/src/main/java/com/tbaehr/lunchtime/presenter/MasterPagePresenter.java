@@ -852,6 +852,8 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
     @Override
     public void onLocationChanged(Location location) {
         IMasterPageViewContainer view = getView();
-        view.onLocationChanged(location);
+        if (view != null) {
+            view.onLocationChanged(location);
+        }
     }
 }

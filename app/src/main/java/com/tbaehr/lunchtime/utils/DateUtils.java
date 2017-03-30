@@ -676,12 +676,15 @@
  */
 package com.tbaehr.lunchtime.utils;
 
+import android.os.Build;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Created by timo.baehr@gmail.com on 14.01.17.
@@ -694,6 +697,8 @@ public class DateUtils {
     private static final String DATE_FORMAT = "MMM dd yyyy HH:mm:ss 'GMT'Z";
 
     private static final String DATE_FORMAT_WEEKDAY = "EEE MMM dd HH:mm:ss 'GMT'Z yyyy";
+
+    private static final String DATE_FORMAT_WEEKDAY_PDT = "EEE MMM dd HH:mm:ss 'PDT'Z yyyy";
 
     private static final String PARSE_ERROR_MESSAGE = "Could not parse weekday date with value \"%1$s\"";
 
@@ -742,13 +747,28 @@ public class DateUtils {
         }
 
         DateFormat dateFormat1 = new SimpleDateFormat(DATE_FORMAT_WEEKDAY, Locale.ENGLISH);
-        DateFormat dateFormat2 = new SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH);
+        DateFormat dateFormat2 = new SimpleDateFormat(DATE_FORMAT_WEEKDAY_PDT, Locale.ENGLISH);
+        DateFormat dateFormat3 = new SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH);
         try {
             Date dateTemp = dateFormat1.parse(date);
             return new DateTime(dateTemp.getTime());
         } catch (ParseException e1) {
-            Date dateTemp = dateFormat2.parse(date);
-            return new DateTime(dateTemp.getTime());
+            try {
+                Date dateTemp = dateFormat2.parse(date);
+                return new DateTime(dateTemp.getTime());
+            } catch (ParseException e2) {
+                Date dateTemp = dateFormat3.parse(date);
+                TimeZone timeZone = TimeZone.getDefault();
+                DateTime dateTime = new DateTime(dateTemp.getTime());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    if (timeZone.observesDaylightTime() && timeZone.inDaylightTime(dateTemp)) {
+                        dateTime.shiftHours(-1);
+                    }
+                } else if (timeZone.inDaylightTime(dateTemp)){
+                    dateTime.shiftHours(-1);
+                }
+                return dateTime;
+            }
         }
     }
 

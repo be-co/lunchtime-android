@@ -693,7 +693,9 @@ public class DateTime implements Comparable<DateTime> {
 
     public static final long SECOND_IN_MILLIS = 1000L;
 
-    public static final long DAY_IN_MILLIS = 24 * 60 * 60 * SECOND_IN_MILLIS;
+    private static final long HOUR_IN_MILLIS = 60 * 60 * SECOND_IN_MILLIS;
+
+    public static final long DAY_IN_MILLIS = 24 * HOUR_IN_MILLIS;
 
     private long timeInMillis;
 
@@ -879,5 +881,9 @@ public class DateTime implements Comparable<DateTime> {
         }
         timeInMillis = timeInMillis + diff * DAY_IN_MILLIS;
         return this;
+    }
+
+    void shiftHours(int hoursOfDay) {
+        timeInMillis = timeInMillis + hoursOfDay * HOUR_IN_MILLIS;
     }
 }

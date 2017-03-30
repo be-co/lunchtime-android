@@ -680,6 +680,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.model.caching.ModelCache;
@@ -880,6 +881,9 @@ public class ModelProvider {
 
                         @Override
                         public void pickUp(RestaurantOffers model) {
+                            if (allOffers.isEmpty()) {
+                                getAllOffersCounter = 0;
+                            }
                             getAllOffersCounter++;
                             allOffers.add(model);
                             if (restaurantKeys.size() == getAllOffersCounter) {
@@ -1018,6 +1022,7 @@ public class ModelProvider {
                                 protected Void doInBackground(Void... voids) {
                                     try {
                                         result = ModelParser.getInstance().parseRestaurantOffers(offersJson);
+                                        Log.i("TimTim", "setLastKnownLocation(" + location + ") " + restaurantId + " | load from server");
                                         result.setLastKnownLocation(location);
                                         ModelCache.getInstance().putRestaurantOffers(offersJson, restaurantId, onServerUpdated);
                                     } catch (JSONException jsonException) {
@@ -1046,6 +1051,7 @@ public class ModelProvider {
                         @Override
                         protected Void doInBackground(Void... voids) {
                             result = getRestaurantOffersFromCache(restaurantId);
+                            Log.i("TimTim", "setLastKnownLocation(" + location + ") " + restaurantId + " | load from cache");
                             result.setLastKnownLocation(location);
                             return null;
                         }

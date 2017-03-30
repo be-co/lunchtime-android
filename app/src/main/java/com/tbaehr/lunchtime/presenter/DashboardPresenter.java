@@ -679,16 +679,15 @@ package com.tbaehr.lunchtime.presenter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.BaseActivity;
 import com.tbaehr.lunchtime.controller.DashboardFragment;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
+import com.tbaehr.lunchtime.localization.LocationListener;
 import com.tbaehr.lunchtime.model.ModelProvider;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
@@ -736,8 +735,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     public void bindView(IDashboardViewContainer view) {
         super.bindView(view);
         activity.requestLocationUpdates();
-        Location lastKnownLocation = activity.getLastKnownLocation();
-        refreshOffers(lastKnownLocation, false);
+        refreshOffers(false);
     }
 
     @Override
@@ -776,11 +774,10 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         return new TimerTask() {
             @Override
             public void run() {
-                final Location lastKnownLocation = activity.getLastKnownLocation();
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        refreshOffers(lastKnownLocation, false);
+                        refreshOffers(false);
                     }
                 });
             }
@@ -861,12 +858,14 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
     @Override
     public void pickUp(List<RestaurantOffers> allOffers) {
+        Log.i("TimTim", "pickUp("+allOffers+")");
         IDashboardViewContainer view = getView();
         if (view == null) {
             return;
         }
 
         if (!hasDataSetChanged(allOffers)) {
+            Log.i("TimTim", "dataSet has NOT changed");
             if (!view.hasOffers()) {
                 if (!areOffersAvailable(allOffers)) {
                     showNoOfferView();
@@ -876,6 +875,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
                 return;
             }
         }
+        Log.i("TimTim", "dataSet has changed");
 
         view.setProgressBarVisibility(false);
         view.clearOffers();
@@ -966,36 +966,22 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         activity.startActivity(openFetchOrderActivityIntent);
     }
 
-    public void refreshOffers(@Nullable Location location, boolean forceUpdate) {
-        ModelProvider.getInstance().getAllOffersAsync(this, location, forceUpdate);
+    public void refreshOffers(boolean forceUpdate) {
+        Location lastKnownLocation = activity.getLastKnownLocation();
+        ModelProvider.getInstance().getAllOffersAsync(this, lastKnownLocation, forceUpdate);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_REQUEST_CODE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Location lastKnownLocation = activity.getLastKnownLocation();
             cachedOffers = null;
-            refreshOffers(lastKnownLocation, true);
+            refreshOffers(true);
         }
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        refreshOffers(location, true);
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        // ;
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-        // ;
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        // ;
+        Log.i("TimTim", "onLocationChanged(" + location + ")");
+        refreshOffers(true);
     }
 }

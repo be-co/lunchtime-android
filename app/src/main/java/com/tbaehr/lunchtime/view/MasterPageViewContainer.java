@@ -678,6 +678,7 @@ package com.tbaehr.lunchtime.view;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -805,8 +806,13 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     }
 
     @Override
-    public void refreshDashboardFragment() {
-        fragmentHolder.refreshDashboardFragment();
+    public void reloadOffers() {
+        fragmentHolder.reloadOffers();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        fragmentHolder.onLocationChanged(location);
     }
 
     @Override
@@ -880,8 +886,8 @@ class FragmentHolder {
         activeFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    void refreshDashboardFragment() {
-        dashboard.refresh();
+    void reloadOffers() {
+        dashboard.reloadOffers();
     }
 
     void showDashboardFragment() {
@@ -908,5 +914,9 @@ class FragmentHolder {
             transaction.remove(previousFragment);
         }
         transaction.replace(R.id.fragment_container, activeFragment, activeFragment.getClass().getCanonicalName()).commit();
+    }
+
+    void onLocationChanged(Location location) {
+        dashboard.onLocationChanged(location);
     }
 }

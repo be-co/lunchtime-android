@@ -682,10 +682,12 @@ import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import com.tbaehr.lunchtime.localization.LocationListener;
+
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
-public interface IMasterPageViewContainer {
+public interface IMasterPageViewContainer extends LocationListener {
 
     void showToolbar(AppCompatActivity activity, NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener);
 
@@ -709,5 +711,5 @@ public interface IMasterPageViewContainer {
 
     void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults);
 
-    void refreshDashboardFragment();
+    void reloadOffers();
 }

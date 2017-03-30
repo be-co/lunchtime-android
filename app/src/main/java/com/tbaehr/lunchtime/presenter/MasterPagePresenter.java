@@ -677,6 +677,7 @@
 package com.tbaehr.lunchtime.presenter;
 
 import android.content.DialogInterface;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -687,6 +688,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.tbaehr.lunchtime.R;
+import com.tbaehr.lunchtime.localization.LocationListener;
 import com.tbaehr.lunchtime.utils.LocationHelper;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
 
@@ -698,7 +700,7 @@ import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_PREFERENCES_
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
 public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewContainer>
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
 
     private final static String KEY_TOOLBAR_TITLE = "toolbarTitle";
 
@@ -798,7 +800,7 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                         LocationHelper.setSelectedLocationIndex(selectedItemIndex);
                         toolbarTitle = LocationHelper.getSelectedLocation();
                         view.setToolbarTitle(toolbarTitle);
-                        view.refreshDashboardFragment();
+                        view.reloadOffers();
                         dialogInterface.dismiss();
                     }
                 });
@@ -845,5 +847,11 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
 
     public void onPostCreate(@Nullable Bundle savedInstanceState) {
         getView().syncDrawerToggleButton();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        IMasterPageViewContainer view = getView();
+        view.onLocationChanged(location);
     }
 }

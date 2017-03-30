@@ -696,7 +696,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
@@ -939,7 +938,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * {@link com.google.android.gms.location.SettingsApi#checkLocationSettings(GoogleApiClient,
      * LocationSettingsRequest)} method, with the results provided through a {@code PendingResult}.
      */
-    protected void checkLocationSettings() {
+    /*protected void checkLocationSettings() {
         Log.i(TAG, "checkLocationSettings()");
         PendingResult<LocationSettingsResult> result =
                 LocationServices.SettingsApi.checkLocationSettings(
@@ -947,7 +946,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
                         mLocationSettingsRequest
                 );
         result.setResultCallback(this);
-    }
+    }*/
 
     /**
      * The callback invoked when
@@ -1009,9 +1008,10 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     protected void startLocationUpdates() {
         Log.i(TAG, "startLocationUpdates()");
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            checkLocationSettings();
-            //alertDialogRequestingLocationPermission();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            alertDialogRequestingLocationPermission();
+            //checkLocationSettings();
             return;
         }
 
@@ -1023,7 +1023,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
             @Override
             public void onResult(Status status) {
                 mRequestingLocationUpdates = true;
-                //setButtonsEnabledState();
             }
         });
     }
@@ -1043,7 +1042,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
             @Override
             public void onResult(Status status) {
                 mRequestingLocationUpdates = false;
-                //setButtonsEnabledState();
             }
         });
     }
@@ -1091,6 +1089,9 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            startLocationUpdates();
+        }
         getPresenter().onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
@@ -1135,23 +1136,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     public Location getLastKnownLocation() {
         Log.i(TAG, "getLastKnownLocation(" + mCurrentLocation + ")");
         return mCurrentLocation;
-
-        /*if (locationManager == null) {
-            //setupLocationProvider();
-        }
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            alertDialogRequestingLocationPermission();
-            return null;
-        }
-
-        Location location = locationManager.getLastKnownLocation(PROVIDER_NETWORK);
-        if (location == null) {
-            Toast.makeText(this, R.string.error_location, Toast.LENGTH_SHORT).show();
-        }
-
-        return location;*/
     }
 
     /**
@@ -1159,60 +1143,20 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     public void requestLocationUpdates() {
         Log.i(TAG, "requestLocationUpdates()");
-        if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
-            startLocationUpdates();
-        }
-        /*if (locationManager == null) {
-            setupLocationProvider();
-        }
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             alertDialogRequestingLocationPermission();
             return;
         }
 
-        locationManager.requestLocationUpdates(PROVIDER_NETWORK, 60000, 25, this);*/
-    }
-
-    /*private void unsubscribeFromLocationUpdates() {
-        stopLocationUpdates();
-        if (locationManager != null) {
-            locationManager.removeUpdates(this);
-        }
-    }*/
-
-    /*@Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        CustomBasePresenter presenter = getPresenter();
-        if (presenter != null && presenter instanceof LocationListener) {
-            ((LocationListener) presenter).onStatusChanged(provider, status, extras);
+        mRequestingLocationUpdates = true;
+        if (mGoogleApiClient.isConnected()) {
+            Log.i(TAG, "Google API Client is connected, starting location updates");
+            startLocationUpdates();
+        } else {
+            Log.i(TAG, "Google API Client is not connected yet");
         }
     }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-        CustomBasePresenter presenter = getPresenter();
-        if (presenter != null && presenter instanceof LocationListener) {
-            ((LocationListener) presenter).onProviderEnabled(provider);
-        }
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        CustomBasePresenter presenter = getPresenter();
-        if (presenter != null && presenter instanceof LocationListener) {
-            ((LocationListener) presenter).onProviderDisabled(provider);
-        }
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        CustomBasePresenter presenter = getPresenter();
-        if (presenter != null && presenter instanceof LocationListener) {
-            ((LocationListener) presenter).onLocationChanged(location);
-        }
-    }*/
 
     /**
      * Runs when a GoogleApiClient object successfully connects.
@@ -1221,7 +1165,14 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     public void onConnected(Bundle connectionHint) {
         Log.i(TAG, "Connected to GoogleApiClient");
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (!mRequestingLocationUpdates) {
+            return;
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            alertDialogRequestingLocationPermission();
+            //checkLocationSettings();
             return;
         }
 
@@ -1237,9 +1188,10 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         // is displayed as the activity is re-created.
         if (mCurrentLocation == null) {
             mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-            tellPresenterLocationChanged();
+            onLocationChanged(mCurrentLocation);
         }
+
+        startLocationUpdates();
     }
 
     /**
@@ -1252,7 +1204,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         tellPresenterLocationChanged();
-        Toast.makeText(this, "location_updated_message", Toast.LENGTH_SHORT).show();
     }
 
     @Override

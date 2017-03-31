@@ -790,7 +790,8 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
 
     private boolean permissionDialogVisible = false;
 
-    /* Android Lifecycle BEGIN */
+    // Android Lifecycle
+    // BEGIN
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -846,7 +847,49 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         super.onDestroy();
     }
 
-    /* Android Lifecycle END */
+    // Android Lifecycle
+    // END
+
+    // Android Activity Utils
+    // BEGIN
+
+    public <T extends Activity> void startActivity(Class<T> activityClazz) {
+        startActivity(new Intent(this, activityClazz));
+    }
+
+    /**
+     * Create an intent with a given action and for a given data url.
+     *
+     * @param uri The Intent data URI.
+     */
+    public void openUrl(Uri uri) {
+        startActivity(new Intent(Intent.ACTION_VIEW, uri));
+    }
+
+    public void setAsFullScreenActivity() {
+        Window window = getWindow();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
+        window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        window.addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+    }
+
+    // Android Activity Utils
+    // END
+
+    // Store and restore logic
+    // BEGIN
+
+    /**
+     * Stores activity data in the Bundle.
+     */
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putBoolean(KEY_REQUESTING_LOCATION_UPDATES, mRequestingLocationUpdates);
+        savedInstanceState.putParcelable(KEY_LOCATION, mCurrentLocation);
+        savedInstanceState.putString(KEY_LAST_UPDATED_TIME_STRING, mLastUpdateTime);
+        super.onSaveInstanceState(savedInstanceState);
+    }
 
     /**
      * Updates fields based on data stored in the bundle.
@@ -876,6 +919,133 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
             }
             tellPresenterLocationChanged();
         }
+    }
+
+    // Store and restore logic
+    // END
+
+    // MVP Code
+    // BEGIN
+
+    public P getPresenter() {
+        return presenter;
+    }
+
+    @Override
+    public FactoryWithType<P> getPresenterFactory() {
+        return this;
+    }
+
+    @Override
+    public void onPresenterProvided(P presenter) {
+        super.onPresenterProvided(presenter);
+        this.presenter = presenter;
+    }
+
+    private void tellPresenterLocationChanged() {
+        Log.v(TAG, "tellPresenterLocationChanged() " + mCurrentLocation);
+        CustomBasePresenter presenter = getPresenter();
+        if (presenter != null && presenter instanceof com.tbaehr.lunchtime.localization.LocationListener) {
+            ((com.tbaehr.lunchtime.localization.LocationListener) presenter).onLocationChanged(mCurrentLocation);
+        }
+    }
+
+    // MVP Code
+    // END
+
+    // Handling permissions (Android API > M)
+    // BEGIN
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            startLocationUpdates();
+        }
+        getPresenter().onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    private void alertDialogRequestingLocationPermission() {
+        if (!permissionDialogVisible && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            permissionDialogVisible = true;
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.permission_location_title)
+                    .setMessage(R.string.permission_location_message)
+                    .setPositiveButton(R.string._yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                BaseActivity.this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_CODE_LOCATION);
+                            }
+                            permissionDialogVisible = false;
+                        }
+                    })
+                    .setNegativeButton(R.string._no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            permissionDialogVisible = false;
+                        }
+                    })
+                    .show();
+        }
+    }
+
+    /**
+     * Check if the device's location settings are adequate for the app's needs using the
+     * {@link com.google.android.gms.location.SettingsApi#checkLocationSettings(GoogleApiClient,
+     * LocationSettingsRequest)} method, with the results provided through a {@code PendingResult}.
+     */
+    /*protected void checkLocationSettings() {
+        Log.i(TAG, "checkLocationSettings()");
+        PendingResult<LocationSettingsResult> result =
+                LocationServices.SettingsApi.checkLocationSettings(
+                        mGoogleApiClient,
+                        mLocationSettingsRequest
+                );
+        result.setResultCallback(this);
+    }*/
+
+    /**
+     * The callback invoked when
+     * {@link com.google.android.gms.location.SettingsApi#checkLocationSettings(GoogleApiClient,
+     * LocationSettingsRequest)} is called. Examines the
+     * {@link com.google.android.gms.location.LocationSettingsResult} object and determines if
+     * location settings are adequate. If they are not, begins the process of presenting a location
+     * settings dialog to the user.
+     */
+    @Override
+    public void onResult(LocationSettingsResult locationSettingsResult) {
+        Log.i(TAG, "onResult(LocationSettingsResult)");
+        final Status status = locationSettingsResult.getStatus();
+        switch (status.getStatusCode()) {
+            case LocationSettingsStatusCodes.SUCCESS:
+                Log.i(TAG, "All location settings are satisfied.");
+                startLocationUpdates();
+                break;
+            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                Log.i(TAG, "Location settings are not satisfied. Show the user a dialog to" +
+                        "upgrade location settings ");
+
+                try {
+                    // Show the dialog by calling startResolutionForResult(), and check the result
+                    // in onActivityResult().
+                    status.startResolutionForResult(BaseActivity.this, REQUEST_CHECK_SETTINGS);
+                } catch (IntentSender.SendIntentException e) {
+                    Log.i(TAG, "PendingIntent unable to execute request.");
+                }
+                break;
+            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                Log.i(TAG, "Location settings are inadequate, and cannot be fixed here. Dialog " +
+                        "not created.");
+                break;
+        }
+    }
+
+    // Handling permissions (Android API > M)
+    // END
+
+    public ITracking getTracker() {
+        return tracker;
     }
 
     /**
@@ -931,57 +1101,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addLocationRequest(mLocationRequest);
         mLocationSettingsRequest = builder.build();
-    }
-
-    /**
-     * Check if the device's location settings are adequate for the app's needs using the
-     * {@link com.google.android.gms.location.SettingsApi#checkLocationSettings(GoogleApiClient,
-     * LocationSettingsRequest)} method, with the results provided through a {@code PendingResult}.
-     */
-    /*protected void checkLocationSettings() {
-        Log.i(TAG, "checkLocationSettings()");
-        PendingResult<LocationSettingsResult> result =
-                LocationServices.SettingsApi.checkLocationSettings(
-                        mGoogleApiClient,
-                        mLocationSettingsRequest
-                );
-        result.setResultCallback(this);
-    }*/
-
-    /**
-     * The callback invoked when
-     * {@link com.google.android.gms.location.SettingsApi#checkLocationSettings(GoogleApiClient,
-     * LocationSettingsRequest)} is called. Examines the
-     * {@link com.google.android.gms.location.LocationSettingsResult} object and determines if
-     * location settings are adequate. If they are not, begins the process of presenting a location
-     * settings dialog to the user.
-     */
-    @Override
-    public void onResult(LocationSettingsResult locationSettingsResult) {
-        Log.i(TAG, "onResult(LocationSettingsResult)");
-        final Status status = locationSettingsResult.getStatus();
-        switch (status.getStatusCode()) {
-            case LocationSettingsStatusCodes.SUCCESS:
-                Log.i(TAG, "All location settings are satisfied.");
-                startLocationUpdates();
-                break;
-            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                Log.i(TAG, "Location settings are not satisfied. Show the user a dialog to" +
-                        "upgrade location settings ");
-
-                try {
-                    // Show the dialog by calling startResolutionForResult(), and check the result
-                    // in onActivityResult().
-                    status.startResolutionForResult(BaseActivity.this, REQUEST_CHECK_SETTINGS);
-                } catch (IntentSender.SendIntentException e) {
-                    Log.i(TAG, "PendingIntent unable to execute request.");
-                }
-                break;
-            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                Log.i(TAG, "Location settings are inadequate, and cannot be fixed here. Dialog " +
-                        "not created.");
-                break;
-        }
     }
 
     @Override
@@ -1044,93 +1163,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
                 mRequestingLocationUpdates = false;
             }
         });
-    }
-
-    /* MVP Code BEGIN */
-
-    public P getPresenter() {
-        return presenter;
-    }
-
-    @Override
-    public FactoryWithType<P> getPresenterFactory() {
-        return this;
-    }
-
-    @Override
-    public void onPresenterProvided(P presenter) {
-        super.onPresenterProvided(presenter);
-        this.presenter = presenter;
-    }
-
-    private void tellPresenterLocationChanged() {
-        Log.v(TAG, "tellPresenterLocationChanged() " + mCurrentLocation);
-        CustomBasePresenter presenter = getPresenter();
-        if (presenter != null && presenter instanceof com.tbaehr.lunchtime.localization.LocationListener) {
-            ((com.tbaehr.lunchtime.localization.LocationListener) presenter).onLocationChanged(mCurrentLocation);
-        }
-    }
-
-    /* MVP Code END */
-
-    public <T extends Activity> void startActivity(Class<T> activityClazz) {
-        startActivity(new Intent(this, activityClazz));
-    }
-
-    /**
-     * Create an intent with a given action and for a given data url.
-     *
-     * @param uri The Intent data URI.
-     */
-    public void openUrl(Uri uri) {
-        startActivity(new Intent(Intent.ACTION_VIEW, uri));
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSION_REQUEST_CODE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            startLocationUpdates();
-        }
-        getPresenter().onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    public void setAsFullScreenActivity() {
-        Window window = getWindow();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        }
-        window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        window.addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-    }
-
-    public ITracking getTracker() {
-        return tracker;
-    }
-
-    private void alertDialogRequestingLocationPermission() {
-        if (!permissionDialogVisible && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            permissionDialogVisible = true;
-            new AlertDialog.Builder(this)
-                    .setTitle(R.string.permission_location_title)
-                    .setMessage(R.string.permission_location_message)
-                    .setPositiveButton(R.string._yes, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                BaseActivity.this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_CODE_LOCATION);
-                            }
-                            permissionDialogVisible = false;
-                        }
-                    })
-                    .setNegativeButton(R.string._no, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            permissionDialogVisible = false;
-                        }
-                    })
-                    .show();
-        }
     }
 
     public Location getLastKnownLocation() {
@@ -1216,15 +1248,5 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
         // onConnectionFailed.
         Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
-    }
-
-    /**
-     * Stores activity data in the Bundle.
-     */
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putBoolean(KEY_REQUESTING_LOCATION_UPDATES, mRequestingLocationUpdates);
-        savedInstanceState.putParcelable(KEY_LOCATION, mCurrentLocation);
-        savedInstanceState.putString(KEY_LAST_UPDATED_TIME_STRING, mLastUpdateTime);
-        super.onSaveInstanceState(savedInstanceState);
     }
 }

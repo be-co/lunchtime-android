@@ -982,6 +982,6 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     @Override
     public void onLocationChanged(Location location) {
         Log.i("TimTim", "onLocationChanged(" + location + ")");
-        refreshOffers(true);
+        refreshOffers(false);
     }
 }

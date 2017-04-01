@@ -676,11 +676,14 @@
  */
 package com.tbaehr.lunchtime.model;
 
+import android.content.Context;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.tbaehr.lunchtime.LunchtimeApplication;
+import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
 
@@ -730,6 +733,34 @@ public class RestaurantOffers implements Comparable<RestaurantOffers> {
             return lastKnownLocation.distanceTo(location);
         } else {
             throw new DistanceNotAvailableException();
+        }
+    }
+
+    public String getDistance() {
+        Context context = LunchtimeApplication.getContext();
+        try {
+            int distanceInMeters = (int) getDistanceInMeters();
+            if (distanceInMeters < 100) {
+                return context.getString(R.string.distance_less100);
+            }
+            int kilometers = distanceInMeters / 1000;
+            if (kilometers > 10) {
+                if (kilometers < 1000) {
+                    return context.getString(R.string.distance_km, kilometers);
+                } else {
+                    return context.getString(R.string.distance_far_away);
+                }
+            }
+
+            int meters = distanceInMeters - (kilometers * 1000);
+            if (meters > 900) {
+                return context.getString(R.string.distance_km_m, kilometers + 1, 0);
+            } else {
+                meters = (int) Math.ceil(meters / 100d);
+                return context.getString(R.string.distance_km_m, kilometers, meters);
+            }
+        } catch (RestaurantOffers.DistanceNotAvailableException e) {
+            return context.getString(R.string.distance_not_available);
         }
     }
 

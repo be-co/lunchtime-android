@@ -907,7 +907,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
             view.addOffers(
                     nearbyRestaurantOffers.getRestaurantName(),
                     nearbyRestaurantOffers.getRestaurantDescription(),
-                    getDistance(nearbyRestaurantOffers),
+                    nearbyRestaurantOffers.getDistance(),
                     nearbyRestaurantOffers.getOffers(),
                     headerClickListener,
                     onSliderItemClickListener
@@ -916,29 +916,6 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
         if (!foundOffers) {
             showNoOfferView();
-        }
-    }
-
-    private String getDistance(RestaurantOffers offers) {
-        try {
-            int distanceInMeters = (int) offers.getDistanceInMeters();
-            String sMeters;
-            if (distanceInMeters < 1000) {
-                int roundedMeters = (int) Math.ceil(distanceInMeters / 10d);
-                //sMeters = "," + ((roundedMeters < 10) ? "0" + roundedMeters : roundedMeters);
-                return (roundedMeters * 10) + " m";
-            } else {
-                int kilometers = distanceInMeters / 1000;
-                int meters = (distanceInMeters - (kilometers * 1000));
-                if (meters < 50) {
-                    sMeters = "";
-                } else {
-                    sMeters = "," + (int) Math.ceil(meters / 100d);
-                }
-                return kilometers +sMeters + " km";
-            }
-        } catch (RestaurantOffers.DistanceNotAvailableException e) {
-            return activity.getString(R.string.distance_not_available);
         }
     }
 

@@ -30,7 +30,12 @@
         \n\nClick \"Accept\" inside the upcoming dialog.
     </string>
     <string name="error_location">Location not available</string>
-    <string name="distance_not_available">\?m</string>
+    <string name="distance_not_available">\?km</string>
+    <string name="distance_less100">&lt; 0,1 km</string>
+    <string name="distance_km_m" formatted="false">%d,%d km</string>
+    <string name="distance_km">%d km</string>
+    <string name="distance_far_away">Far away</string>
+
     <string name="starts">Starts </string>
     <string name="ends">Ends </string>
     <string name="expired">Expired</string>

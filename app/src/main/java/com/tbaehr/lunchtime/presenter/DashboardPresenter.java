@@ -741,6 +741,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     @Override
     public void unbindView() {
         stopTimeBasedRefresh();
+        activity.stopLocationUpdates();
         super.unbindView();
     }
 

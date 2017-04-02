@@ -2,6 +2,8 @@
     <string name="changelog_header">Versionshistorie</string>
     <string name="changelog"><b>2017.04.02 Alpha (v17)</b>
         \n•  Entfernung wird automatisch aktualisiert
+        \n•  Energie-sparende Standorterkennung wird unterstützt / Optimierung für Android O
+        \n•  Reduzierte Dateigröße für gleichbleibende Gerichte
         \n•  Verbesserung der Inhaltsstofferkennung
         \n•  (Fehlerkorrektur) Sommerzeit wird nun korrekt anzeigt
         \n\n<b>2017.03.26 Alpha (v16)</b>

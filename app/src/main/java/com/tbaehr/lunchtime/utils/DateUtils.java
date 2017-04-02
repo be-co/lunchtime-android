@@ -711,7 +711,33 @@ public class DateUtils {
             int hours = Integer.valueOf(parsedTime[0]);
             int minutes = Integer.valueOf(parsedTime[1]);
             int weekDay;
+            int today;
             switch (parsedWeekDay) {
+                case "MoFr":
+                    today = new DateTime().get(Calendar.DAY_OF_WEEK);
+                    if (today == Calendar.MONDAY
+                            || today == Calendar.TUESDAY
+                            || today == Calendar.WEDNESDAY
+                            || today == Calendar.THURSDAY
+                            || today == Calendar.FRIDAY) {
+                        weekDay = today;
+                    } else {
+                        weekDay = Calendar.MONDAY;
+                    }
+                    break;
+                case "MoSa":
+                    today = new DateTime().get(Calendar.DAY_OF_WEEK);
+                    if (today == Calendar.MONDAY
+                            || today == Calendar.TUESDAY
+                            || today == Calendar.WEDNESDAY
+                            || today == Calendar.THURSDAY
+                            || today == Calendar.FRIDAY
+                            || today == Calendar.SATURDAY) {
+                        weekDay = today;
+                    } else {
+                        weekDay = Calendar.MONDAY;
+                    }
+                    break;
                 case "Mon":
                     weekDay = Calendar.MONDAY;
                     break;

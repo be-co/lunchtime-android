@@ -961,12 +961,11 @@ public class ModelParser {
         }
 
         DateTime[] listOfStrings = new DateTime[array.length()];
-        String[] openingValues;
         boolean nextDay = false;
         int hourLast = -1;
         for (int i = 0; i < listOfStrings.length; i++) {
-            openingValues = array.getString(i).split(":");
-            if (openingValues == null || openingValues.length != 2) {
+            String[] openingValues = array.getString(i).split(":");
+            if (openingValues.length != 2) {
                 throw new ParseException("Could not parse restaurant opening times (value = "+array.getString(i)+")", 0);
             }
             int hours = Integer.valueOf(openingValues[0]);

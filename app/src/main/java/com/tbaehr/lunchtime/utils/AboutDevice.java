@@ -674,188 +674,35 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.presenter;
+package com.tbaehr.lunchtime.utils;
 
-import android.content.DialogInterface;
-import android.location.Location;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.design.widget.NavigationView;
-import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
-import android.view.View;
+import android.content.Context;
+import android.graphics.Point;
+import android.view.Display;
+import android.view.WindowManager;
 
-import com.tbaehr.lunchtime.R;
-import com.tbaehr.lunchtime.localization.LocationListener;
-import com.tbaehr.lunchtime.utils.LocationHelper;
-import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
-
-import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_DASHBOARD_FRAGMENT;
-import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_HELP_FRAGMENT;
-import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_PREFERENCES_FRAGMENT;
+import com.tbaehr.lunchtime.LunchtimeApplication;
 
 /**
- * Created by timo.baehr@gmail.com on 31.12.16.
+ * Created by timo.baehr@gmail.com on 02.04.2017.
  */
-public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewContainer>
-        implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
+public class AboutDevice {
 
-    private final static String KEY_TOOLBAR_TITLE = "toolbarTitle";
+    public static Point getDisplayDimensions() {
+        Context context = LunchtimeApplication.getContext();
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
 
-    private final static String KEY_ACTIVE_FRAGMENT = "activeFragment";
-
-    private final static boolean CLEAR_OFFERS = true;
-
-    private String toolbarTitle;
-
-    private String activeFragment;
-
-    private AppCompatActivity activity;
-
-    public MasterPagePresenter(AppCompatActivity activity) {
-        this.activity = activity;
+        Point size = new Point();
+        display.getSize(size);
+        return size;
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (savedInstanceState == null) {
-            toolbarTitle = getDashboardTitle();
-            activeFragment = TAG_DASHBOARD_FRAGMENT;
-        } else {
-            toolbarTitle = savedInstanceState.getString(KEY_TOOLBAR_TITLE);
-            activeFragment = savedInstanceState.getString(KEY_ACTIVE_FRAGMENT);
-        }
+    public static int getDisplayWidth() {
+        return getDisplayDimensions().x;
     }
 
-    @Override
-    public void bindView(final IMasterPageViewContainer view) {
-        super.bindView(view);
-        view.showToolbar(activity, this);
-        view.setToolbarTitle(toolbarTitle);
-
-        if (activeFragment.equals(TAG_DASHBOARD_FRAGMENT)) {
-            presentDashboard();
-        } else if (activeFragment.equals(TAG_HELP_FRAGMENT)) {
-            presentHelpPage();
-        }
-    }
-
-    @Override
-    public void unbindView() {
-        IMasterPageViewContainer view = getView();
-        if (view != null) {
-            view.setOnTitleClickListener(null);
-        }
-        super.unbindView();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putString(KEY_TOOLBAR_TITLE, toolbarTitle);
-        outState.putString(KEY_ACTIVE_FRAGMENT, activeFragment);
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        // TODO: Check visitor pattern for a MVP improvement
-        switch (item.getItemId()) {
-            case R.id.nav_dashboard:
-                presentDashboard();
-                break;
-            case R.id.nav_preferences:
-                presentPreferencesPage();
-                break;
-            case R.id.nav_help:
-                presentHelpPage();
-                break;
-        }
-        getView().closeDrawer();
-
-        return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        final IMasterPageViewContainer view = getView();
-        view.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    private void presentDashboard() {
-        activeFragment = TAG_DASHBOARD_FRAGMENT;
-
-        final IMasterPageViewContainer view = getView();
-        toolbarTitle = getDashboardTitle();
-        view.setToolbarTitle(toolbarTitle);
-        view.setOnTitleClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View clickedView) {
-                view.openLocationPicker(LocationHelper.getLocations(), LocationHelper.getSelectedLocationIndex(), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int selectedItemIndex) {
-                        LocationHelper.setSelectedLocationIndex(selectedItemIndex);
-                        toolbarTitle = LocationHelper.getSelectedLocation();
-                        view.setToolbarTitle(toolbarTitle);
-                        view.reloadOffers(CLEAR_OFFERS);
-                        dialogInterface.dismiss();
-                    }
-                });
-            }
-        });
-        view.showDashboardFragment();
-    }
-
-    private void presentPreferencesPage() {
-        activeFragment = TAG_PREFERENCES_FRAGMENT;
-
-        IMasterPageViewContainer view = getView();
-        toolbarTitle = getString(R.string.nav_item_preferences);
-        view.setToolbarTitle(toolbarTitle);
-        view.setOnTitleClickListener(null);
-        view.showPreferencesFragment();
-    }
-
-    private void presentHelpPage() {
-        activeFragment = TAG_HELP_FRAGMENT;
-
-        IMasterPageViewContainer view = getView();
-        toolbarTitle = getString(R.string.nav_item_help);
-        view.setToolbarTitle(toolbarTitle);
-        view.setOnTitleClickListener(null);
-        view.showHelpFragment();
-    }
-
-    @Override
-    public void onDestroy() {
-        toolbarTitle = null;
-        activeFragment = null;
-        activity = null;
-        super.onDestroy();
-    }
-
-    private String getDashboardTitle() {
-        return LocationHelper.getSelectedLocation();
-    }
-
-    private String getString(@StringRes int resId) {
-        return activity.getApplicationContext().getString(resId);
-    }
-
-    public void onPostCreate(@Nullable Bundle savedInstanceState) {
-        getView().syncDrawerToggleButton();
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        IMasterPageViewContainer view = getView();
-        if (view != null) {
-            view.onLocationChanged(location);
-        }
+    public static int getDisplayHeight() {
+        return getDisplayDimensions().y;
     }
 }

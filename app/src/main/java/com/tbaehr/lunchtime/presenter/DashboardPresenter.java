@@ -679,16 +679,16 @@ package com.tbaehr.lunchtime.presenter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.BaseActivity;
 import com.tbaehr.lunchtime.controller.DashboardFragment;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
+import com.tbaehr.lunchtime.localization.LocationListener;
 import com.tbaehr.lunchtime.model.ModelProvider;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
@@ -736,13 +736,16 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     public void bindView(IDashboardViewContainer view) {
         super.bindView(view);
         activity.requestLocationUpdates();
-        Location lastKnownLocation = activity.getLastKnownLocation();
-        refreshOffers(lastKnownLocation, false);
+        if (cachedOffers == null || cachedOffers.size() == 0) {
+            getView().setProgressBarVisibility(true);
+        }
+        refreshOffers(false);
     }
 
     @Override
     public void unbindView() {
         stopTimeBasedRefresh();
+        activity.stopLocationUpdates();
         super.unbindView();
     }
 
@@ -776,11 +779,10 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         return new TimerTask() {
             @Override
             public void run() {
-                final Location lastKnownLocation = activity.getLastKnownLocation();
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        refreshOffers(lastKnownLocation, false);
+                        refreshOffers(false);
                     }
                 });
             }
@@ -801,7 +803,9 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
             public void run() {
                 IDashboardViewContainer view = getView();
                 if (view != null) {
-                    getView().setProgressBarVisibility(true);
+                    if (cachedOffers == null || cachedOffers.size() == 0) {
+                        getView().setProgressBarVisibility(true);
+                    }
                 }
             }
         });
@@ -821,30 +825,27 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         });
     }
 
-    private Set<RestaurantOffers> cachedOffers;
+    private SparseArray<RestaurantOffers> cachedOffers;
 
-    private boolean hasDataSetChanged(Collection<RestaurantOffers> allOffers) {
-        /*
-         * The Java behaviour on Android is not correct here.
-         * If cachedOffers is of type Set, the dataSet change code
-         * is not working. From the first line on cachedOffers is
-         * the same object as allOffers although it is set at the
-         * end of this method.
-         */
+    private boolean hasDataSetChanged(List<RestaurantOffers> allOffers) {
         boolean dataSetChanged = false;
         if (cachedOffers == null || cachedOffers.size() != allOffers.size()) {
             dataSetChanged = true;
-            cachedOffers = new HashSet<>();
-            for (RestaurantOffers offers : allOffers) {
-                cachedOffers.add(offers);
-            }
         } else {
-            for (RestaurantOffers offers : allOffers) {
-                boolean contains = cachedOffers.contains(offers);
-                if (!contains) {
+            for (int i = 0; i < allOffers.size(); i++) {
+                RestaurantOffers offers = allOffers.get(i);
+                RestaurantOffers cached = cachedOffers.get(i);
+                if (!offers.equals(cached)) {
                     dataSetChanged = true;
-                    break;
                 }
+            }
+        }
+
+        if (dataSetChanged) {
+            cachedOffers = new SparseArray<>();
+            for (int i = 0; i < allOffers.size(); i++) {
+                RestaurantOffers offers = allOffers.get(i);
+                cachedOffers.put(i, offers);
             }
         }
         return dataSetChanged;
@@ -859,23 +860,37 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         return false;
     }
 
+    private void updateDistance(List<RestaurantOffers> allOffers) {
+        IDashboardViewContainer view = getView();
+        if (view != null) {
+            for (RestaurantOffers offers : allOffers) {
+                view.updateOffers(offers.getRestaurantId(), offers.getDistance());
+            }
+        }
+    }
+
     @Override
     public void pickUp(List<RestaurantOffers> allOffers) {
+        Log.i("TimTim", "pickUp("+allOffers+")");
         IDashboardViewContainer view = getView();
         if (view == null) {
             return;
         }
 
         if (!hasDataSetChanged(allOffers)) {
+            Log.i("TimTim", "dataSet has NOT changed");
             if (!view.hasOffers()) {
                 if (!areOffersAvailable(allOffers)) {
                     showNoOfferView();
                     return;
                 }
             } else if (!view.isProgressBarVisible()) {
+                Log.i("TimTim", "distance updated");
+                updateDistance(allOffers);
                 return;
             }
         }
+        Log.i("TimTim", "dataSet has changed");
 
         view.setProgressBarVisibility(false);
         view.clearOffers();
@@ -905,9 +920,10 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
             };
 
             view.addOffers(
+                    nearbyRestaurantOffers.getRestaurantId(),
                     nearbyRestaurantOffers.getRestaurantName(),
                     nearbyRestaurantOffers.getRestaurantDescription(),
-                    getDistance(nearbyRestaurantOffers),
+                    nearbyRestaurantOffers.getDistance(),
                     nearbyRestaurantOffers.getOffers(),
                     headerClickListener,
                     onSliderItemClickListener
@@ -916,29 +932,6 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
         if (!foundOffers) {
             showNoOfferView();
-        }
-    }
-
-    private String getDistance(RestaurantOffers offers) {
-        try {
-            int distanceInMeters = (int) offers.getDistanceInMeters();
-            String sMeters;
-            if (distanceInMeters < 1000) {
-                int roundedMeters = (int) Math.ceil(distanceInMeters / 10d);
-                //sMeters = "," + ((roundedMeters < 10) ? "0" + roundedMeters : roundedMeters);
-                return (roundedMeters * 10) + " m";
-            } else {
-                int kilometers = distanceInMeters / 1000;
-                int meters = (distanceInMeters - (kilometers * 1000));
-                if (meters < 50) {
-                    sMeters = "";
-                } else {
-                    sMeters = "," + (int) Math.ceil(meters / 100d);
-                }
-                return kilometers +sMeters + " km";
-            }
-        } catch (RestaurantOffers.DistanceNotAvailableException e) {
-            return activity.getString(R.string.distance_not_available);
         }
     }
 
@@ -966,36 +959,27 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         activity.startActivity(openFetchOrderActivityIntent);
     }
 
-    public void refreshOffers(@Nullable Location location, boolean forceUpdate) {
-        ModelProvider.getInstance().getAllOffersAsync(this, location, forceUpdate);
+    public void refreshOffers(boolean forceUpdate) {
+        Location lastKnownLocation = activity.getLastKnownLocation();
+        IDashboardViewContainer view = getView();
+        if (forceUpdate && view != null) {
+            view.clearOffers();
+            view.setProgressBarVisibility(true);
+        }
+        ModelProvider.getInstance().getAllOffersAsync(this, lastKnownLocation, forceUpdate);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_REQUEST_CODE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Location lastKnownLocation = activity.getLastKnownLocation();
             cachedOffers = null;
-            refreshOffers(lastKnownLocation, true);
+            refreshOffers(true);
         }
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        refreshOffers(location, true);
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        // ;
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-        // ;
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        // ;
+        Log.i("TimTim", "onLocationChanged(" + location + ")");
+        refreshOffers(false);
     }
 }

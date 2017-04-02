@@ -683,6 +683,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.tbaehr.lunchtime.localization.LocationListener;
 import com.tbaehr.lunchtime.presenter.DashboardPresenter;
 import com.tbaehr.lunchtime.tracking.CustomDimension;
 import com.tbaehr.lunchtime.tracking.TrackingScreen;
@@ -693,7 +694,8 @@ import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 /**
  * Created by timo.baehr@gmail.com on 25.11.16.
  */
-public class DashboardFragment extends BaseFragment<IDashboardViewContainer, DashboardPresenter> {
+public class DashboardFragment extends BaseFragment<IDashboardViewContainer, DashboardPresenter>
+        implements LocationListener {
 
     private IDashboardViewContainer viewContainer;
 
@@ -744,8 +746,15 @@ public class DashboardFragment extends BaseFragment<IDashboardViewContainer, Das
         getPresenter().onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    public void refresh() {
-        Location lastKnownLocation = ((BaseActivity) getActivity()).getLastKnownLocation();
-        getPresenter().refreshOffers(lastKnownLocation, false);
+    public void reloadOffers(boolean clearOffers) {
+        getPresenter().refreshOffers(clearOffers);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        DashboardPresenter presenter = getPresenter();
+        if (presenter != null) {
+            presenter.onLocationChanged(location);
+        }
     }
 }

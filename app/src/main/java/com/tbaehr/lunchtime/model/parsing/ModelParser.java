@@ -909,24 +909,24 @@ public class ModelParser {
 
 
     private void autoSearchForIngredients(Set<Offer.Ingredient> ingredientList, String offerText) {
-        if (contains(offerText, "Mettenden", "Mettwurst", "schinken", "Cevapcici", "Wildbraten", "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
+        if (contains(offerText, "Bacon", "Mettenden", "Mettwurst", "schinken", "Cevapcici", "Wildbraten", "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Krustenbraten")) {
             if (!offerText.contains("vom Rind") && !offerText.contains("vegetarisch")) {
                 ingredientList.add(Offer.Ingredient.PORK);
             }
         }
-        if (contains(offerText, "Ochse", "Wildbraten", "Rumpsteak", "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Rindswurst", "Carne", "Hacksteak", "Bockwurst")) {
+        if (contains(offerText, "Beef", "Hirsch", "Lamm", "Ochse", "Wildbraten", "Rumpsteak", "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Rindswurst", "Carne", "Hacksteak", "Bockwurst")) {
             ingredientList.add(Offer.Ingredient.COW);
         }
-        if (contains(offerText, "Ente", "Coq", "Gans", "Geflügel", "Hähnchen", "Huhn", "Hühner", "Pute", "Truthahn")) {
+        if (contains(offerText, "Chicken", "Ente", "Coq", "Gans", "Geflügel", "Hähnchen", "Huhn", "Hühner", "Pute", "Truthahn")) {
             ingredientList.add(Offer.Ingredient.CHICKEN);
         }
-        if (contains(offerText, "Lasagne", "Rigatoni", "Pasta", "Futtuccine", "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
+        if (contains(offerText, "Dürüm", "Tortellini", "Flammkuchen", "Döner", "döner", "Lasagne", "Rigatoni", "Pasta", "Futtuccine", "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
             ingredientList.add(Offer.Ingredient.GLUTEN);
         }
         if (contains(offerText, "Mozzarella", "Feta", "Lasagne", "quark", "schmarrn", "Parmesan", "Käse", "käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand", "Frischkaese", "Kochkaese", "Frischkäse", "Kochkäs")) {
             ingredientList.add(Offer.Ingredient.LACTOSE);
         }
-        if (contains(offerText, "Pescatore", "Wolfsbarsch", "Kabeljau", "Schlemmerfilet", "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {
+        if (contains(offerText, "Garnele", "Pescatore", "Wolfsbarsch", "Kabeljau", "Schlemmerfilet", "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {
             ingredientList.add(Offer.Ingredient.FISH);
         }
         if (contains(offerText, "Omelett", " Ei", "Ei ", "Eier", "eier", "Spiegelei", "Majonese", "Eierknöpfle", "Tagliatelle", "Spaghetti", "Spätzle", "Nudel", "nudel")) {
@@ -961,12 +961,11 @@ public class ModelParser {
         }
 
         DateTime[] listOfStrings = new DateTime[array.length()];
-        String[] openingValues;
         boolean nextDay = false;
         int hourLast = -1;
         for (int i = 0; i < listOfStrings.length; i++) {
-            openingValues = array.getString(i).split(":");
-            if (openingValues == null || openingValues.length != 2) {
+            String[] openingValues = array.getString(i).split(":");
+            if (openingValues.length != 2) {
                 throw new ParseException("Could not parse restaurant opening times (value = "+array.getString(i)+")", 0);
             }
             int hours = Integer.valueOf(openingValues[0]);

@@ -1,6 +1,13 @@
 <resources>
     <string name="changelog_header">Changelog</string>
-    <string name="changelog"><b>2017.03.26 Alpha (v16)</b>
+    <string name="changelog"><b>2017.04.02 Alpha (v17)</b>
+        \n•  Distance will be updated automatically
+        \n•  Support for energy-saving localization method  / Android O compatibility
+        \n•  Support for three opening times per day
+        \n•  Smaller file size for non-changing offers
+        \n•  Updated ingredient recognition
+        \n•  (Fix) Starting time for changing offers is now shown correctly
+        \n\n<b>2017.03.26 Alpha (v16)</b>
         \n•  (Fix) Error reports and usability reports can be independently enabled/disabled
         \n•  Distance is now shown inside restaurant offer sections (work in progress)
         \n\n<b>2017.03.19 Alpha (v15)</b>

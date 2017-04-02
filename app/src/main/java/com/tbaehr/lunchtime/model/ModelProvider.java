@@ -880,6 +880,9 @@ public class ModelProvider {
 
                         @Override
                         public void pickUp(RestaurantOffers model) {
+                            if (allOffers.isEmpty()) {
+                                getAllOffersCounter = 0;
+                            }
                             getAllOffersCounter++;
                             allOffers.add(model);
                             if (restaurantKeys.size() == getAllOffersCounter) {

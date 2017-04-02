@@ -750,8 +750,7 @@ public class HorizontalSliderView extends LinearLayout {
         descriptionTextView = (TextView) rootView.findViewById(R.id.short_description);
         descriptionTextView.setText(shortDescription);
 
-        distanceTextView = (TextView) rootView.findViewById(R.id.distance);
-        distanceTextView.setText(distance);
+        updateDistance(distance);
 
         setOffers(context, offers);
 
@@ -762,6 +761,11 @@ public class HorizontalSliderView extends LinearLayout {
                 headerClickListener.onSliderHeaderClick();
             }
         });
+    }
+
+    public void updateDistance(String distance) {
+        distanceTextView = (TextView) rootView.findViewById(R.id.distance);
+        distanceTextView.setText(distance);
     }
 
     public void setOffers(Context context, List<Offer> offers) {

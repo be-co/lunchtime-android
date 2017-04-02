@@ -906,6 +906,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
             };
 
             view.addOffers(
+                    nearbyRestaurantOffers.getRestaurantId(),
                     nearbyRestaurantOffers.getRestaurantName(),
                     nearbyRestaurantOffers.getRestaurantDescription(),
                     nearbyRestaurantOffers.getDistance(),
@@ -960,6 +961,15 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     @Override
     public void onLocationChanged(Location location) {
         Log.i("TimTim", "onLocationChanged(" + location + ")");
-        refreshOffers(false);
+        // IF ORDER HAS CHANGED
+           refreshOffers(false);
+        // ELSE
+        /*IDashboardViewContainer view = getView();
+        if (view != null && cachedOffers != null) {
+            for (RestaurantOffers offers : cachedOffers) {
+                offers.setLastKnownLocation(location);
+                view.updateOffers(offers.getRestaurantId(), offers.getDistance());
+            }
+        }*/
     }
 }

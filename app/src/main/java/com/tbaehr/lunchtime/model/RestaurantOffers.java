@@ -724,7 +724,7 @@ public class RestaurantOffers implements Comparable<RestaurantOffers> {
         return location;
     }
 
-    void setLastKnownLocation(Location lastKnownLocation) {
+    public void setLastKnownLocation(Location lastKnownLocation) {
         this.lastKnownLocation = lastKnownLocation;
     }
 

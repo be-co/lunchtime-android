@@ -687,6 +687,7 @@ import android.widget.TextView;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.model.Offer;
 
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -712,6 +713,8 @@ public class DashboardViewContainer implements IDashboardViewContainer {
     @BindView(R.id.progress_bar_loading)
     LinearLayout progressBarLoading;
 
+    private HashMap<String, HorizontalSliderView> sliderViewMap = new HashMap<>();
+
     public DashboardViewContainer(Context context, LayoutInflater inflater, ViewGroup container) {
         rootView = inflater.inflate(R.layout.content_dashboard, container, false);
         ButterKnife.bind(this, rootView);
@@ -719,10 +722,19 @@ public class DashboardViewContainer implements IDashboardViewContainer {
     }
 
     @Override
-    public void addOffers(String sectionTitle, String shortDescription, String distance, List<Offer> offers, HorizontalSliderView.OnSliderHeaderClickListener headerClickListener, HorizontalSliderView.OnSliderItemClickListener sliderItemClickListener) {
+    public void addOffers(String sectionId, String sectionTitle, String shortDescription, String distance, List<Offer> offers, HorizontalSliderView.OnSliderHeaderClickListener headerClickListener, HorizontalSliderView.OnSliderItemClickListener sliderItemClickListener) {
         HorizontalSliderView sliderView = new HorizontalSliderView(context, sectionTitle, shortDescription, distance, offers, headerClickListener, sliderItemClickListener);
         viewContainer.addView(sliderView, 0);
+        sliderViewMap.put(sectionId, sliderView);
         hasOffers = true;
+    }
+
+    @Override
+    public void updateOffers(String sectionId, String distance) {
+        HorizontalSliderView sliderView = sliderViewMap.get(sectionId);
+        if (sliderView != null) {
+            sliderView.updateDistance(distance);
+        }
     }
 
     @Override
@@ -760,6 +772,7 @@ public class DashboardViewContainer implements IDashboardViewContainer {
         hideNoOffersView();
         hasOffers = false;
         viewContainer.removeAllViews();
+        sliderViewMap.clear();
     }
 
     @Override

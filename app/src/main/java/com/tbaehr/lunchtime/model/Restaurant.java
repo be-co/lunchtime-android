@@ -821,8 +821,10 @@ public class Restaurant {
         if (timeFormat.equals(TimeFormat.FORMAT_OPENS_CLOSES_HH_MM)) {
             DateTime opens1 = openingTimes.get(0);
             DateTime opens2 = openingTimes.size() > 1 ? openingTimes.get(1) : null;
+            DateTime opens3 = openingTimes.size() > 2 ? openingTimes.get(2) : null;
             DateTime closes1 = closingTimes.get(0);
             DateTime closes2 = closingTimes.size() > 1 ? closingTimes.get(1) : null;
+            DateTime closes3 = closingTimes.size() > 2 ? closingTimes.get(2) : null;
             if (opens1 != null && now.before(opens1)) {
                 String sOpens = opens1.asHourMinute();
                 return context.getString(R.string.opens_at, sOpens);
@@ -834,6 +836,12 @@ public class Restaurant {
                 return context.getString(R.string.opens_at, sOpens);
             } else if (closes2 != null && now.before(closes2)) {
                 String sCloses = closes2.asHourMinute();
+                return context.getString(R.string.closes_at, sCloses);
+            } else if (opens3 != null && now.before(opens3)) {
+                String sOpens = opens3.asHourMinute();
+                return context.getString(R.string.opens_at, sOpens);
+            } else if (closes3 != null && now.before(closes3)) {
+                String sCloses = closes3.asHourMinute();
                 return context.getString(R.string.closes_at, sCloses);
             } else {
                 return context.getString(R.string.closed);

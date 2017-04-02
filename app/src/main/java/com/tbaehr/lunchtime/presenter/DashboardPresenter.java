@@ -736,6 +736,9 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     public void bindView(IDashboardViewContainer view) {
         super.bindView(view);
         activity.requestLocationUpdates();
+        if (cachedOffers == null || cachedOffers.size() == 0) {
+            getView().setProgressBarVisibility(true);
+        }
         refreshOffers(false);
     }
 

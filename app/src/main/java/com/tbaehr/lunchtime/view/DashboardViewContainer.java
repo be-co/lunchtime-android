@@ -730,7 +730,12 @@ public class DashboardViewContainer implements IDashboardViewContainer {
     public void updateOffers(String sectionId, String distance) {
         HorizontalSliderView sliderView = sliderViewMap.get(sectionId);
         if (sliderView != null) {
-            sliderView.updateDistance(distance);
+            String current = sliderView.getDistance();
+            String distanceNotAvailable = context.getString(R.string.distance_not_available);
+            if (distance.equals(distanceNotAvailable) && !current.equals(distanceNotAvailable))  {
+                return;
+            }
+            sliderView.setDistance(distance);
         }
     }
 

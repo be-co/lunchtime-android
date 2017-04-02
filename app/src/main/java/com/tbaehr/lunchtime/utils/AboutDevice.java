@@ -674,266 +674,35 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime.model;
+package com.tbaehr.lunchtime.utils;
 
 import android.content.Context;
-import android.location.Location;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.graphics.Point;
+import android.view.Display;
+import android.view.WindowManager;
 
 import com.tbaehr.lunchtime.LunchtimeApplication;
-import com.tbaehr.lunchtime.R;
-import com.tbaehr.lunchtime.utils.AboutDevice;
-import com.tbaehr.lunchtime.utils.DateTime;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
 
 /**
- * Created by timo.baehr@gmail.com on 27.12.16.
+ * Created by timo.baehr@gmail.com on 02.04.2017.
  */
-public class Restaurant {
+public class AboutDevice {
 
-    private final String DOUBLE_LINE_BREAK = "<br/><br/>";
-    private final String LINE_BREAK = "<br/>";
-
-    private enum TimeFormat {
-        FORMAT_HH_MM,
-        FORMAT_OPENS_CLOSES_HH_MM;
-    }
-
-    private String id;
-
-    private String name;
-
-    private String shortDescription, longDescription;
-
-    private String locationDescription;
-
-    private Location location;
-
-    private Map<Integer, DateTime[]> openingTimes;
-
-    private String parking;
-
-    private String paying;
-
-    private String phoneNumber;
-
-    private String email;
-
-    private String url;
-
-    private String[] photoUrls;
-
-    public Restaurant(
-            @NonNull String id,
-            @NonNull String name,
-            @NonNull String shortDescription,
-            @NonNull String longDescription,
-            @NonNull String locationDescription,
-            @NonNull Location location,
-            @NonNull Map<Integer, DateTime[]> openingTimes,
-            @Nullable String parking,
-            @Nullable String paying,
-            @Nullable String phoneNumber,
-            @Nullable String email,
-            @Nullable String url,
-            @Nullable final String[] photoUrls) {
-        this.id = id;
-        this.name = name;
-        this.shortDescription = shortDescription;
-        this.longDescription = longDescription;
-        this.locationDescription = locationDescription;
-        this.location = location;
-        this.openingTimes = openingTimes;
-        this.parking = parking;
-        this.paying = paying;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        this.url = url;
-        this.photoUrls = photoUrls;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getShortDescription() {
-        return shortDescription;
-    }
-
-    public String getLongDescription() {
-        return longDescription;
-    }
-
-    public String getLocationDescription() {
-        return locationDescription;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    private DateTime[] getOpeningTimes(int dayOfWeek) {
-        return openingTimes.get(dayOfWeek);
-    }
-
-    private DateTime[] getOpeningTimesForToday() {
-        DateTime now = new DateTime();
-        return getOpeningTimes(now.get(Calendar.DAY_OF_WEEK));
-    }
-
-    public String getOpeningTimeDescriptionForToday() {
-        DateTime now = new DateTime();
-        int weekDay = now.get(Calendar.DAY_OF_WEEK);
-        return getOpeningTimeDescription(weekDay, true, TimeFormat.FORMAT_OPENS_CLOSES_HH_MM);
-    }
-
-    private String getOpeningTimeDescription(int weekDay, boolean considerIsToday, TimeFormat timeFormat) {
+    public static Point getDisplayDimensions() {
         Context context = LunchtimeApplication.getContext();
-        DateTime now = new DateTime();
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
 
-        DateTime[] dayOpeningTimes = getOpeningTimes(weekDay);
-
-        if (dayOpeningTimes == null || dayOpeningTimes.length == 0) {
-            if (considerIsToday) {
-                return context.getString(R.string.now_closed);
-            } else {
-                return context.getString(R.string.closed);
-            }
-        }
-
-        List<DateTime> openingTimes = new ArrayList<>();
-        List<DateTime> closingTimes = new ArrayList<>();
-        for (int i = 0; i < dayOpeningTimes.length; i++) {
-            if (i % 2 == 0) {
-                DateTime openingTime = dayOpeningTimes[i];
-                openingTimes.add(openingTime);
-            } else {
-                DateTime closingTime = dayOpeningTimes[i];
-                closingTimes.add(closingTime);
-            }
-        }
-
-        if (timeFormat.equals(TimeFormat.FORMAT_OPENS_CLOSES_HH_MM)) {
-            DateTime opens1 = openingTimes.get(0);
-            DateTime opens2 = openingTimes.size() > 1 ? openingTimes.get(1) : null;
-            DateTime opens3 = openingTimes.size() > 2 ? openingTimes.get(2) : null;
-            DateTime closes1 = closingTimes.get(0);
-            DateTime closes2 = closingTimes.size() > 1 ? closingTimes.get(1) : null;
-            DateTime closes3 = closingTimes.size() > 2 ? closingTimes.get(2) : null;
-            if (opens1 != null && now.before(opens1)) {
-                String sOpens = opens1.asHourMinute();
-                return context.getString(R.string.opens_at, sOpens);
-            } else if (closes1 != null && now.before(closes1)) {
-                String sCloses = closes1.asHourMinute();
-                return context.getString(R.string.closes_at, sCloses);
-            } else if (opens2 != null && now.before(opens2)) {
-                String sOpens = opens2.asHourMinute();
-                return context.getString(R.string.opens_at, sOpens);
-            } else if (closes2 != null && now.before(closes2)) {
-                String sCloses = closes2.asHourMinute();
-                return context.getString(R.string.closes_at, sCloses);
-            } else if (opens3 != null && now.before(opens3)) {
-                String sOpens = opens3.asHourMinute();
-                return context.getString(R.string.opens_at, sOpens);
-            } else if (closes3 != null && now.before(closes3)) {
-                String sCloses = closes3.asHourMinute();
-                return context.getString(R.string.closes_at, sCloses);
-            } else {
-                return context.getString(R.string.closed);
-            }
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < openingTimes.size(); i++) {
-            DateTime openingTime = openingTimes.get(i);
-            DateTime closingTime = closingTimes.get(i);
-            String sOpens = openingTime.asHourMinute();
-            String sCloses = closingTime.asHourMinute();
-            if (sb.length() > 0) {
-                sb.append(context.getString(R.string.and)).append(" ");
-            }
-            sb.append(sOpens).append("-").append(sCloses);
-        }
-        return sb.toString();
+        Point size = new Point();
+        display.getSize(size);
+        return size;
     }
 
-    public String[] getOpeningTimeDescriptionFull() {
-        DateTime now = new DateTime();
-        int[] nextWeekDays = now.nextWeekDays();
-
-        StringBuilder sb1 = new StringBuilder();
-        StringBuilder sb2 = new StringBuilder();
-
-        int weekDayNow = now.get(Calendar.DAY_OF_WEEK);
-        sb1.append("<b>"); sb2.append("<b>");
-        sb1.append(LunchtimeApplication.getContext().getString(R.string.today)).append(DOUBLE_LINE_BREAK);
-        sb2.append(getOpeningTimeDescription(weekDayNow, false, TimeFormat.FORMAT_HH_MM)).append(DOUBLE_LINE_BREAK);
-        sb1.append("</b>"); sb2.append("</b>");
-        int displayWidth = AboutDevice.getDisplayWidth();
-        DateTime[] times = openingTimes.get(weekDayNow);
-        if (displayWidth < 1000 && times != null && times.length == 6) {
-            sb1.append(LINE_BREAK);
-        }
-        for (int weekDay : nextWeekDays) {
-            sb1.append(DateTime.asWeekDay(weekDay)).append(DOUBLE_LINE_BREAK);
-            sb2.append(getOpeningTimeDescription(weekDay, false, TimeFormat.FORMAT_HH_MM)).append(DOUBLE_LINE_BREAK);
-            times = openingTimes.get(weekDay);
-            if (displayWidth < 1000 && times != null && times.length == 6) {
-                sb1.append(LINE_BREAK);
-            }
-        }
-        sb1.delete(sb1.length() - DOUBLE_LINE_BREAK.length(), sb1.length());
-        sb2.delete(sb2.length() - DOUBLE_LINE_BREAK.length(), sb2.length());
-        return new String[] { sb1.toString(), sb2.toString() };
+    public static int getDisplayWidth() {
+        return getDisplayDimensions().x;
     }
 
-    public DateTime getOpeningDate() {
-        DateTime[] dayOpeningTimes = getOpeningTimesForToday();
-        if (dayOpeningTimes == null || dayOpeningTimes.length == 0) {
-            return null;
-        }
-        return dayOpeningTimes[0];
+    public static int getDisplayHeight() {
+        return getDisplayDimensions().y;
     }
-
-    public DateTime getClosingDate() {
-        DateTime[] dayClosingTimes = getOpeningTimesForToday();
-        if (dayClosingTimes == null || dayClosingTimes.length == 0) {
-            return null;
-        }
-        return dayClosingTimes[1];
-    }
-
-    public String getParkingInformation() {
-        return parking;
-    }
-
-    public String getPaymentMethods() {
-        return paying;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public String[] getPhotoUrls() {
-        return photoUrls;
-    }
-
 }

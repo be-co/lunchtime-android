@@ -2,6 +2,7 @@
     <string name="changelog_header">Versionshistorie</string>
     <string name="changelog"><b>2017.04.02 Alpha (v17)</b>
         \n•  Entfernung wird automatisch aktualisiert
+        \n•  Verbesserung der Inhaltsstofferkennung
         \n•  (Fehlerkorrektur) Sommerzeit wird nun korrekt anzeigt
         \n\n<b>2017.03.26 Alpha (v16)</b>
         \n•  (Fehlerkorrektur) Fehlerberichte und Nutzungsstatistiken lassen sich nun wirklich separat voneinander an-/ausschalten

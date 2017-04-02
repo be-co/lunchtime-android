@@ -2,6 +2,7 @@
     <string name="changelog_header">Changelog</string>
     <string name="changelog"><b>2017.04.02 Alpha (v17)</b>
         \n•  Distance will be updated automatically
+        \n•  Updated ingredient recognition
         \n•  (Fix) Starting time for changing offers is now shown correctly
         \n\n<b>2017.03.26 Alpha (v16)</b>
         \n•  (Fix) Error reports and usability reports can be independently enabled/disabled

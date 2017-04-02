@@ -831,16 +831,6 @@ public class RestaurantOffers implements Comparable<RestaurantOffers> {
             return false;
         }
 
-        if (!(lastKnownLocation == null && otherOffers.lastKnownLocation == null)) {
-            if (lastKnownLocation != null && otherOffers.lastKnownLocation != null) {
-                if (!lastKnownLocation.equals(otherOffers.lastKnownLocation)) {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        }
-
         // equal offers?
         for (int i = 0; i< offers.size(); i++) {
             Offer offer = getOffer(i);
@@ -857,9 +847,6 @@ public class RestaurantOffers implements Comparable<RestaurantOffers> {
     @Override
     public int hashCode() {
         int hash = (restaurantId + title + description).hashCode() + offers.size();
-        if (lastKnownLocation != null) {
-            hash += lastKnownLocation.getLatitude() + lastKnownLocation.getLongitude();
-        }
         for (int i = 0; i< offers.size(); i++) {
             Offer offer = getOffer(i);
             hash += offer.hashCode();

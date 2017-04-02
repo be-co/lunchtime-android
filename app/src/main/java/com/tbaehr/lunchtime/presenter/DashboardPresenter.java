@@ -681,6 +681,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 
 import com.tbaehr.lunchtime.R;
@@ -819,30 +820,27 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         });
     }
 
-    private Set<RestaurantOffers> cachedOffers;
+    private SparseArray<RestaurantOffers> cachedOffers;
 
-    private boolean hasDataSetChanged(Collection<RestaurantOffers> allOffers) {
-        /*
-         * The Java behaviour on Android is not correct here.
-         * If cachedOffers is of type Set, the dataSet change code
-         * is not working. From the first line on cachedOffers is
-         * the same object as allOffers although it is set at the
-         * end of this method.
-         */
+    private boolean hasDataSetChanged(List<RestaurantOffers> allOffers) {
         boolean dataSetChanged = false;
         if (cachedOffers == null || cachedOffers.size() != allOffers.size()) {
             dataSetChanged = true;
-            cachedOffers = new HashSet<>();
-            for (RestaurantOffers offers : allOffers) {
-                cachedOffers.add(offers);
-            }
         } else {
-            for (RestaurantOffers offers : allOffers) {
-                boolean contains = cachedOffers.contains(offers);
-                if (!contains) {
+            for (int i = 0; i < allOffers.size(); i++) {
+                RestaurantOffers offers = allOffers.get(i);
+                RestaurantOffers cached = cachedOffers.get(i);
+                if (!offers.equals(cached)) {
                     dataSetChanged = true;
-                    break;
                 }
+            }
+        }
+
+        if (dataSetChanged) {
+            cachedOffers = new SparseArray<>();
+            for (int i = 0; i < allOffers.size(); i++) {
+                RestaurantOffers offers = allOffers.get(i);
+                cachedOffers.put(i, offers);
             }
         }
         return dataSetChanged;
@@ -855,6 +853,15 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
             }
         }
         return false;
+    }
+
+    private void updateDistance(List<RestaurantOffers> allOffers) {
+        IDashboardViewContainer view = getView();
+        if (view != null) {
+            for (RestaurantOffers offers : allOffers) {
+                view.updateOffers(offers.getRestaurantId(), offers.getDistance());
+            }
+        }
     }
 
     @Override
@@ -873,6 +880,8 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
                     return;
                 }
             } else if (!view.isProgressBarVisible()) {
+                Log.i("TimTim", "distance updated");
+                updateDistance(allOffers);
                 return;
             }
         }
@@ -961,15 +970,6 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     @Override
     public void onLocationChanged(Location location) {
         Log.i("TimTim", "onLocationChanged(" + location + ")");
-        // IF ORDER HAS CHANGED
-           refreshOffers(false);
-        // ELSE
-        /*IDashboardViewContainer view = getView();
-        if (view != null && cachedOffers != null) {
-            for (RestaurantOffers offers : cachedOffers) {
-                offers.setLastKnownLocation(location);
-                view.updateOffers(offers.getRestaurantId(), offers.getDistance());
-            }
-        }*/
+        refreshOffers(false);
     }
 }

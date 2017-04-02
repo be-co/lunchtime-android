@@ -702,8 +702,6 @@ public class DashboardViewContainer implements IDashboardViewContainer {
 
     private View rootView;
 
-    private boolean hasOffers = false;
-
     @BindView(R.id.no_offers)
     TextView noOffersView;
 
@@ -726,7 +724,6 @@ public class DashboardViewContainer implements IDashboardViewContainer {
         HorizontalSliderView sliderView = new HorizontalSliderView(context, sectionTitle, shortDescription, distance, offers, headerClickListener, sliderItemClickListener);
         viewContainer.addView(sliderView, 0);
         sliderViewMap.put(sectionId, sliderView);
-        hasOffers = true;
     }
 
     @Override
@@ -751,7 +748,7 @@ public class DashboardViewContainer implements IDashboardViewContainer {
 
     @Override
     public boolean hasOffers() {
-        return hasOffers;
+        return !sliderViewMap.values().isEmpty();
     }
 
     @Override
@@ -770,7 +767,6 @@ public class DashboardViewContainer implements IDashboardViewContainer {
     @Override
     public void clearOffers() {
         hideNoOffersView();
-        hasOffers = false;
         viewContainer.removeAllViews();
         sliderViewMap.clear();
     }

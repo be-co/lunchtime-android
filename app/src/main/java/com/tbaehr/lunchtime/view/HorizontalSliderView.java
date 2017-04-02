@@ -769,7 +769,7 @@ public class HorizontalSliderView extends LinearLayout {
     }
 
     public String getDistance() {
-        return (String) distanceTextView.getText();
+        return String.valueOf(distanceTextView.getText());
     }
 
     public void setOffers(Context context, List<Offer> offers) {

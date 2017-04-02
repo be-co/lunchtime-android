@@ -800,7 +800,9 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
             public void run() {
                 IDashboardViewContainer view = getView();
                 if (view != null) {
-                    getView().setProgressBarVisibility(true);
+                    if (cachedOffers == null || cachedOffers.size() == 0) {
+                        getView().setProgressBarVisibility(true);
+                    }
                 }
             }
         });
@@ -956,6 +958,11 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
     public void refreshOffers(boolean forceUpdate) {
         Location lastKnownLocation = activity.getLastKnownLocation();
+        IDashboardViewContainer view = getView();
+        if (forceUpdate && view != null) {
+            view.clearOffers();
+            view.setProgressBarVisibility(true);
+        }
         ModelProvider.getInstance().getAllOffersAsync(this, lastKnownLocation, forceUpdate);
     }
 

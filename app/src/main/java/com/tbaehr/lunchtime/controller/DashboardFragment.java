@@ -746,8 +746,8 @@ public class DashboardFragment extends BaseFragment<IDashboardViewContainer, Das
         getPresenter().onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    public void reloadOffers() {
-        getPresenter().refreshOffers(false);
+    public void reloadOffers(boolean clearOffers) {
+        getPresenter().refreshOffers(clearOffers);
     }
 
     @Override

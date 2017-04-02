@@ -706,6 +706,8 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
 
     private final static String KEY_ACTIVE_FRAGMENT = "activeFragment";
 
+    private final static boolean CLEAR_OFFERS = true;
+
     private String toolbarTitle;
 
     private String activeFragment;
@@ -800,7 +802,7 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                         LocationHelper.setSelectedLocationIndex(selectedItemIndex);
                         toolbarTitle = LocationHelper.getSelectedLocation();
                         view.setToolbarTitle(toolbarTitle);
-                        view.reloadOffers();
+                        view.reloadOffers(CLEAR_OFFERS);
                         dialogInterface.dismiss();
                     }
                 });

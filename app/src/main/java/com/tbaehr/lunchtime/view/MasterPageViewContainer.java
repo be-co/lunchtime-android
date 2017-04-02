@@ -806,8 +806,8 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     }
 
     @Override
-    public void reloadOffers() {
-        fragmentHolder.reloadOffers();
+    public void reloadOffers(boolean clearOffers) {
+        fragmentHolder.reloadOffers(clearOffers);
     }
 
     @Override
@@ -886,8 +886,8 @@ class FragmentHolder {
         activeFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    void reloadOffers() {
-        dashboard.reloadOffers();
+    void reloadOffers(boolean clearOffers) {
+        dashboard.reloadOffers(clearOffers);
     }
 
     void showDashboardFragment() {

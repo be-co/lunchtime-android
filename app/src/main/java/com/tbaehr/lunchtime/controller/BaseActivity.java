@@ -723,7 +723,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         LocationListener,
         ResultCallback<LocationSettingsResult> {
 
-    private static final String TAG = "TimTim";
+    private static final String TAG = "Lunchtime.BaseActivity";
 
     /**
      * Constant used in the location settings dialog.
@@ -942,7 +942,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     }
 
     private void tellPresenterLocationChanged() {
-        Log.v(TAG, "tellPresenterLocationChanged() " + mCurrentLocation);
         CustomBasePresenter presenter = getPresenter();
         if (presenter != null && presenter instanceof com.tbaehr.lunchtime.localization.LocationListener) {
             ((com.tbaehr.lunchtime.localization.LocationListener) presenter).onLocationChanged(mCurrentLocation);
@@ -1014,28 +1013,27 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     @Override
     public void onResult(LocationSettingsResult locationSettingsResult) {
-        Log.i(TAG, "onResult(LocationSettingsResult)");
         final Status status = locationSettingsResult.getStatus();
         switch (status.getStatusCode()) {
             case LocationSettingsStatusCodes.SUCCESS:
-                Log.i(TAG, "All location settings are satisfied.");
+                // All location settings are satisfied.
                 startLocationUpdates();
                 break;
             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                Log.i(TAG, "Location settings are not satisfied. Show the user a dialog to" +
-                        "upgrade location settings ");
+                // Location settings are not satisfied.
+                // Show the user a dialog to upgrade location settings.
 
                 try {
-                    // Show the dialog by calling startResolutionForResult(), and check the result
-                    // in onActivityResult().
+                    // Show the dialog by calling startResolutionForResult(),
+                    // and check the result in onActivityResult().
                     status.startResolutionForResult(BaseActivity.this, REQUEST_CHECK_SETTINGS);
                 } catch (IntentSender.SendIntentException e) {
-                    Log.i(TAG, "PendingIntent unable to execute request.");
+                    Log.e(TAG, "PendingIntent unable to execute request.");
                 }
                 break;
             case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                Log.i(TAG, "Location settings are inadequate, and cannot be fixed here. Dialog " +
-                        "not created.");
+                // Location settings are inadequate, and cannot be fixed here.
+                // Dialog not created.
                 break;
         }
     }
@@ -1052,7 +1050,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * LocationServices API.
      */
     protected synchronized void buildGoogleApiClient() {
-        Log.i(TAG, "Building GoogleApiClient");
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -1074,7 +1071,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * updates.
      */
     protected void createLocationRequest() {
-        Log.i(TAG, "createLocationRequest()");
         mLocationRequest = new LocationRequest();
 
         // Sets the desired interval for active location updates. This interval is
@@ -1096,7 +1092,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * if a device has the needed location settings.
      */
     protected void buildLocationSettingsRequest() {
-        Log.i(TAG, "buildLocationSettingsRequest()");
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addLocationRequest(mLocationRequest);
         mLocationSettingsRequest = builder.build();
@@ -1104,17 +1099,16 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i(TAG, "onActivityResult(int requestCode, int resultCode, Intent data)");
         switch (requestCode) {
-            // Check for the integer request code originally supplied to startResolutionForResult().
+            // Check for the integer request code originally supplied to startResolutionForResult()
             case REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
+                    // User agreed to make required location settings changes
                     case Activity.RESULT_OK:
-                        Log.i(TAG, "User agreed to make required location settings changes.");
                         startLocationUpdates();
                         break;
+                    // User chose not to make required location settings changes
                     case Activity.RESULT_CANCELED:
-                        Log.i(TAG, "User chose not to make required location settings changes.");
                         break;
                 }
                 break;
@@ -1125,7 +1119,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * Requests location updates from the FusedLocationApi.
      */
     protected void startLocationUpdates() {
-        Log.i(TAG, "startLocationUpdates()");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             alertDialogRequestingLocationPermission();
@@ -1149,7 +1142,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * Removes location updates from the FusedLocationApi.
      */
     public void stopLocationUpdates() {
-        Log.i(TAG, "stopLocationUpdates()");
         // It is a good practice to remove location requests when the activity is in a paused or
         // stopped state. Doing so helps battery performance and is especially
         // recommended in applications that request frequent location updates.
@@ -1167,7 +1159,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     }
 
     public Location getLastKnownLocation() {
-        Log.i(TAG, "getLastKnownLocation(" + mCurrentLocation + ")");
         return mCurrentLocation;
     }
 
@@ -1175,7 +1166,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * Usually called inside onResume()
      */
     public void requestLocationUpdates() {
-        Log.i(TAG, "requestLocationUpdates()");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             alertDialogRequestingLocationPermission();
@@ -1184,10 +1174,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
 
         mRequestingLocationUpdates = true;
         if (mGoogleApiClient.isConnected()) {
-            Log.i(TAG, "Google API Client is connected, starting location updates");
             startLocationUpdates();
-        } else {
-            Log.i(TAG, "Google API Client is not connected yet");
         }
     }
 
@@ -1196,8 +1183,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     @Override
     public void onConnected(Bundle connectionHint) {
-        Log.i(TAG, "Connected to GoogleApiClient");
-
         if (!mRequestingLocationUpdates) {
             return;
         }
@@ -1232,7 +1217,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     @Override
     public void onLocationChanged(Location location) {
-        Log.i(TAG, "onLocationChanged("+location+")");
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         tellPresenterLocationChanged();
@@ -1240,11 +1224,11 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
 
     @Override
     public void onConnectionSuspended(int cause) {
-        Log.i(TAG, "Connection suspended");
+        // ;
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
+        // ;
     }
 }

@@ -674,20 +674,60 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime;
+package com.tbaehr.lunchtime.utils;
 
 import org.junit.Test;
 
+import java.util.Calendar;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
- * Example local unit test, which will execute on the development machine (host).
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
+ * Testing of DateUtils class with static methods
  */
-public class ExampleUnitTest {
+public class DateTimeUtilsTest {
+
     @Test
-    public void addition_isCorrect() throws Exception {
-        assertEquals(4, 2 + 2);
+    public void shouldBeAbleToParseDateRfc3339_1() throws Exception {
+        DateTime dateTime = DateUtils.createDateFromString("2017-04-07T14:54:00+02:00");
+        assertNotNull(dateTime);
+        assertEquals(dateTime.asHourMinute(), "14:54");
+    }
+
+    @Test
+    public void shouldBeAbleToParseDateRfc3339_2() throws Exception {
+        DateTime dateTime = DateUtils.createDateFromString("2017-04-07T14:54:00-02:00");
+        assertNotNull(dateTime);
+        assertEquals(dateTime.asHourMinute(), "18:54");
+    }
+
+    @Test
+    public void shouldBeAbleToParseDateRfc3339_3() throws Exception {
+        DateTime dateTime = DateUtils.createDateFromString("2017-04-07T14:54:00Z");
+        assertNotNull(dateTime);
+        assertEquals(dateTime.asHourMinute(), "16:54");
+    }
+
+    @Test
+    public void shouldBeAbleToParseDate1() throws Exception {
+        DateTime dateTime = DateUtils.createDateFromString("Feb 27 2017 11:00:00 GMT+0100");
+        assertNotNull(dateTime);
+        assertEquals(dateTime.asHourMinute(), "11:00");
+    }
+
+    @Test
+    public void shouldBeAbleToParseDate2() throws Exception {
+        DateTime dateTime = DateUtils.createWeekdayDateFromString("Mon 11:34:00 GMT+0100");
+        assertNotNull(dateTime);
+        assertEquals(dateTime.asHourMinute(), "11:34");
+        assertEquals(dateTime.get(Calendar.DAY_OF_WEEK), Calendar.MONDAY);
+    }
+
+    @Test
+    public void shouldBeAbleToParseDate3() throws Exception {
+        DateTime dateTime = DateUtils.createDateFromString("Mon Mar 20 11:00:00 PDT 2017");
+        assertNotNull(dateTime);
+        assertEquals(dateTime.asHourMinute(), "12:00");
     }
 }

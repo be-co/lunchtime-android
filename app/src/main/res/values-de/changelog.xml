@@ -1,6 +1,8 @@
 <resources>
     <string name="changelog_header">Versionshistorie</string>
-    <string name="changelog"><b>2017.04.02 Alpha (v17)</b>
+    <string name="changelog"><b>2017.04.09 Alpha (v19)</b>
+        \n•  Unterstützung für Datumsformat RFC3339, MEZ, …
+        \n\n<b>2017.04.02 Alpha (v17/18)</b>
         \n•  Entfernung wird automatisch aktualisiert
         \n•  Energie-sparende Standorterkennung wird unterstützt / Optimierung für Android O
         \n•  Reduzierte Dateigröße für gleichbleibende Gerichte

@@ -1,7 +1,20 @@
 <resources>
     <string name="changelog_header">Changelog</string>
-    <string name="changelog"><b>2017.03.19 Alpha (v15)</b>
+    <string name="changelog"><b>2017.04.09 Alpha (v19)</b>
+        \n•  Support for parsing RFC3339 date, MEZ, …
+        \n\n<b>2017.04.02 Alpha (v17/18)</b>
+        \n•  Distance will be updated automatically
+        \n•  Support for energy-saving localization method  / Android O compatibility
+        \n•  Support for three opening times per day
+        \n•  Smaller file size for non-changing offers
+        \n•  Updated ingredient recognition
+        \n•  (Fix) Starting time for changing offers is now shown correctly
+        \n\n<b>2017.03.26 Alpha (v16)</b>
+        \n•  (Fix) Error reports and usability reports can be independently enabled/disabled
+        \n•  Distance is now shown inside restaurant offer sections (work in progress)
+        \n\n<b>2017.03.19 Alpha (v15)</b>
         \n•  Error reports and usability reports can be independently enabled/disabled
+        \n•  Sort restaurant\'s offers by distance to the current location
         \n\n<b>2017.03.12 Alpha (v14)</b>
         \n•  Usability statistics enabled by Google Analytics
         \n•  Added permission ACCESS_NETWORK_STATE for Google Analytics

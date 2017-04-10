@@ -677,13 +677,18 @@
 package com.tbaehr.lunchtime.presenter;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.support.annotation.NonNull;
+import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 
-import com.propaneapps.tomorrow.presenter.BasePresenter;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.BaseActivity;
 import com.tbaehr.lunchtime.controller.DashboardFragment;
 import com.tbaehr.lunchtime.controller.DetailPageActivity;
+import com.tbaehr.lunchtime.localization.LocationListener;
 import com.tbaehr.lunchtime.model.ModelProvider;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
@@ -692,7 +697,6 @@ import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -700,14 +704,15 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.tbaehr.lunchtime.controller.BaseActivity.PERMISSION_REQUEST_CODE_LOCATION;
 import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_OFFER_INDEX;
 import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_ID;
 
 /**
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
-public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
-        implements ModelProvider.NearbyOffersChangeListener {
+public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContainer>
+        implements ModelProvider.NearbyOffersChangeListener, LocationListener {
 
     private BaseActivity activity;
 
@@ -730,12 +735,17 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
     @Override
     public void bindView(IDashboardViewContainer view) {
         super.bindView(view);
-        refreshOffers();
+        activity.requestLocationUpdates();
+        if (cachedOffers == null || cachedOffers.size() == 0) {
+            getView().setProgressBarVisibility(true);
+        }
+        refreshOffers(false);
     }
 
     @Override
     public void unbindView() {
         stopTimeBasedRefresh();
+        activity.stopLocationUpdates();
         super.unbindView();
     }
 
@@ -772,7 +782,7 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        refreshOffers();
+                        refreshOffers(false);
                     }
                 });
             }
@@ -793,7 +803,9 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
             public void run() {
                 IDashboardViewContainer view = getView();
                 if (view != null) {
-                    getView().setProgressBarVisibility(true);
+                    if (cachedOffers == null || cachedOffers.size() == 0) {
+                        getView().setProgressBarVisibility(true);
+                    }
                 }
             }
         });
@@ -813,36 +825,33 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         });
     }
 
-    private List<RestaurantOffers> cachedOffers;
+    private SparseArray<RestaurantOffers> cachedOffers;
 
-    private boolean hasDataSetChanged(Set<RestaurantOffers> allOffers) {
-        /*
-         * The Java behaviour on Android is not correct here.
-         * If cachedOffers is of type Set, the dataSet change code
-         * is not working. From the first line on cachedOffers is
-         * the same object as allOffers although it is set at the
-         * end of this method.
-         */
-        boolean dataSetChanged = cachedOffers == null;
+    private boolean hasDataSetChanged(List<RestaurantOffers> allOffers) {
+        boolean dataSetChanged = false;
         if (cachedOffers == null || cachedOffers.size() != allOffers.size()) {
             dataSetChanged = true;
-            cachedOffers = new ArrayList<>();
-            for (RestaurantOffers offers : allOffers) {
-                cachedOffers.add(offers);
-            }
         } else {
-            for (RestaurantOffers offers : cachedOffers) {
-                boolean contains = allOffers.contains(offers);
-                if (!contains) {
+            for (int i = 0; i < allOffers.size(); i++) {
+                RestaurantOffers offers = allOffers.get(i);
+                RestaurantOffers cached = cachedOffers.get(i);
+                if (!offers.equals(cached)) {
                     dataSetChanged = true;
-                    break;
                 }
+            }
+        }
+
+        if (dataSetChanged) {
+            cachedOffers = new SparseArray<>();
+            for (int i = 0; i < allOffers.size(); i++) {
+                RestaurantOffers offers = allOffers.get(i);
+                cachedOffers.put(i, offers);
             }
         }
         return dataSetChanged;
     }
 
-    private boolean areOffersAvailable(Set<RestaurantOffers> allOffers) {
+    private boolean areOffersAvailable(Collection<RestaurantOffers> allOffers) {
         for (RestaurantOffers offers : allOffers) {
             if (!offers.isEmpty()) {
                 return true;
@@ -851,23 +860,37 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         return false;
     }
 
+    private void updateDistance(List<RestaurantOffers> allOffers) {
+        IDashboardViewContainer view = getView();
+        if (view != null) {
+            for (RestaurantOffers offers : allOffers) {
+                view.updateOffers(offers.getRestaurantId(), offers.getDistance());
+            }
+        }
+    }
+
     @Override
-    public void pickUp(Set<RestaurantOffers> allOffers) {
+    public void pickUp(List<RestaurantOffers> allOffers) {
+        Log.i("TimTim", "pickUp("+allOffers+")");
         IDashboardViewContainer view = getView();
         if (view == null) {
             return;
         }
 
         if (!hasDataSetChanged(allOffers)) {
+            Log.i("TimTim", "dataSet has NOT changed");
             if (!view.hasOffers()) {
                 if (!areOffersAvailable(allOffers)) {
                     showNoOfferView();
                     return;
                 }
             } else if (!view.isProgressBarVisible()) {
+                Log.i("TimTim", "distance updated");
+                updateDistance(allOffers);
                 return;
             }
         }
+        Log.i("TimTim", "dataSet has changed");
 
         view.setProgressBarVisibility(false);
         view.clearOffers();
@@ -895,9 +918,12 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
                     openDetailPage(offer.getRestaurantId(), nearbyRestaurantOffers.getIndex(offer));
                 }
             };
+
             view.addOffers(
+                    nearbyRestaurantOffers.getRestaurantId(),
                     nearbyRestaurantOffers.getRestaurantName(),
                     nearbyRestaurantOffers.getRestaurantDescription(),
+                    nearbyRestaurantOffers.getDistance(),
                     nearbyRestaurantOffers.getOffers(),
                     headerClickListener,
                     onSliderItemClickListener
@@ -933,7 +959,27 @@ public class DashboardPresenter extends BasePresenter<IDashboardViewContainer>
         activity.startActivity(openFetchOrderActivityIntent);
     }
 
-    public void refreshOffers() {
-        ModelProvider.getInstance().getAllOffersAsync(this);
+    public void refreshOffers(boolean forceUpdate) {
+        Location lastKnownLocation = activity.getLastKnownLocation();
+        IDashboardViewContainer view = getView();
+        if (forceUpdate && view != null) {
+            view.clearOffers();
+            view.setProgressBarVisibility(true);
+        }
+        ModelProvider.getInstance().getAllOffersAsync(this, lastKnownLocation, forceUpdate);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSION_REQUEST_CODE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            cachedOffers = null;
+            refreshOffers(true);
+        }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.i("TimTim", "onLocationChanged(" + location + ")");
+        refreshOffers(false);
     }
 }

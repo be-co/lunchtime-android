@@ -676,6 +676,7 @@
  */
 package com.tbaehr.lunchtime.model;
 
+import android.location.Location;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -694,9 +695,10 @@ import com.tbaehr.lunchtime.utils.SharedPrefsHelper;
 import org.json.JSONException;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collections;
+import java.util.List;
 
 import static com.tbaehr.lunchtime.tracking.ITracking.KEY_ERROR_REPORTING_ENABLED;
 import static com.tbaehr.lunchtime.tracking.ITracking.KEY_TRACKING_ENABLED;
@@ -724,7 +726,7 @@ public class ModelProvider {
         // ;
     }
 
-    public interface NearbyOffersChangeListener extends ModelChangeListener<Set<RestaurantOffers>> {
+    public interface NearbyOffersChangeListener extends ModelChangeListener<List<RestaurantOffers>> {
         // ;
     }
 
@@ -759,7 +761,7 @@ public class ModelProvider {
         lastSync = -1;
     }
 
-    private void getNearbyAsync(@NonNull final NearbyChangeListener callback) {
+    private void getNearbyAsync(@NonNull final NearbyChangeListener callback, boolean forceUpdate) {
         final String locationId = LocationHelper.getSelectedLocation();
         NearbyRestaurants nearby = null;
         try {
@@ -769,7 +771,7 @@ public class ModelProvider {
             // ;
         }
         long now = System.currentTimeMillis();
-        if (nearby == null || lastSync + MINUTE < now) {
+        if (nearby == null || lastSync + MINUTE < now || forceUpdate) {
             lastSync = now;
             ModelDownloader.getInstance().downloadNearby(locationId, new LoadJobListener<String>() {
                 @Override
@@ -856,8 +858,8 @@ public class ModelProvider {
 
     private int getAllOffersCounter = 0;
 
-    public void getAllOffersAsync(@Nullable final NearbyOffersChangeListener callback) {
-        final Set<RestaurantOffers> allOffers = new HashSet<>();
+    public void getAllOffersAsync(@Nullable final NearbyOffersChangeListener callback, @Nullable final Location location, boolean forceUpdate) {
+        final List<RestaurantOffers> allOffers = new ArrayList<>();
 
         getNearbyAsync(new NearbyChangeListener() {
             @Override
@@ -870,18 +872,21 @@ public class ModelProvider {
                 final Collection<String> restaurantKeys = nearby.getRestaurantKeys();
                 getAllOffersCounter = 0;
                 for (String restaurantId : restaurantKeys) {
-                    getRestaurantOffersAsync(restaurantId, new RestaurantOffersChangeListener() {
+                    getRestaurantOffersAsync(restaurantId, location, new RestaurantOffersChangeListener() {
                         @Override
                         public void loadingStarted() {
-                            callback.loadingStarted();
+                            // ;
                         }
 
                         @Override
                         public void pickUp(RestaurantOffers model) {
+                            if (allOffers.isEmpty()) {
+                                getAllOffersCounter = 0;
+                            }
                             getAllOffersCounter++;
                             allOffers.add(model);
                             if (restaurantKeys.size() == getAllOffersCounter) {
-                                callback.pickUp(allOffers);
+                                publishOffers();
                             }
                         }
 
@@ -891,8 +896,13 @@ public class ModelProvider {
                             if (restaurantKeys.size() == getAllOffersCounter && allOffers.size() == 0) {
                                 callback.failed();
                             } else {
-                                callback.pickUp(allOffers);
+                                publishOffers();
                             }
+                        }
+
+                        private void publishOffers() {
+                            Collections.sort(allOffers);
+                            callback.pickUp(allOffers);
                         }
                     });
                 }
@@ -914,7 +924,7 @@ public class ModelProvider {
                     callback.failed();
                 }
             }
-        });
+        }, forceUpdate);
     }
 
     public void getRestaurantAsync(@NonNull final String restaurantId, @Nullable final RestaurantChangeListener callback) {
@@ -971,7 +981,7 @@ public class ModelProvider {
             public void failed() {
                 callback.failed();
             }
-        });
+        }, false);
     }
 
     private Restaurant getRestaurant(String restaurantId) throws ParseException, JSONException {
@@ -979,7 +989,7 @@ public class ModelProvider {
         return ModelParser.getInstance().parseRestaurant(restaurantJson, restaurantId);
     }
 
-    public void getRestaurantOffersAsync(final @NonNull String restaurantId, final @Nullable RestaurantOffersChangeListener callback) {
+    public void getRestaurantOffersAsync(final @NonNull String restaurantId, final @Nullable Location location, final @Nullable RestaurantOffersChangeListener callback) {
         final DateTime locallyUpdated = ModelCache.getInstance().getRestaurantOffersLastUpdated(restaurantId);
         getNearbyAsync(new NearbyChangeListener() {
             @Override
@@ -1011,6 +1021,7 @@ public class ModelProvider {
                                 protected Void doInBackground(Void... voids) {
                                     try {
                                         result = ModelParser.getInstance().parseRestaurantOffers(offersJson);
+                                        result.setLastKnownLocation(location);
                                         ModelCache.getInstance().putRestaurantOffers(offersJson, restaurantId, onServerUpdated);
                                     } catch (JSONException jsonException) {
                                         jsonException.printStackTrace();
@@ -1038,6 +1049,7 @@ public class ModelProvider {
                         @Override
                         protected Void doInBackground(Void... voids) {
                             result = getRestaurantOffersFromCache(restaurantId);
+                            result.setLastKnownLocation(location);
                             return null;
                         }
 
@@ -1069,7 +1081,7 @@ public class ModelProvider {
                     callback.failed();
                 }
             }
-        });
+        }, false);
     }
 
     private RestaurantOffers getRestaurantOffersFromCache(@NonNull String restaurantId) {

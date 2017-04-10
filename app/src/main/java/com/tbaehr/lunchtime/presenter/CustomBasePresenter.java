@@ -693,7 +693,7 @@ public class CustomBasePresenter<V> extends BasePresenter<V> {
         //;
     }
 
-    public void onRequestPermissionsResult(int requestCode, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,  @NonNull int[] grantResults) {
         //;
     }
 

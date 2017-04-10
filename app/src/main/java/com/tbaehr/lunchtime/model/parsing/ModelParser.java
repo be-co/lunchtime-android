@@ -676,10 +676,10 @@
  */
 package com.tbaehr.lunchtime.model.parsing;
 
-import android.content.Context;
+import android.location.Location;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.util.Pair;
-import android.widget.Toast;
 
 import com.tbaehr.lunchtime.BuildConfig;
 import com.tbaehr.lunchtime.LunchtimeApplication;
@@ -687,8 +687,11 @@ import com.tbaehr.lunchtime.model.NearbyRestaurants;
 import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.Restaurant;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
+import com.tbaehr.lunchtime.tracking.ITracking;
+import com.tbaehr.lunchtime.tracking.LunchtimeTracker;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
+import com.tbaehr.lunchtime.utils.SharedPrefsHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -702,6 +705,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.tbaehr.lunchtime.tracking.ITracking.KEY_ERROR_REPORTING_ENABLED;
+import static com.tbaehr.lunchtime.tracking.ITracking.KEY_TRACKING_ENABLED;
 
 /**
  * Created by timo.baehr@gmail.com on 24.02.17.
@@ -743,6 +749,22 @@ public class ModelParser {
         String shortDescription = restaurantJSON.getString("shortDescription");
         String longDescription = restaurantJSON.getString("longDescription");
         String address = restaurantJSON.getString("address");
+
+        Location location = null;
+        // TODO: Can be removed once all files have these mandatory values
+        if (restaurantJSON.has("lat") && restaurantJSON.has("long")) {
+            String sLat = restaurantJSON.getString("lat");
+            String sLong = restaurantJSON.getString("long");
+            if (sLat != null) {
+                double latitude = Double.valueOf(sLat);
+                double longitude = Double.valueOf(sLong);
+                location = new Location(restaurantId);
+                location.setLatitude(latitude);
+                location.setLatitude(longitude);
+            }
+        } else {
+            System.err.print("restaurant_" + restaurantId+".json hat noch kein Längen- und Breitengrad");
+        }
 
         JSONObject openingTimesObject = restaurantJSON.getJSONObject("openingTimes");
         JSONArray mondayArray = openingTimesObject.getJSONArray("monday");
@@ -796,13 +818,30 @@ public class ModelParser {
             photoUrls = convertToStringArray(photoUrlsObjects);
         }
 
-        return new Restaurant(restaurantId, name, shortDescription, longDescription, address,
+        return new Restaurant(restaurantId, name, shortDescription, longDescription, address, location,
                 openingTimes, parking, paying, phoneNumber, email, website, photoUrls);
     }
 
     public RestaurantOffers parseRestaurantOffers(String jsonText) throws JSONException {
         JSONObject restaurantObject = new JSONObject(jsonText);
         final String restaurantId = restaurantObject.getString("restaurantID");
+
+        Location location = null;
+        // TODO: Can be removed once all files have these mandatory values
+        if (restaurantObject.has("lat") && restaurantObject.has("long")) {
+            final String sLat = restaurantObject.getString("lat");
+            final String sLong = restaurantObject.getString("long");
+            if (sLat != null) {
+                double latitude = Double.valueOf(sLat);
+                double longitude = Double.valueOf(sLong);
+                location = new Location(restaurantId);
+                location.setLatitude(latitude);
+                location.setLongitude(longitude);
+            }
+        } else {
+            System.err.print("restaurant_" + restaurantId+".json hat noch kein Längen- und Breitengrad");
+        }
+
         final String restaurantTitle = restaurantObject.getString("title");
         final String restaurantDescription = restaurantObject.getString("description");
         final JSONArray restaurantOffersArray = restaurantObject.getJSONArray("offers");
@@ -844,8 +883,12 @@ public class ModelParser {
             } catch (ParseException e) {
                 e.printStackTrace();
                 if (BuildConfig.DEBUG) {
-                    Context context = LunchtimeApplication.getContext();
-                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("ModelParser", e.getMessage());
+                    e.printStackTrace();
+                    boolean usabilityTrackingEnabled = SharedPrefsHelper.getBoolean(KEY_TRACKING_ENABLED, true);
+                    boolean errorReportingEnabled = SharedPrefsHelper.getBoolean(KEY_ERROR_REPORTING_ENABLED, true);
+                    ITracking tracker = new LunchtimeTracker(LunchtimeApplication.getContext(), usabilityTrackingEnabled, errorReportingEnabled);
+                    tracker.trackException(e);
                 }
                 continue;
             }
@@ -861,29 +904,29 @@ public class ModelParser {
             }
         }
 
-        return new RestaurantOffers(restaurantId, restaurantTitle, restaurantDescription, offersToday.isEmpty() ? offersNextDays : offersToday);
+        return new RestaurantOffers(restaurantId, location, restaurantTitle, restaurantDescription, offersToday.isEmpty() ? offersNextDays : offersToday);
     }
 
 
     private void autoSearchForIngredients(Set<Offer.Ingredient> ingredientList, String offerText) {
-        if (contains(offerText, "Mettenden", "Mettwurst", "schinken", "Cevapcici", "Wildbraten", "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Fleisch", "Krustenbraten")) {
+        if (contains(offerText, "Bacon", "Mettenden", "Mettwurst", "schinken", "Cevapcici", "Wildbraten", "Bolognese", "bratwurst", "ferkel", "Kabanossi", "Kasseler", "Grillteller", "Pfefferlendchen", "Pfeffergeschnetzeltes", "Wild-Lasagne", "Rippchen", "Wildgulasch", "Hack", "bratwürstchen", "Currywurst", "Bratwurst", "Schinken", "Jäger", "Schwein", "Speck", "Leber", "Schnitzel", "schnitzel", "Carne", "Hacksteak", "Frikadelle", "frikadelle", "Bolognese", "Lende", "Gulasch", "Geschnetzeltes", "Krustenbraten")) {
             if (!offerText.contains("vom Rind") && !offerText.contains("vegetarisch")) {
                 ingredientList.add(Offer.Ingredient.PORK);
             }
         }
-        if (contains(offerText, "Ochse", "Wildbraten", "Rumpsteak", "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Rindswurst", "Carne", "Hacksteak", "Bockwurst")) {
+        if (contains(offerText, "Beef", "Hirsch", "Lamm", "Ochse", "Wildbraten", "Rumpsteak", "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Rindswurst", "Carne", "Hacksteak", "Bockwurst")) {
             ingredientList.add(Offer.Ingredient.COW);
         }
-        if (contains(offerText, "Ente", "Coq", "Gans", "Geflügel", "Hähnchen", "Huhn", "Hühner", "Pute", "Truthahn")) {
+        if (contains(offerText, "Chicken", "Ente", "Coq", "Gans", "Geflügel", "Hähnchen", "Huhn", "Hühner", "Pute", "Truthahn")) {
             ingredientList.add(Offer.Ingredient.CHICKEN);
         }
-        if (contains(offerText, "Lasagne", "Rigatoni", "Pasta", "Futtuccine", "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
+        if (contains(offerText, "Dürüm", "Tortellini", "Flammkuchen", "Döner", "döner", "Lasagne", "Rigatoni", "Pasta", "Futtuccine", "Penne", "Eierknöpfle", "Cavatelli", "Tagliatelle", "Spaghetti", "Spätzle", "spätzle", "Gnocchi", "schmarrn", "Nudel", "nudel", "Semmelknödel", "Nougatknödel", "Schlutzkrapfen", "Klopse", "Baguette", "Pizza")) {
             ingredientList.add(Offer.Ingredient.GLUTEN);
         }
         if (contains(offerText, "Mozzarella", "Feta", "Lasagne", "quark", "schmarrn", "Parmesan", "Käse", "käse", "Sahne", "gratin", "Rahm", "Remoulade", "schmand", "Frischkaese", "Kochkaese", "Frischkäse", "Kochkäs")) {
             ingredientList.add(Offer.Ingredient.LACTOSE);
         }
-        if (contains(offerText, "Pescatore", "Wolfsbarsch", "Kabeljau", "Schlemmerfilet", "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {
+        if (contains(offerText, "Garnele", "Pescatore", "Wolfsbarsch", "Kabeljau", "Schlemmerfilet", "Seelachs", "Seezunge", "Matjes", "Lachs", "Forelle", "Fisch", "fisch")) {
             ingredientList.add(Offer.Ingredient.FISH);
         }
         if (contains(offerText, "Omelett", " Ei", "Ei ", "Eier", "eier", "Spiegelei", "Majonese", "Eierknöpfle", "Tagliatelle", "Spaghetti", "Spätzle", "Nudel", "nudel")) {
@@ -918,12 +961,11 @@ public class ModelParser {
         }
 
         DateTime[] listOfStrings = new DateTime[array.length()];
-        String[] openingValues;
         boolean nextDay = false;
         int hourLast = -1;
         for (int i = 0; i < listOfStrings.length; i++) {
-            openingValues = array.getString(i).split(":");
-            if (openingValues == null || openingValues.length != 2) {
+            String[] openingValues = array.getString(i).split(":");
+            if (openingValues.length != 2) {
                 throw new ParseException("Could not parse restaurant opening times (value = "+array.getString(i)+")", 0);
             }
             int hours = Integer.valueOf(openingValues[0]);

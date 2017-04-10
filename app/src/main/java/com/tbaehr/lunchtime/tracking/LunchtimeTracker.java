@@ -740,22 +740,21 @@ public class LunchtimeTracker implements ITracking {
 
     @Override
     public void trackException(Exception e) {
+        e.printStackTrace();
         if (!errorReportingEnabled) {
             return;
         }
 
-        if (e != null) {
-            Tracker t = getGoogleAnalyticsTracker();
-            t.send(new HitBuilders.ExceptionBuilder()
-                    .setDescription(
-                            new StandardExceptionParser(context, null)
-                                    .getDescription(Thread.currentThread().getName(), e))
-                    .setFatal(false)
-                    .build()
-            );
+        Tracker t = getGoogleAnalyticsTracker();
+        t.send(new HitBuilders.ExceptionBuilder()
+                .setDescription(
+                        new StandardExceptionParser(context, null)
+                                .getDescription(Thread.currentThread().getName(), e))
+                .setFatal(false)
+                .build()
+        );
 
-            GoogleAnalytics.getInstance(context).dispatchLocalHits();
-        }
+        GoogleAnalytics.getInstance(context).dispatchLocalHits();
     }
 
     @Override

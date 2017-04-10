@@ -677,11 +677,13 @@
 package com.tbaehr.lunchtime.model;
 
 import android.content.Context;
+import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
+import com.tbaehr.lunchtime.utils.AboutDevice;
 import com.tbaehr.lunchtime.utils.DateTime;
 
 import java.util.ArrayList;
@@ -693,6 +695,9 @@ import java.util.Map;
  * Created by timo.baehr@gmail.com on 27.12.16.
  */
 public class Restaurant {
+
+    private final String DOUBLE_LINE_BREAK = "<br/><br/>";
+    private final String LINE_BREAK = "<br/>";
 
     private enum TimeFormat {
         FORMAT_HH_MM,
@@ -706,6 +711,8 @@ public class Restaurant {
     private String shortDescription, longDescription;
 
     private String locationDescription;
+
+    private Location location;
 
     private Map<Integer, DateTime[]> openingTimes;
 
@@ -727,6 +734,7 @@ public class Restaurant {
             @NonNull String shortDescription,
             @NonNull String longDescription,
             @NonNull String locationDescription,
+            @NonNull Location location,
             @NonNull Map<Integer, DateTime[]> openingTimes,
             @Nullable String parking,
             @Nullable String paying,
@@ -739,6 +747,7 @@ public class Restaurant {
         this.shortDescription = shortDescription;
         this.longDescription = longDescription;
         this.locationDescription = locationDescription;
+        this.location = location;
         this.openingTimes = openingTimes;
         this.parking = parking;
         this.paying = paying;
@@ -766,6 +775,10 @@ public class Restaurant {
 
     public String getLocationDescription() {
         return locationDescription;
+    }
+
+    public Location getLocation() {
+        return location;
     }
 
     private DateTime[] getOpeningTimes(int dayOfWeek) {
@@ -812,8 +825,10 @@ public class Restaurant {
         if (timeFormat.equals(TimeFormat.FORMAT_OPENS_CLOSES_HH_MM)) {
             DateTime opens1 = openingTimes.get(0);
             DateTime opens2 = openingTimes.size() > 1 ? openingTimes.get(1) : null;
+            DateTime opens3 = openingTimes.size() > 2 ? openingTimes.get(2) : null;
             DateTime closes1 = closingTimes.get(0);
             DateTime closes2 = closingTimes.size() > 1 ? closingTimes.get(1) : null;
+            DateTime closes3 = closingTimes.size() > 2 ? closingTimes.get(2) : null;
             if (opens1 != null && now.before(opens1)) {
                 String sOpens = opens1.asHourMinute();
                 return context.getString(R.string.opens_at, sOpens);
@@ -825,6 +840,12 @@ public class Restaurant {
                 return context.getString(R.string.opens_at, sOpens);
             } else if (closes2 != null && now.before(closes2)) {
                 String sCloses = closes2.asHourMinute();
+                return context.getString(R.string.closes_at, sCloses);
+            } else if (opens3 != null && now.before(opens3)) {
+                String sOpens = opens3.asHourMinute();
+                return context.getString(R.string.opens_at, sOpens);
+            } else if (closes3 != null && now.before(closes3)) {
+                String sCloses = closes3.asHourMinute();
                 return context.getString(R.string.closes_at, sCloses);
             } else {
                 return context.getString(R.string.closed);
@@ -846,7 +867,6 @@ public class Restaurant {
     }
 
     public String[] getOpeningTimeDescriptionFull() {
-        final String LINE_BREAK = "<br/><br/>";
         DateTime now = new DateTime();
         int[] nextWeekDays = now.nextWeekDays();
 
@@ -855,15 +875,24 @@ public class Restaurant {
 
         int weekDayNow = now.get(Calendar.DAY_OF_WEEK);
         sb1.append("<b>"); sb2.append("<b>");
-        sb1.append(LunchtimeApplication.getContext().getString(R.string.today)).append(LINE_BREAK);
-        sb2.append(getOpeningTimeDescription(weekDayNow, false, TimeFormat.FORMAT_HH_MM)).append(LINE_BREAK);
+        sb1.append(LunchtimeApplication.getContext().getString(R.string.today)).append(DOUBLE_LINE_BREAK);
+        sb2.append(getOpeningTimeDescription(weekDayNow, false, TimeFormat.FORMAT_HH_MM)).append(DOUBLE_LINE_BREAK);
         sb1.append("</b>"); sb2.append("</b>");
-        for (int weekDay : nextWeekDays) {
-            sb1.append(DateTime.asWeekDay(weekDay)).append(LINE_BREAK);
-            sb2.append(getOpeningTimeDescription(weekDay, false, TimeFormat.FORMAT_HH_MM)).append(LINE_BREAK);
+        int displayWidth = AboutDevice.getDisplayWidth();
+        DateTime[] times = openingTimes.get(weekDayNow);
+        if (displayWidth < 1000 && times != null && times.length == 6) {
+            sb1.append(LINE_BREAK);
         }
-        sb1.delete(sb1.length() - LINE_BREAK.length(), sb1.length());
-        sb2.delete(sb2.length() - LINE_BREAK.length(), sb2.length());
+        for (int weekDay : nextWeekDays) {
+            sb1.append(DateTime.asWeekDay(weekDay)).append(DOUBLE_LINE_BREAK);
+            sb2.append(getOpeningTimeDescription(weekDay, false, TimeFormat.FORMAT_HH_MM)).append(DOUBLE_LINE_BREAK);
+            times = openingTimes.get(weekDay);
+            if (displayWidth < 1000 && times != null && times.length == 6) {
+                sb1.append(LINE_BREAK);
+            }
+        }
+        sb1.delete(sb1.length() - DOUBLE_LINE_BREAK.length(), sb1.length());
+        sb2.delete(sb2.length() - DOUBLE_LINE_BREAK.length(), sb2.length());
         return new String[] { sb1.toString(), sb2.toString() };
     }
 

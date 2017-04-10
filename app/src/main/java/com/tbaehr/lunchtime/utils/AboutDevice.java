@@ -674,20 +674,35 @@
  * <http://www.gnu.org/philosophy/why-not-lgpl.html>.
  *
  */
-package com.tbaehr.lunchtime;
+package com.tbaehr.lunchtime.utils;
 
-import org.junit.Test;
+import android.content.Context;
+import android.graphics.Point;
+import android.view.Display;
+import android.view.WindowManager;
 
-import static org.junit.Assert.assertEquals;
+import com.tbaehr.lunchtime.LunchtimeApplication;
 
 /**
- * Example local unit test, which will execute on the development machine (host).
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
+ * Created by timo.baehr@gmail.com on 02.04.2017.
  */
-public class ExampleUnitTest {
-    @Test
-    public void addition_isCorrect() throws Exception {
-        assertEquals(4, 2 + 2);
+public class AboutDevice {
+
+    public static Point getDisplayDimensions() {
+        Context context = LunchtimeApplication.getContext();
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
+
+        Point size = new Point();
+        display.getSize(size);
+        return size;
+    }
+
+    public static int getDisplayWidth() {
+        return getDisplayDimensions().x;
+    }
+
+    public static int getDisplayHeight() {
+        return getDisplayDimensions().y;
     }
 }

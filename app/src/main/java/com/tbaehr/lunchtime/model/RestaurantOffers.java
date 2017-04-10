@@ -676,8 +676,14 @@
  */
 package com.tbaehr.lunchtime.model;
 
+import android.content.Context;
+import android.location.Location;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
+import com.tbaehr.lunchtime.LunchtimeApplication;
+import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.utils.DateTime;
 import com.tbaehr.lunchtime.utils.DateUtils;
 
@@ -688,7 +694,11 @@ import java.util.Set;
 /**
  * Created by timo.baehr@gmail.com on 08.01.17.
  */
-public class RestaurantOffers {
+public class RestaurantOffers implements Comparable<RestaurantOffers> {
+
+    public class DistanceNotAvailableException extends Exception {
+        // ;
+    }
 
     private String restaurantId;
 
@@ -698,48 +708,60 @@ public class RestaurantOffers {
 
     private List<Offer> offers;
 
-    public RestaurantOffers(String restaurantId, String title, String description, List<Offer> offers) {
+    private Location location;
+
+    private Location lastKnownLocation;
+
+    public RestaurantOffers(String restaurantId, Location location, String title, String description, List<Offer> offers) {
         this.restaurantId = restaurantId;
+        this.location = location;
         this.title = title;
         this.description = description;
         this.offers = offers;
     }
 
-    @Override
-    public boolean equals(@Nullable Object obj) {
-        // equal type?
-        if (obj == null || !(obj instanceof RestaurantOffers)) {
-            return false;
-        }
-        RestaurantOffers otherOffers = (RestaurantOffers) obj;
-
-        // equal size?
-        boolean isEqual = getOffers().size() == otherOffers.getOffers().size();
-        if (!isEqual) {
-            return false;
-        }
-
-        // equal offers?
-        for (int i = 0; i< offers.size(); i++) {
-            Offer offer = getOffer(i);
-            Offer anotherOffer = otherOffers.getOffer(i);
-            isEqual = offer.equals(anotherOffer);
-            if (!isEqual) {
-                return false;
-            }
-        }
-
-        return true;
+    private Location getLocation() {
+        return location;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = (restaurantId + title + description).hashCode() + offers.size();
-        for (int i = 0; i< offers.size(); i++) {
-            Offer offer = getOffer(i);
-            hash += offer.hashCode();
+    public void setLastKnownLocation(Location lastKnownLocation) {
+        this.lastKnownLocation = lastKnownLocation;
+    }
+
+    public float getDistanceInMeters() throws DistanceNotAvailableException {
+        if (lastKnownLocation != null && location != null) {
+            return lastKnownLocation.distanceTo(location);
+        } else {
+            throw new DistanceNotAvailableException();
         }
-        return hash;
+    }
+
+    public String getDistance() {
+        Context context = LunchtimeApplication.getContext();
+        try {
+            int distanceInMeters = (int) getDistanceInMeters();
+            if (distanceInMeters < 100) {
+                return context.getString(R.string.distance_less100);
+            }
+            int kilometers = distanceInMeters / 1000;
+            if (kilometers > 10) {
+                if (kilometers < 1000) {
+                    return context.getString(R.string.distance_km, kilometers);
+                } else {
+                    return context.getString(R.string.distance_far_away);
+                }
+            }
+
+            int meters = distanceInMeters - (kilometers * 1000);
+            if (meters > 900) {
+                return context.getString(R.string.distance_km_m, kilometers + 1, 0);
+            } else {
+                meters = (int) Math.ceil(meters / 100d);
+                return context.getString(R.string.distance_km_m, kilometers, meters);
+            }
+        } catch (RestaurantOffers.DistanceNotAvailableException e) {
+            return context.getString(R.string.distance_not_available);
+        }
     }
 
     public String getRestaurantName() {
@@ -793,5 +815,68 @@ public class RestaurantOffers {
 
     public Offer getOffer(int index) {
         return offers.get(index);
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        // equal type?
+        if (obj == null || !(obj instanceof RestaurantOffers)) {
+            return false;
+        }
+        RestaurantOffers otherOffers = (RestaurantOffers) obj;
+
+        // equal size?
+        boolean isEqual = getOffers().size() == otherOffers.getOffers().size();
+        if (!isEqual) {
+            return false;
+        }
+
+        // equal offers?
+        for (int i = 0; i< offers.size(); i++) {
+            Offer offer = getOffer(i);
+            Offer anotherOffer = otherOffers.getOffer(i);
+            isEqual = offer.equals(anotherOffer);
+            if (!isEqual) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = (restaurantId + title + description).hashCode() + offers.size();
+        for (int i = 0; i< offers.size(); i++) {
+            Offer offer = getOffer(i);
+            hash += offer.hashCode();
+        }
+        return hash;
+    }
+
+    @Override
+    public int compareTo(@NonNull RestaurantOffers other) {
+        final int FALLBACK = -1;
+        if (lastKnownLocation == null) {
+            Log.e("RestaurantOffers", "Last known location is null (" + restaurantId + ")");
+            return FALLBACK;
+        }
+        if (this.getLocation() == null) {
+            Log.e("RestaurantOffers", "Location for " + restaurantId + " is null");
+            return FALLBACK;
+        }
+        if (other.getLocation() == null) {
+            Log.e("RestaurantOffers", "Location for " + other.restaurantId + " is null");
+            return FALLBACK;
+        }
+        try {
+            float distanceThisRestaurant = this.getDistanceInMeters();
+            float distanceOtherRestaurant = other.getDistanceInMeters();
+
+            return distanceThisRestaurant < distanceOtherRestaurant ? 1 : -1;
+        } catch (DistanceNotAvailableException e) {
+            // This should never happen
+            return FALLBACK;
+        }
     }
 }

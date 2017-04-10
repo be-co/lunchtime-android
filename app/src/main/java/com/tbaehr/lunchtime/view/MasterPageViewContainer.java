@@ -678,6 +678,8 @@ package com.tbaehr.lunchtime.view;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.location.Location;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
@@ -799,8 +801,18 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     }
 
     @Override
-    public void refreshDashboardFragment() {
-        fragmentHolder.refreshDashboardFragment();
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        fragmentHolder.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void reloadOffers(boolean clearOffers) {
+        fragmentHolder.reloadOffers(clearOffers);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        fragmentHolder.onLocationChanged(location);
     }
 
     @Override
@@ -870,8 +882,12 @@ class FragmentHolder {
         }
     }
 
-    void refreshDashboardFragment() {
-        dashboard.refresh();
+    void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        activeFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    void reloadOffers(boolean clearOffers) {
+        dashboard.reloadOffers(clearOffers);
     }
 
     void showDashboardFragment() {
@@ -898,5 +914,9 @@ class FragmentHolder {
             transaction.remove(previousFragment);
         }
         transaction.replace(R.id.fragment_container, activeFragment, activeFragment.getClass().getCanonicalName()).commit();
+    }
+
+    void onLocationChanged(Location location) {
+        dashboard.onLocationChanged(location);
     }
 }

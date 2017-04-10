@@ -802,9 +802,7 @@ public class Offer {
         return other.getPrize() == prize
                 //&& other.drawableRes == drawableRes
                 && other.title.equals(title)
-                && other.description.equals(description)
-                && other.startDate.equals(startDate)
-                && other.endDate.equals(endDate);
+                && other.description.equals(description);
     }
 
     @Override

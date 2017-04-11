@@ -710,6 +710,7 @@ import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.presenter.CustomBasePresenter;
 import com.tbaehr.lunchtime.tracking.ITracking;
+import com.tbaehr.lunchtime.utils.SharedPrefsHelper;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -1207,6 +1208,9 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         // is displayed as the activity is re-created.
         if (mCurrentLocation == null) {
             mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            if (mCurrentLocation == null) {
+                mCurrentLocation = SharedPrefsHelper.getLocation(KEY_LOCATION);
+            }
             onLocationChanged(mCurrentLocation);
         }
 
@@ -1219,6 +1223,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     @Override
     public void onLocationChanged(Location location) {
         mCurrentLocation = location;
+        SharedPrefsHelper.putLocation(KEY_LOCATION, mCurrentLocation);
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         tellPresenterLocationChanged();
     }

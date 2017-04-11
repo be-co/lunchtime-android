@@ -740,7 +740,10 @@ public class ModelProvider {
 
     private static final int[] RADIUS = new int[] { 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000 };
 
-    private static final int MIN_OFFERS = 3;
+    /**
+     * The number of offer sections that should be shown (if any offers are available)
+     */
+    private static final int MINIMUM_OFFER_SECTIONS = 3;
 
     private static int selectedRadius = 0;
 
@@ -767,6 +770,7 @@ public class ModelProvider {
 
     public void resetLastSync() {
         lastSync = -1;
+        selectedRadius = 0;
     }
 
     private void getNearbyAsync(@NonNull final NearbyChangeListener callback, boolean forceUpdate) {
@@ -973,7 +977,7 @@ public class ModelProvider {
             output.add(offers);
         }
 
-        if (output.size() < MIN_OFFERS) {
+        if (output.size() < MINIMUM_OFFER_SECTIONS) {
             if (increaseMoreOffersCounter()) {
                 return stripByDistance(inputOffers);
             }

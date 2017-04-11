@@ -678,6 +678,7 @@ package com.tbaehr.lunchtime.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Location;
 
 import com.tbaehr.lunchtime.LunchtimeApplication;
 
@@ -689,6 +690,44 @@ import static android.content.Context.MODE_PRIVATE;
 public class SharedPrefsHelper {
 
     private static final String KEY_STORAGE = "cache";
+
+    public static Location getLocation(String key) {
+        Context context = LunchtimeApplication.getContext();
+        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
+
+        String restored = sharedPreferences.getString(key, null);
+        if (restored == null) {
+            return null;
+        }
+
+        String[] values = restored.split("|");
+        double longitude = Double.valueOf(values[0]);
+        double latitude = Double.valueOf(values[1]);
+        String provider = values[2];
+        float accuracy = Float.valueOf(values[3]);
+
+        Location location = new Location(provider);
+        location.setLatitude(latitude);
+        location.setLongitude(longitude);
+        location.setAccuracy(accuracy);
+
+        return location;
+    }
+
+    public static void putLocation(String key, Location location) {
+        Context context = LunchtimeApplication.getContext();
+        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        String longitude = String.valueOf(location.getLongitude());
+        String latitude = String.valueOf(location.getLatitude());
+        String provider = location.getProvider();
+        String accuracy = String.valueOf(location.getAccuracy());
+
+        String value = longitude + "|" + latitude + "|" + provider + "|" + accuracy;
+
+        editor.putString(key, value).apply();
+    }
 
     public static String getString(String key) {
         Context context = LunchtimeApplication.getContext();

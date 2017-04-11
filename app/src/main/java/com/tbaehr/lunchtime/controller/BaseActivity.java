@@ -695,6 +695,7 @@ import android.view.WindowManager;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
@@ -993,7 +994,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * {@link com.google.android.gms.location.SettingsApi#checkLocationSettings(GoogleApiClient,
      * LocationSettingsRequest)} method, with the results provided through a {@code PendingResult}.
      */
-    /*protected void checkLocationSettings() {
+    protected void checkLocationSettings() {
         Log.i(TAG, "checkLocationSettings()");
         PendingResult<LocationSettingsResult> result =
                 LocationServices.SettingsApi.checkLocationSettings(
@@ -1001,7 +1002,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
                         mLocationSettingsRequest
                 );
         result.setResultCallback(this);
-    }*/
+    }
 
     /**
      * The callback invoked when

@@ -698,6 +698,7 @@ import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -898,6 +899,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
         boolean foundOffers = false;
 
+        Collections.reverse(allOffers);
         for (final RestaurantOffers nearbyRestaurantOffers : allOffers) {
             if (nearbyRestaurantOffers.isEmpty()) {
                 continue;

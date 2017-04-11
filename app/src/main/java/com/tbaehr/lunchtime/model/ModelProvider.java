@@ -738,9 +738,17 @@ public class ModelProvider {
 
     private static final int MINUTE = 60 * 1000;
 
+    private static final int[] RADIUS = new int[] { 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000 };
+
+    private static final int MIN_OFFERS = 3;
+
+    private static int selectedRadius = 0;
+
     private static ModelProvider instance;
 
     private static ITracking tracker;
+
+    private static List<RestaurantOffers> allOffers;
 
     public static ModelProvider getInstance() {
         if (instance == null) {
@@ -858,7 +866,7 @@ public class ModelProvider {
     private int getAllOffersCounter = 0;
 
     public void getAllOffersAsync(@Nullable final NearbyOffersChangeListener callback, @Nullable final Location location, boolean forceUpdate) {
-        final List<RestaurantOffers> allOffers = new ArrayList<>();
+        allOffers = new ArrayList<>();
 
         getNearbyAsync(new NearbyChangeListener() {
             @Override
@@ -900,8 +908,11 @@ public class ModelProvider {
                         }
 
                         private void publishOffers() {
-                            Collections.sort(allOffers);
-                            callback.pickUp(allOffers);
+                            try {
+                                callback.pickUp(stripByDistance(allOffers));
+                            } catch (RestaurantOffers.DistanceNotAvailableException e) {
+                                callback.pickUp(Collections.EMPTY_LIST);
+                            }
                         }
                     });
                 }
@@ -924,6 +935,51 @@ public class ModelProvider {
                 }
             }
         }, forceUpdate);
+    }
+
+    public boolean canLoadMoreOffers() {
+        return RADIUS.length - 2 > selectedRadius;
+    }
+
+    private boolean increaseMoreOffersCounter() {
+        if (canLoadMoreOffers()) {
+            selectedRadius++;
+            return true;
+        }
+        return false;
+    }
+
+    public List<RestaurantOffers> loadMoreOffers() {
+        try {
+            if (!increaseMoreOffersCounter()) {
+                return stripByDistance(allOffers);
+            }
+
+            return stripByDistance(allOffers);
+        } catch (RestaurantOffers.DistanceNotAvailableException e) {
+            return Collections.EMPTY_LIST;
+        }
+    }
+
+    private List<RestaurantOffers> stripByDistance(List<RestaurantOffers> inputOffers) throws RestaurantOffers.DistanceNotAvailableException {
+        Collections.sort(inputOffers);
+        List<RestaurantOffers> output = new ArrayList<>();
+
+        for (RestaurantOffers offers : inputOffers) {
+            float distance = offers.getDistanceInMeters();
+            if (distance > RADIUS[selectedRadius]) {
+                break;
+            }
+            output.add(offers);
+        }
+
+        if (output.size() < MIN_OFFERS) {
+            if (increaseMoreOffersCounter()) {
+                return stripByDistance(inputOffers);
+            }
+        }
+
+        return output;
     }
 
     public void getRestaurantAsync(@NonNull final String restaurantId, @Nullable final RestaurantChangeListener callback) {

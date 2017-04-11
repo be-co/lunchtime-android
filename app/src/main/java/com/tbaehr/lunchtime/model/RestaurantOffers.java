@@ -873,7 +873,7 @@ public class RestaurantOffers implements Comparable<RestaurantOffers> {
             float distanceThisRestaurant = this.getDistanceInMeters();
             float distanceOtherRestaurant = other.getDistanceInMeters();
 
-            return distanceThisRestaurant < distanceOtherRestaurant ? 1 : -1;
+            return distanceThisRestaurant < distanceOtherRestaurant ? -1 : 1;
         } catch (DistanceNotAvailableException e) {
             // This should never happen
             return FALLBACK;

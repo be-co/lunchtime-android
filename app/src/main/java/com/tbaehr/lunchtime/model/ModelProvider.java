@@ -801,7 +801,6 @@ public class ModelProvider {
                                 ModelCache.getInstance().putNearby(nearbyJson, locationId);
                             } catch (JSONException e) {
                                 tracker.trackException(e);
-                                callback.failed();
                             }
                             return null;
                         }

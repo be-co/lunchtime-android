@@ -1,6 +1,8 @@
 <resources>
     <string name="changelog_header">Changelog</string>
-    <string name="changelog"><b>2017.04.09 Alpha (v19)</b>
+    <string name="changelog"><b>2017.04.16 Alpha (v20)</b>
+        \n•  (Fix) Crash at connection timeout when opening detail page
+        \n\n<b>2017.04.09 Alpha (v19)</b>
         \n•  Support for parsing RFC3339 date, MEZ, …
         \n\n<b>2017.04.02 Alpha (v17/18)</b>
         \n•  Distance will be updated automatically

@@ -1,6 +1,8 @@
 <resources>
     <string name="changelog_header">Versionshistorie</string>
-    <string name="changelog"><b>2017.04.09 Alpha (v19)</b>
+    <string name="changelog"><b>2017.04.16 Alpha (v20)</b>
+        \n•  (Fix) Crash bei Verbindungszeitüberschreitung beim Öffnen der Detailseite
+        \n\n<b>2017.04.09 Alpha (v19)</b>
         \n•  Unterstützung für Datumsformat RFC3339, MEZ, …
         \n\n<b>2017.04.02 Alpha (v17/18)</b>
         \n•  Entfernung wird automatisch aktualisiert

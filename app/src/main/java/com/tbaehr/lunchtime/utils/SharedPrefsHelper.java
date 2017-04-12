@@ -700,7 +700,12 @@ public class SharedPrefsHelper {
             return null;
         }
 
-        String[] values = restored.split("|");
+        String[] values = restored.split(";");
+
+        if (values.length != 4) {
+            return null;
+        }
+
         double longitude = Double.valueOf(values[0]);
         double latitude = Double.valueOf(values[1]);
         String provider = values[2];
@@ -715,6 +720,10 @@ public class SharedPrefsHelper {
     }
 
     public static void putLocation(String key, Location location) {
+        if (location == null) {
+            return;
+        }
+
         Context context = LunchtimeApplication.getContext();
         SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_STORAGE, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -724,7 +733,7 @@ public class SharedPrefsHelper {
         String provider = location.getProvider();
         String accuracy = String.valueOf(location.getAccuracy());
 
-        String value = longitude + "|" + latitude + "|" + provider + "|" + accuracy;
+        String value = longitude + ";" + latitude + ";" + provider + ";" + accuracy;
 
         editor.putString(key, value).apply();
     }

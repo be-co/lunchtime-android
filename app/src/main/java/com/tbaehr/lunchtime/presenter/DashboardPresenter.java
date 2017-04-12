@@ -872,7 +872,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
     @Override
     public void pickUp(List<RestaurantOffers> allOffers) {
-        Log.i("TimTim", "pickUp("+allOffers+")");
+        Log.i("TimTim", "pickUp("+allOffers+") "+allOffers.size()+" offer sections");
         IDashboardViewContainer view = getView();
         if (view == null) {
             return;
@@ -963,6 +963,11 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
     public void refreshOffers(boolean forceUpdate) {
         Location lastKnownLocation = activity.getLastKnownLocation();
+        if (lastKnownLocation == null) {
+            Log.v("TimTim", "Last known location is null. (DashboardPresenter.refreshOffers)");
+            return;
+        }
+
         IDashboardViewContainer view = getView();
         if (forceUpdate && view != null) {
             view.clearOffers();
@@ -981,7 +986,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.i("TimTim", "onLocationChanged(" + location + ")");
+        Log.i("TimTim", "DashboardPresenter.onLocationChanged(" + location + ")");
         refreshOffers(false);
     }
 }

@@ -678,6 +678,7 @@ package com.tbaehr.lunchtime.view;
 
 import android.content.Context;
 import android.support.annotation.StringRes;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -771,6 +772,7 @@ public class DashboardViewContainer implements IDashboardViewContainer {
 
     @Override
     public void clearOffers() {
+        Log.v("TimTim", "DashboardView.clearOffers");
         hideNoOffersView();
         viewContainer.removeAllViews();
         sliderViewMap.clear();

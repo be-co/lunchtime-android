@@ -751,7 +751,7 @@ public class ModelProvider {
 
     private static ITracking tracker;
 
-    private static List<RestaurantOffers> allOffers;
+    private static List<RestaurantOffers> allOffers = new ArrayList<>();
 
     public static ModelProvider getInstance() {
         if (instance == null) {
@@ -870,8 +870,6 @@ public class ModelProvider {
     private int getAllOffersCounter = 0;
 
     public void getAllOffersAsync(@Nullable final NearbyOffersChangeListener callback, @Nullable final Location location, boolean forceUpdate) {
-        allOffers = new ArrayList<>();
-
         getNearbyAsync(new NearbyChangeListener() {
             @Override
             public void loadingStarted() {
@@ -882,6 +880,7 @@ public class ModelProvider {
             public void pickUp(NearbyRestaurants nearby) {
                 final Collection<String> restaurantKeys = nearby.getRestaurantKeys();
                 getAllOffersCounter = 0;
+                allOffers.clear();
                 for (String restaurantId : restaurantKeys) {
                     getRestaurantOffersAsync(restaurantId, location, new RestaurantOffersChangeListener() {
                         @Override

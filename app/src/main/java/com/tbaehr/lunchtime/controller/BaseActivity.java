@@ -787,7 +787,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * Tracks the status of the location updates request. Value changes when the user presses the
      * Start Updates and Stop Updates buttons.
      */
-    protected Boolean mRequestingLocationUpdates;
+    protected boolean mRequestingLocationUpdates = false;
 
     private boolean permissionDialogVisible = false;
 
@@ -799,7 +799,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         super.onCreate(savedInstanceState);
         tracker = ((LunchtimeApplication) getApplication()).getTracker();
 
-        mRequestingLocationUpdates = false;
         mLastUpdateTime = "";
 
         // Update values using data stored in the Bundle.
@@ -944,6 +943,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     }
 
     private void tellPresenterLocationChanged() {
+        Log.v("TimTim", "tellPresenterLocationChanged()");
         CustomBasePresenter presenter = getPresenter();
         if (presenter != null && presenter instanceof com.tbaehr.lunchtime.localization.LocationListener) {
             ((com.tbaehr.lunchtime.localization.LocationListener) presenter).onLocationChanged(mCurrentLocation);
@@ -996,7 +996,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * LocationSettingsRequest)} method, with the results provided through a {@code PendingResult}.
      */
     protected void checkLocationSettings() {
-        Log.i(TAG, "checkLocationSettings()");
         PendingResult<LocationSettingsResult> result =
                 LocationServices.SettingsApi.checkLocationSettings(
                         mGoogleApiClient,
@@ -1161,6 +1160,10 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     }
 
     public Location getLastKnownLocation() {
+        if (mCurrentLocation == null) {
+            mCurrentLocation = SharedPrefsHelper.getLocation(KEY_LOCATION);
+            Log.v("TimTim", "set location to "+mCurrentLocation);
+        }
         return mCurrentLocation;
     }
 
@@ -1208,9 +1211,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         // is displayed as the activity is re-created.
         if (mCurrentLocation == null) {
             mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            if (mCurrentLocation == null) {
-                mCurrentLocation = SharedPrefsHelper.getLocation(KEY_LOCATION);
-            }
             onLocationChanged(mCurrentLocation);
         }
 
@@ -1222,7 +1222,11 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     @Override
     public void onLocationChanged(Location location) {
+        if (location == null) {
+            return;
+        }
         mCurrentLocation = location;
+        // Where is RestaurantOffers called with location?
         SharedPrefsHelper.putLocation(KEY_LOCATION, mCurrentLocation);
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         tellPresenterLocationChanged();

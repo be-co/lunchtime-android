@@ -994,4 +994,12 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         Log.i("TimTim", "DashboardPresenter.onLocationChanged(" + location + ")");
         refreshOffers(false);
     }
+
+    @Override
+    public void onLocationLookupStarted() {
+        IDashboardViewContainer view = getView();
+        if (view != null) {
+            view.showSearchingLocation();
+        }
+    }
 }

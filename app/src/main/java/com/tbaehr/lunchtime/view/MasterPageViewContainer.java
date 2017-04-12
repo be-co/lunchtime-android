@@ -816,6 +816,11 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     }
 
     @Override
+    public void onLocationLookupStarted() {
+        fragmentHolder.onLocationLookupStarted();
+    }
+
+    @Override
     public void showDashboardFragment() {
         fragmentHolder.showDashboardFragment();
     }
@@ -918,5 +923,9 @@ class FragmentHolder {
 
     void onLocationChanged(Location location) {
         dashboard.onLocationChanged(location);
+    }
+
+    public void onLocationLookupStarted() {
+        dashboard.onLocationLookupStarted();
     }
 }

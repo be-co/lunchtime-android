@@ -763,4 +763,12 @@ public class DashboardFragment extends BaseFragment<IDashboardViewContainer, Das
             presenter.onLocationChanged(location);
         }
     }
+
+    @Override
+    public void onLocationLookupStarted() {
+        DashboardPresenter presenter = getPresenter();
+        if (presenter != null) {
+            presenter.onLocationLookupStarted();
+        }
+    }
 }

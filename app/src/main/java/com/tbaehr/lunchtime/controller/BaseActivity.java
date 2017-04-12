@@ -950,6 +950,13 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         }
     }
 
+    private void tellPresenterLocationLookupStarted() {
+        CustomBasePresenter presenter = getPresenter();
+        if (presenter != null && presenter instanceof com.tbaehr.lunchtime.localization.LocationListener) {
+            ((com.tbaehr.lunchtime.localization.LocationListener) presenter).onLocationLookupStarted();
+        }
+    }
+
     // MVP Code
     // END
 
@@ -1108,11 +1115,11 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
                 switch (resultCode) {
                     // User agreed to make required location settings changes
                     case Activity.RESULT_OK:
+                        tellPresenterLocationLookupStarted();
                         startLocationUpdates();
                         break;
                     // User chose not to make required location settings changes
                     case Activity.RESULT_CANCELED:
-                        onLocationChanged(null);
                         break;
                 }
                 break;

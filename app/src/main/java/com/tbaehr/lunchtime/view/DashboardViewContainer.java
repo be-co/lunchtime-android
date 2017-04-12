@@ -812,7 +812,6 @@ public class DashboardViewContainer implements IDashboardViewContainer {
             @Override
             public void onClick(View v) {
                 listener.onLocationSettingsClicked();
-                showSearchingLocation();
             }
         });
     }

@@ -30,6 +30,8 @@
         \n\nClick \"Accept\" inside the upcoming dialog.
     </string>
     <string name="error_location">Location not available</string>
+    <string name="message_location_unknown">Your Location is not available. Hence, Lunchtime cannot show you the nearby offers.\n\nIn future you can alternatively enter an adress.</string>
+    <string name="message_location_settings_check">Check settings</string>
     <string name="distance_not_available">\?km</string>
     <string name="distance_less100">&lt; 0,1 km</string>
     <string name="distance_km_m" formatted="false">%d,%d km</string>
@@ -47,6 +49,7 @@
     <string name="no_offers_today4">No offers for today, a messy kitchen is a sign of happiness.</string>
     <string name="no_offers_today5">No offers for today. The onions aren\'t making me cry, it\'s being in the kitchen in general.</string>
     <string name="status_loading">Loading offers</string>
+    <string name="status_location_lookup">Searching for location</string>
     <string name="status_offer_sync_failed">Updating offers unfortunately failed.</string>
     <string name="status_restaurant_download_failed">Downloading restaurant data  unfortunately failed.</string>
     <string name="status_title_restaurant_download_failed">Failed to download</string>

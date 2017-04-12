@@ -30,6 +30,8 @@
         \n\nKlicke im nächsten Dialog auf \"Zulassen\".
     </string>
     <string name="error_location">Standort nicht verfügbar</string>
+    <string name="message_location_unknown">Dein Standort ist nicht verfügbar. Ohne Standort kann Lunchtime Dir leider nicht die nächstgelegenen Angebote anzeigen.\n\nSpäter kannst Du auch ohne verfügbaren Standort Angebote sehen, indem Du eine Adresse festlegst.</string>
+    <string name="message_location_settings_check">Einstellungen überprüfen</string>
     <string name="distance_not_available">\? km</string>
     <string name="distance_less100">&lt; 0,1 km</string>
     <string name="distance_km_m" formatted="false">%d,%d km</string>
@@ -47,6 +49,7 @@
     <string name="no_offers_today4">Heute keine Angebote verfügbar, pass auf, dass Du nicht in Teufels Küche kommst.</string>
     <string name="no_offers_today5">Heute keine Angebote verfügbar, das Geheimnis einer sauberen Küche? Nicht kochen…</string>
     <string name="status_loading">Aktualisiere Angebote</string>
+    <string name="status_location_lookup">Suche Standort</string>
     <string name="status_offer_sync_failed">Beim Aktualisieren der Angebote ist leider ein Fehler aufgetreten.</string>
     <string name="status_restaurant_download_failed">Beim Download der Restaurantdaten ist leider ein Fehler aufgetreten.</string>
     <string name="status_title_restaurant_download_failed">Downloadfehler</string>

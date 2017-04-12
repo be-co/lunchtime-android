@@ -701,7 +701,13 @@ public class DashboardFragment extends BaseFragment<IDashboardViewContainer, Das
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        viewContainer = new DashboardViewContainer(getContext(), inflater, container);
+        final DashboardViewContainer.OnCheckLocationSettingsListener listener = new DashboardViewContainer.OnCheckLocationSettingsListener() {
+            @Override
+            public void onLocationSettingsClicked() {
+                ((BaseActivity) getActivity()).checkLocationSettings();
+            }
+        };
+        viewContainer = new DashboardViewContainer(getContext(), inflater, container, listener);
         return viewContainer.getRootView();
     }
 

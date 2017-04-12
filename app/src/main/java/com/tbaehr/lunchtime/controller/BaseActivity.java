@@ -995,7 +995,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * {@link com.google.android.gms.location.SettingsApi#checkLocationSettings(GoogleApiClient,
      * LocationSettingsRequest)} method, with the results provided through a {@code PendingResult}.
      */
-    protected void checkLocationSettings() {
+    public void checkLocationSettings() {
         PendingResult<LocationSettingsResult> result =
                 LocationServices.SettingsApi.checkLocationSettings(
                         mGoogleApiClient,
@@ -1014,6 +1014,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     @Override
     public void onResult(LocationSettingsResult locationSettingsResult) {
+        Log.v("TimTim", "onResult");
         final Status status = locationSettingsResult.getStatus();
         switch (status.getStatusCode()) {
             case LocationSettingsStatusCodes.SUCCESS:
@@ -1100,6 +1101,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.v("TimTim", "onActivityResult("+requestCode+", "+requestCode+", "+data+")");
         switch (requestCode) {
             // Check for the integer request code originally supplied to startResolutionForResult()
             case REQUEST_CHECK_SETTINGS:
@@ -1110,6 +1112,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
                         break;
                     // User chose not to make required location settings changes
                     case Activity.RESULT_CANCELED:
+                        onLocationChanged(null);
                         break;
                 }
                 break;
@@ -1120,6 +1123,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * Requests location updates from the FusedLocationApi.
      */
     protected void startLocationUpdates() {
+        Log.v("TimTim", "startLocationUpdates()");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             alertDialogRequestingLocationPermission();
@@ -1188,6 +1192,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     @Override
     public void onConnected(Bundle connectionHint) {
+        Log.v("TimTim", "onConnected("+connectionHint+")");
         if (!mRequestingLocationUpdates) {
             return;
         }
@@ -1209,10 +1214,8 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         // user launches the activity,
         // moves to a new location, and then changes the device orientation, the original location
         // is displayed as the activity is re-created.
-        if (mCurrentLocation == null) {
-            mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            onLocationChanged(mCurrentLocation);
-        }
+        mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        onLocationChanged(mCurrentLocation);
 
         startLocationUpdates();
     }
@@ -1222,11 +1225,8 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     @Override
     public void onLocationChanged(Location location) {
-        if (location == null) {
-            return;
-        }
+        Log.v("TimTim", "onLocationChanged("+location+")");
         mCurrentLocation = location;
-        // Where is RestaurantOffers called with location?
         SharedPrefsHelper.putLocation(KEY_LOCATION, mCurrentLocation);
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         tellPresenterLocationChanged();
@@ -1234,11 +1234,13 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
 
     @Override
     public void onConnectionSuspended(int cause) {
+        Log.v("TimTim", "onConnectionSuspended("+cause+")");
         // ;
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
+        Log.v("TimTim", "onConnectionSuspended("+result+")");
         // ;
     }
 }

@@ -721,6 +721,8 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
     private Timer timer;
 
+    private Location lastKnownLocation;
+
     public DashboardPresenter(DashboardFragment fragment) {
         this.activity = (BaseActivity) fragment.getActivity();
         this.tracker = activity.getTracker();
@@ -738,7 +740,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         super.bindView(view);
         activity.requestLocationUpdates();
         if (cachedOffers == null || cachedOffers.size() == 0) {
-            getView().setProgressBarVisibility(true);
+            getView().showLoadingOffers();
         }
         refreshOffers(false);
     }
@@ -805,7 +807,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
                 IDashboardViewContainer view = getView();
                 if (view != null) {
                     if (cachedOffers == null || cachedOffers.size() == 0) {
-                        getView().setProgressBarVisibility(true);
+                        view.showLoadingOffers();
                     }
                 }
             }
@@ -819,7 +821,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
             public void run() {
                 IDashboardViewContainer view = getView();
                 if (view != null) {
-                    view.setProgressBarVisibility(false);
+                    view.hideProgressBar();
                     getView().showNoOffersView(R.string.status_offer_sync_failed);
                 }
             }
@@ -872,7 +874,6 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
     @Override
     public void pickUp(List<RestaurantOffers> allOffers) {
-        Log.i("TimTim", "pickUp("+allOffers+") "+allOffers.size()+" offer sections");
         IDashboardViewContainer view = getView();
         if (view == null) {
             return;
@@ -893,7 +894,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         }
         Log.i("TimTim", "dataSet has changed");
 
-        view.setProgressBarVisibility(false);
+        view.hideProgressBar();
         view.clearOffers();
         restartTimeBasedRefresh(allOffers);
 
@@ -962,16 +963,19 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     }
 
     public void refreshOffers(boolean forceUpdate) {
-        Location lastKnownLocation = activity.getLastKnownLocation();
+        Log.v("TimTim", "DashboardPresenter.refreshOffers("+forceUpdate+")");
+        IDashboardViewContainer view = getView();
+
         if (lastKnownLocation == null) {
-            Log.v("TimTim", "Last known location is null. (DashboardPresenter.refreshOffers)");
+            if (view != null) {
+                view.showLocationUnknown();
+            }
             return;
         }
 
-        IDashboardViewContainer view = getView();
         if (forceUpdate && view != null) {
             view.clearOffers();
-            view.setProgressBarVisibility(true);
+            view.showLoadingOffers();
         }
         ModelProvider.getInstance().getAllOffersAsync(this, lastKnownLocation, forceUpdate);
     }
@@ -986,6 +990,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
     @Override
     public void onLocationChanged(Location location) {
+        lastKnownLocation = location;
         Log.i("TimTim", "DashboardPresenter.onLocationChanged(" + location + ")");
         refreshOffers(false);
     }

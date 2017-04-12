@@ -692,17 +692,9 @@ public interface IDashboardViewContainer {
 
     boolean isInitialized();
 
-    void addOffers(
-            String sectionId,
-            String sectionTitle,
-            String shortDescription,
-            String distance,
-            List<Offer> offers,
-            HorizontalSliderView.OnSliderHeaderClickListener headerClickListener,
-            HorizontalSliderView.OnSliderItemClickListener sliderItemClickListener
-    );
-
     void hideNoOffersView();
+
+    void addOffers(String sectionId, String sectionTitle, String shortDescription, String distance, List<Offer> offers, HorizontalSliderView.OnSliderHeaderClickListener headerClickListener, HorizontalSliderView.OnSliderItemClickListener sliderItemClickListener);
 
     void updateOffers(String sectionTitle, String distance);
 
@@ -712,7 +704,13 @@ public interface IDashboardViewContainer {
 
     boolean isProgressBarVisible();
 
-    void setProgressBarVisibility(boolean visible);
+    void hideProgressBar();
 
     void clearOffers();
+
+    void showLoadingOffers();
+
+    void showSearchingLocation();
+
+    void showLocationUnknown();
 }

@@ -44,12 +44,15 @@ public class NearbyRestaurants {
     }
 
     public DateTime offersLastUpdated(@NonNull String restaurantId) {
-        String dStr = lastUpdatedMap.get(restaurantId).second;
+        Pair<String, String> pair = lastUpdatedMap.get(restaurantId);
+        if (pair == null) {
+            throw new IllegalStateException("There should always be a non-null update pair for restaurant offers. (restaurant key = " + restaurantId + ")");
+        }
+        String offersLastUpdated = pair.second;
         try {
-            return DateUtils.createDateFromString(dStr);
+            return DateUtils.createDateFromString(offersLastUpdated);
         } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
+            throw new IllegalStateException("The cached date should always be parsable. (restaurant key = " + restaurantId + ")");
         }
     }
 

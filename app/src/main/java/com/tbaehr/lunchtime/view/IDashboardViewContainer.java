@@ -696,6 +696,8 @@ public interface IDashboardViewContainer {
 
     void addOffers(String sectionId, String sectionTitle, String shortDescription, String distance, List<Offer> offers, HorizontalSliderView.OnSliderHeaderClickListener headerClickListener, HorizontalSliderView.OnSliderItemClickListener sliderItemClickListener);
 
+    void showLoadMoreButton(DashboardViewContainer.OnLoadMoreClickListener listener);
+
     void updateOffers(String sectionTitle, String distance);
 
     void showNoOffersView(@StringRes int message);

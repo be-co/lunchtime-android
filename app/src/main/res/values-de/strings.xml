@@ -53,6 +53,7 @@
     <string name="status_offer_sync_failed">Beim Aktualisieren der Angebote ist leider ein Fehler aufgetreten.</string>
     <string name="status_restaurant_download_failed">Beim Download der Restaurantdaten ist leider ein Fehler aufgetreten.</string>
     <string name="status_title_restaurant_download_failed">Downloadfehler</string>
+    <string name="load_more">Weitere Angebote anzeigen</string>
 
     <!-- Preferences page -->
     <string name="preferences_your_date_headline">Verwendung Deiner Daten</string>

@@ -677,8 +677,11 @@
 package com.tbaehr.lunchtime.view;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.StringRes;
+import android.support.v7.view.ContextThemeWrapper;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -699,6 +702,10 @@ import butterknife.ButterKnife;
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
 public class DashboardViewContainer implements IDashboardViewContainer {
+
+    public interface OnLoadMoreClickListener {
+        void onLoadMoreClicked();
+    }
 
     public interface OnCheckLocationSettingsListener {
         void onLocationSettingsClicked();
@@ -739,6 +746,32 @@ public class DashboardViewContainer implements IDashboardViewContainer {
         HorizontalSliderView sliderView = new HorizontalSliderView(context, sectionTitle, shortDescription, distance, offers, headerClickListener, sliderItemClickListener);
         viewContainer.addView(sliderView, 0);
         sliderViewMap.put(sectionId, sliderView);
+    }
+
+    @Override
+    public void showLoadMoreButton(final OnLoadMoreClickListener listener) {
+        int style;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            style = android.R.style.Widget_Material_Button_Borderless_Colored;
+        } else {
+            style = android.R.style.Widget_Button;
+        }
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.CENTER;
+        Button loadMoreButton = new Button(new ContextThemeWrapper(context, style), null, style);
+        loadMoreButton.setText(R.string.load_more);
+        loadMoreButton.setLayoutParams(params);
+
+        loadMoreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onLoadMoreClicked();
+            }
+        });
+
+        viewContainer.addView(loadMoreButton);
     }
 
     @Override

@@ -694,6 +694,7 @@ import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
 import com.tbaehr.lunchtime.tracking.ITracking;
 import com.tbaehr.lunchtime.utils.DateTime;
+import com.tbaehr.lunchtime.view.DashboardViewContainer;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
@@ -932,9 +933,25 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
                     onSliderItemClickListener
             );
         }
+        if (ModelProvider.getInstance().canLoadMoreOffers()) {
+            view.showLoadMoreButton(new DashboardViewContainer.OnLoadMoreClickListener() {
+                @Override
+                public void onLoadMoreClicked() {
+                    loadMoreOffers();
+                }
+            });
+        }
 
         if (!foundOffers) {
             showNoOfferView();
+        }
+    }
+
+    public void loadMoreOffers() {
+        ModelProvider provider = ModelProvider.getInstance();
+        if (provider.canLoadMoreOffers()) {
+            List<RestaurantOffers> offers = provider.loadMoreOffers();
+            pickUp(offers);
         }
     }
 

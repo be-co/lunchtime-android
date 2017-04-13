@@ -53,6 +53,7 @@
     <string name="status_offer_sync_failed">Updating offers unfortunately failed.</string>
     <string name="status_restaurant_download_failed">Downloading restaurant data  unfortunately failed.</string>
     <string name="status_title_restaurant_download_failed">Failed to download</string>
+    <string name="load_more">Show more</string>
 
     <!-- Preferences page -->
     <string name="preferences_your_date_headline">Your personal data</string>

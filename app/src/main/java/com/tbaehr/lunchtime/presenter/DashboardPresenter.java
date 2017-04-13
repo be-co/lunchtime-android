@@ -880,6 +880,10 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
             return;
         }
 
+        if (allOffers.size() == 0) {
+            view.showNoOffersView(R.string.no_offers);
+        }
+
         if (!hasDataSetChanged(allOffers)) {
             Log.i("TimTim", "dataSet has NOT changed");
             if (!view.hasOffers()) {

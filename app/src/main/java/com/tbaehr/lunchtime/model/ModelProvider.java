@@ -698,7 +698,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.tbaehr.lunchtime.tracking.ITracking.KEY_ERROR_REPORTING_ENABLED;
 import static com.tbaehr.lunchtime.tracking.ITracking.KEY_TRACKING_ENABLED;
@@ -751,7 +753,7 @@ public class ModelProvider {
 
     private static ITracking tracker;
 
-    private static List<RestaurantOffers> allOffers = new ArrayList<>();
+    private static Set<RestaurantOffers> allOffers = new HashSet<>();
 
     public static ModelProvider getInstance() {
         if (instance == null) {
@@ -914,7 +916,7 @@ public class ModelProvider {
                             try {
                                 callback.pickUp(stripByDistance(allOffers));
                             } catch (RestaurantOffers.DistanceNotAvailableException e) {
-                                callback.pickUp(Collections.EMPTY_LIST);
+                                callback.failed();
                             }
                         }
                     });
@@ -952,26 +954,21 @@ public class ModelProvider {
         return false;
     }
 
-    public List<RestaurantOffers> loadMoreOffers() {
-        try {
-            if (!increaseMoreOffersCounter()) {
-                return stripByDistance(allOffers);
-            }
-
+    public List<RestaurantOffers> loadMoreOffers() throws RestaurantOffers.DistanceNotAvailableException {
+        if (!increaseMoreOffersCounter()) {
             return stripByDistance(allOffers);
-        } catch (RestaurantOffers.DistanceNotAvailableException e) {
-            return Collections.EMPTY_LIST;
         }
+
+        return stripByDistance(allOffers);
     }
 
-    private List<RestaurantOffers> stripByDistance(List<RestaurantOffers> inputOffers) throws RestaurantOffers.DistanceNotAvailableException {
-        Collections.sort(inputOffers);
+    private List<RestaurantOffers> stripByDistance(Set<RestaurantOffers> inputOffers) throws RestaurantOffers.DistanceNotAvailableException {
         List<RestaurantOffers> output = new ArrayList<>();
 
         for (RestaurantOffers offers : inputOffers) {
             float distance = offers.getDistanceInMeters();
             if (distance > RADIUS[selectedRadius]) {
-                break;
+                continue;
             }
             output.add(offers);
         }
@@ -982,6 +979,7 @@ public class ModelProvider {
             }
         }
 
+        Collections.sort(output);
         return output;
     }
 

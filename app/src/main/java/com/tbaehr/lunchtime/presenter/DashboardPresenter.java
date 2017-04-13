@@ -947,10 +947,20 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         }
     }
 
-    public void loadMoreOffers() {
+    private void loadMoreOffers() {
         ModelProvider provider = ModelProvider.getInstance();
         if (provider.canLoadMoreOffers()) {
-            List<RestaurantOffers> offers = provider.loadMoreOffers();
+            List<RestaurantOffers> offers = null;
+            try {
+                offers = provider.loadMoreOffers();
+            } catch (RestaurantOffers.DistanceNotAvailableException e) {
+                IDashboardViewContainer view = getView();
+                if (view != null) {
+                    view.showLocationUnknown();
+                    return;
+                }
+            }
+            Log.v("TimTim", "Received "+offers.size()+" offer sections.");
             pickUp(offers);
         }
     }

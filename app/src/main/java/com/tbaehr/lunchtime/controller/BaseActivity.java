@@ -1026,6 +1026,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         switch (status.getStatusCode()) {
             case LocationSettingsStatusCodes.SUCCESS:
                 // All location settings are satisfied.
+                tellPresenterLocationLookupStarted();
                 startLocationUpdates();
                 break;
             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
@@ -1134,7 +1135,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             alertDialogRequestingLocationPermission();
-            //checkLocationSettings();
             return;
         }
 
@@ -1168,14 +1168,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
                 }
             });
         }
-    }
-
-    public Location getLastKnownLocation() {
-        if (mCurrentLocation == null) {
-            mCurrentLocation = SharedPrefsHelper.getLocation(KEY_LOCATION);
-            Log.v("TimTim", "set location to "+mCurrentLocation);
-        }
-        return mCurrentLocation;
     }
 
     /**

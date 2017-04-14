@@ -680,6 +680,7 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.StringRes;
 import android.support.v7.view.ContextThemeWrapper;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -791,6 +792,7 @@ public class DashboardViewContainer implements IDashboardViewContainer {
     public void showNoOffersView(@StringRes int message) {
         hideProgressBar();
         noOffersView.setText(message);
+        noOffersView.setMovementMethod (LinkMovementMethod.getInstance());
         noOffersView.setVisibility(View.VISIBLE);
     }
 
@@ -839,6 +841,9 @@ public class DashboardViewContainer implements IDashboardViewContainer {
 
     @Override
     public void showLocationUnknown() {
+        clearOffers();
+        hideProgressBar();
+
         showNoOffersView(R.string.message_location_unknown);
         checkLocationSettingsButton.setVisibility(View.VISIBLE);
         checkLocationSettingsButton.setOnClickListener(new View.OnClickListener() {

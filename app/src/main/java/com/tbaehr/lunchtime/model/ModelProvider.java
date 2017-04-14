@@ -740,7 +740,7 @@ public class ModelProvider {
 
     private static final int MINUTE = 60 * 1000;
 
-    private static final int[] RADIUS = new int[] { 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000 };
+    private static final int[] RADIUS = new int[] { 10,20 };//1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000 };
 
     /**
      * The number of offer sections that should be shown (if any offers are available)

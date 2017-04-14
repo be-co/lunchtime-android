@@ -41,7 +41,7 @@
     <string name="starts">Starts </string>
     <string name="ends">Ends </string>
     <string name="expired">Expired</string>
-    <string name="no_offers">Lunchtime does not have found any offers in range.\n\nSoon you can enter an address to see what you can eat.</string>
+    <string name="no_offers">Lunchtime does not have found any offers in range.\n\nDo you like to share your favorite restaurant? <a href="mailto:info@lunchtimeapp.de?Subject=Restaurantvorschlag">info@lunchtimeapp.de</a></string>
     <string name="excellentChoice">Excellent choice!</string>
     <string name="no_offers_today1">No offers for today, my friends think you are a cooking genius.</string>
     <string name="no_offers_today2">No offers for today, the secret to a clean kitchen is simple, don\'t cook.</string>

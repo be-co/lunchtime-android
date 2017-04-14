@@ -41,7 +41,7 @@
     <string name="starts">Ab </string>
     <string name="ends">Bis </string>
     <string name="expired">Abgelaufen</string>
-    <string name="no_offers">Im Umkreis von 5 km kennt Lunchtime leider noch keine Restaurants.\n\nIn Kürze kannst Du hier eine Adresse eingeben, um herauszufinden, was Du essen kannst.</string>
+    <string name="no_offers">In dieser Region kennt Lunchtime leider noch keine Restaurants.\n\nMöchtest Du uns Dein Lieblingsrestaurant verraten? <a href="mailto:info@lunchtimeapp.de?Subject=Restaurantvorschlag">info@lunchtimeapp.de</a></string>
     <string name="excellentChoice">Hervorragende Wahl!</string>
     <string name="no_offers_today1">Heute keine Angebote verfügbar, mein Tipp: Alles nochmal Menü passieren lassen.</string>
     <string name="no_offers_today2">Heute keine Angebote verfügbar, mache Gebrauch von Deinem Burger-Recht, gehe wählen.</string>

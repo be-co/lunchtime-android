@@ -8,7 +8,7 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 19
-        versionName "2017.04.13"
+        versionName "2017.04.14"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

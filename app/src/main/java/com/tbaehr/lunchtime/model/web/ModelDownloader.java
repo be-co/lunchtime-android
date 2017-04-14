@@ -685,7 +685,6 @@ import android.util.Log;
 
 import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.utils.ImageUtils;
-import com.tbaehr.lunchtime.utils.LocationHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -700,13 +699,13 @@ import java.util.List;
  */
 public class ModelDownloader {
 
-    private static final String BASE_URI = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/%1$s/";
+    private static final String BASE_URI = "http://www.c-c-w.de/fileadmin/ccw/user_upload/android/json/";
 
-    private static final String URI_NEARBY_RESTAURANTS = BASE_URI + "nearby_restaurants_%2$s.json";
+    private static final String URI_NEARBY_RESTAURANTS = BASE_URI + "nearby_restaurants.json";
 
-    private static final String URI_RESTAURANT = BASE_URI + "restaurant_%2$s.json";
+    private static final String URI_RESTAURANT = BASE_URI + "restaurant_%1$s.json";
 
-    private static final String URI_OFFER = BASE_URI + "offers_%2$s.json";
+    private static final String URI_OFFER = BASE_URI + "offers_%1$s.json";
 
     private static ModelDownloader instance;
 
@@ -721,26 +720,22 @@ public class ModelDownloader {
         // ;
     }
 
-    public void downloadNearby(@NonNull final String locationId, @Nullable final LoadJobListener<String> callback) {
-        String uri = String.format(URI_NEARBY_RESTAURANTS, locationId.toLowerCase(), locationId.toLowerCase());
-        downloadFromServer(uri, callback);
+    public void downloadNearby(@Nullable final LoadJobListener<String> callback) {
+        downloadFromServer(URI_NEARBY_RESTAURANTS, callback);
     }
 
     public void downloadRestaurantOffers(@NonNull final String restaurantId, @Nullable final LoadJobListener<String> callback) {
         // TODO: Use locationId of restaurant instead
-        String locationId = LocationHelper.getSelectedLocation().toLowerCase();
-        String uri = String.format(URI_OFFER, locationId, restaurantId);
+        String uri = String.format(URI_OFFER, restaurantId);
         downloadFromServer(uri, callback);
     }
 
     public void downloadRestaurant(@NonNull final String restaurantId, @Nullable final LoadJobListener<String> callback) {
-        // TODO: Use locationId of restaurant instead
-        String locationId = LocationHelper.getSelectedLocation().toLowerCase();
-        String uri = String.format(URI_RESTAURANT, locationId, restaurantId);
+        String uri = String.format(URI_RESTAURANT, restaurantId);
         downloadFromServer(uri, callback);
     }
 
-    private void downloadFromServer(@NonNull final String uri, @NonNull final LoadJobListener<String> callback) {
+    private void downloadFromServer(@NonNull final String uri, @Nullable final LoadJobListener<String> callback) {
         new AsyncTask<Void, Void, Void>() {
             private String result;
 
@@ -749,7 +744,9 @@ public class ModelDownloader {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                callback.onDownloadStarted();
+                if (callback != null) {
+                    callback.onDownloadStarted();
+                }
             }
 
             @Override
@@ -778,6 +775,10 @@ public class ModelDownloader {
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
+                if (callback == null) {
+                    return;
+                }
+
                 if (errorMessage != null) {
                     callback.onDownloadFailed(errorMessage);
                 } else {

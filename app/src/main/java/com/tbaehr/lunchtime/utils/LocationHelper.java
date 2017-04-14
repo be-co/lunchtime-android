@@ -687,6 +687,7 @@ public class LocationHelper {
 
     private static int selectedLocationIndex = -1;
 
+    @Deprecated
     public static CharSequence[] getLocations() {
         return new CharSequence[] {"Weiterstadt", "Darmstadt"};
     }
@@ -695,6 +696,7 @@ public class LocationHelper {
         return selectedLocationIndex != -1 ? selectedLocationIndex : SharedPrefsHelper.getInt(KEY_SELECTED_LOCATION_INDEX, 0);
     }
 
+    @Deprecated
     public static String getSelectedLocation() {
         return (String) getLocations()[getSelectedLocationIndex()];
     }

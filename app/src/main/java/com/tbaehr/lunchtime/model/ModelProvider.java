@@ -740,7 +740,7 @@ public class ModelProvider {
 
     private static final int MINUTE = 60 * 1000;
 
-    private static final int[] RADIUS = new int[] { 10,20 };//1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000 };
+    private static final int[] RADIUS = new int[] { 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000 };
 
     /**
      * The number of offer sections that should be shown (if any offers are available)
@@ -776,7 +776,6 @@ public class ModelProvider {
     }
 
     private void getNearbyAsync(@NonNull final NearbyChangeListener callback, boolean forceUpdate) {
-        final String locationId = LocationHelper.getSelectedLocation();
         NearbyRestaurants nearby = null;
         try {
             // try to reload if cached nearby has syntax errors
@@ -787,7 +786,7 @@ public class ModelProvider {
         long now = System.currentTimeMillis();
         if (nearby == null || lastSync + MINUTE < now || forceUpdate) {
             lastSync = now;
-            ModelDownloader.getInstance().downloadNearby(locationId, new LoadJobListener<String>() {
+            ModelDownloader.getInstance().downloadNearby(new LoadJobListener<String>() {
                 @Override
                 public void onDownloadStarted() {
                     callback.loadingStarted();
@@ -812,7 +811,7 @@ public class ModelProvider {
                         protected Void doInBackground(Void... voids) {
                             try {
                                 result = ModelParser.getInstance().parseNearbyRestaurants(nearbyJson);
-                                ModelCache.getInstance().putNearby(nearbyJson, locationId);
+                                ModelCache.getInstance().putNearby(nearbyJson);
                             } catch (JSONException e) {
                                 tracker.trackException(e);
                             }

@@ -694,7 +694,7 @@ import static com.tbaehr.lunchtime.utils.SharedPrefsHelper.putString;
  */
 public class ModelCache {
 
-    private static final String KEY_NEARBY_OFFERS = "nearby_offers_%s";
+    private static final String KEY_NEARBY_OFFERS = "nearby_offers";
 
     private static final String KEY_RESTAURANT = "restaurant_%s";
 
@@ -717,9 +717,8 @@ public class ModelCache {
         return instance;
     }
 
-    public void putNearby(String jsonText, String locationId) {
-        final String keySync = String.format(KEY_NEARBY_OFFERS, locationId.toLowerCase());
-        putString(keySync, jsonText);
+    public void putNearby(String jsonText) {
+        putString(KEY_NEARBY_OFFERS, jsonText);
     }
 
     public void putRestaurant(String jsonText, String restaurantId, DateTime dateUpdated) {

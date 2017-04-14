@@ -793,6 +793,7 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         final IMasterPageViewContainer view = getView();
         toolbarTitle = getDashboardTitle();
         view.setToolbarTitle(toolbarTitle);
+        // TODO: Enter adress or current location (instead now)
         view.setOnTitleClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View clickedView) {

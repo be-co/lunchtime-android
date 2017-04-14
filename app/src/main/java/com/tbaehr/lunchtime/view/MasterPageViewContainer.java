@@ -693,6 +693,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -833,6 +834,37 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
         searchView = (MaterialSearchView) activity.findViewById(R.id.search_view);
         searchView.setMenuItem(searchItem);
         searchView.setHint(activity.getString(R.string.searchview_hint_enter_address));
+
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //Do some magic
+                Log.v("TimTim2", "onQueryTextSubmit("+query+")");
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                //Do some magic
+                Log.v("TimTim2", "onQueryTextChange("+newText+")");
+                searchView.setSuggestions(new String[] {"Aktueller Standort", newText, "Darmstadt", "Darmstadt Stadtmitte", "Darmstadt, T-Online-Allee", "Weiterstadt", "Weiterstadt, Loop5", "Weiterstadt, Skoda"});
+                return false;
+            }
+        });
+
+        searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+            @Override
+            public void onSearchViewShown() {
+                Log.v("TimTim2", "onSearchViewShown()");
+                //Do some magic
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                Log.v("TimTim2", "onSearchViewClosed()");
+                //Do some magic, close keyboard
+            }
+        });
 
         return true;
     }

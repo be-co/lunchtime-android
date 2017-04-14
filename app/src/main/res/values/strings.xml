@@ -115,5 +115,6 @@
     <string name="and">,</string>
     <string name="today">Today</string>
     <string name="choose_location">Choose location</string>
+    <string name="searchview_hint_enter_address">Enter addres</string>
 
 </resources>

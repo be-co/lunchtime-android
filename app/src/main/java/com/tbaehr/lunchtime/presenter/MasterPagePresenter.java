@@ -684,6 +684,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -843,6 +844,16 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         activeFragment = null;
         activity = null;
         super.onDestroy();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        IMasterPageViewContainer view = getView();
+        if (view != null) {
+            return view.inflateSearchView(menu);
+        }
+
+        return false;
     }
 
     private String getDashboardTitle() {

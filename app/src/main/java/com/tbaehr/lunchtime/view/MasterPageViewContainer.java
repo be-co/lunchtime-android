@@ -693,9 +693,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DashboardFragment;
 import com.tbaehr.lunchtime.controller.HelpFragment;
@@ -737,8 +739,12 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     @BindView(R.id.app_bar_layout)
     AppBarLayout appBarLayout;
 
-    @BindView(R.id.location_mode_button)
-    ImageView locationModeButton;
+    /**
+     * The location mode picker item inside the toolbar.
+     */
+    MenuItem searchItem;
+
+    MaterialSearchView searchView;
 
     @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbar;
@@ -793,7 +799,7 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
 
     @Override
     public void setLocationModeIcon(boolean listeningOnLocation) {
-        locationModeButton.setImageResource(listeningOnLocation ? R.drawable.ic_location_white : R.drawable.ic_location_off_white);
+        searchItem.setIcon(listeningOnLocation ? R.drawable.ic_location_white : R.drawable.ic_location_off_white);
     }
 
     @Override
@@ -817,6 +823,18 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     @Override
     public void reloadOffers(boolean clearOffers) {
         fragmentHolder.reloadOffers(clearOffers);
+    }
+
+    @Override
+    public boolean inflateSearchView(Menu menu) {
+        activity.getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        searchItem = menu.findItem(R.id.action_search);
+        searchView = (MaterialSearchView) activity.findViewById(R.id.search_view);
+        searchView.setMenuItem(searchItem);
+        searchView.setHint(activity.getString(R.string.searchview_hint_enter_address));
+
+        return true;
     }
 
     @Override

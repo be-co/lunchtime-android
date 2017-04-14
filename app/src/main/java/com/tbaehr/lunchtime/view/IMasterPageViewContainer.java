@@ -680,6 +680,7 @@ import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 import android.view.View;
 
 import com.tbaehr.lunchtime.localization.LocationListener;
@@ -714,4 +715,6 @@ public interface IMasterPageViewContainer extends LocationListener {
     void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults);
 
     void reloadOffers(boolean clearOffers);
+
+    boolean inflateSearchView(Menu menu);
 }

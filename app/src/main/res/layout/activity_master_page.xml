@@ -46,18 +46,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     app:layout_collapseMode="pin"
-                    app:layout_scrollFlags="scroll|enterAlways">
+                    app:layout_scrollFlags="scroll|enterAlways" />
 
-                    <ImageView
-                        android:id="@+id/location_mode_button"
-                        android:layout_width="?attr/actionBarSize"
-                        android:layout_height="?attr/actionBarSize"
-                        android:layout_gravity="right"
-                        android:paddingBottom="16dp"
-                        android:paddingTop="16dp"
-                        android:src="@drawable/ic_location_white" />
-
-                </android.support.v7.widget.Toolbar>
+                <com.miguelcatalan.materialsearchview.MaterialSearchView
+                    android:id="@+id/search_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/searchview_hint_enter_address"
+                    app:layout_collapseMode="pin"
+                    app:layout_scrollFlags="scroll|enterAlways" />
 
             </android.support.design.widget.CollapsingToolbarLayout>
 

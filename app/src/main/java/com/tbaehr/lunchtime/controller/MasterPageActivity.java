@@ -678,6 +678,7 @@ package com.tbaehr.lunchtime.controller;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.Menu;
 
 import com.tbaehr.lunchtime.presenter.MasterPagePresenter;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
@@ -719,6 +720,11 @@ public class MasterPageActivity extends BaseActivity<IMasterPageViewContainer, M
         if (!view.onBackPressed()) {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return getPresenter().onCreateOptionsMenu(menu);
     }
 
     @Override

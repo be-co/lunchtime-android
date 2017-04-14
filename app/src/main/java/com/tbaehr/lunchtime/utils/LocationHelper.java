@@ -683,28 +683,29 @@ import com.tbaehr.lunchtime.model.ModelProvider;
  */
 public class LocationHelper {
 
-    private static final String KEY_SELECTED_LOCATION_INDEX = "selected location index";
-
-    private static int selectedLocationIndex = -1;
-
-    @Deprecated
-    public static CharSequence[] getLocations() {
-        return new CharSequence[] {"Weiterstadt", "Darmstadt"};
+    public enum LocationMode {
+        CURRENT_LOCATION,
+        ADDRESS;
     }
 
-    public static int getSelectedLocationIndex() {
-        return selectedLocationIndex != -1 ? selectedLocationIndex : SharedPrefsHelper.getInt(KEY_SELECTED_LOCATION_INDEX, 0);
+    private static final String KEY_ADRESS = "entered address";
+
+    private static LocationMode mLocationMode;
+
+    private static String mAddress;
+
+    public static void setLocationMode(LocationMode locationMode) {
+        mLocationMode = locationMode;
     }
 
-    @Deprecated
-    public static String getSelectedLocation() {
-        return (String) getLocations()[getSelectedLocationIndex()];
+    public static LocationMode getLocationMode() {
+        return mLocationMode;
     }
 
-    public static void setSelectedLocationIndex(int index) {
-        selectedLocationIndex = index;
+    public static void setAddress(String address) {
+        mAddress = address;
         ModelProvider.getInstance().resetLastSync();
-        SharedPrefsHelper.putInt(KEY_SELECTED_LOCATION_INDEX, index);
+        SharedPrefsHelper.putString(KEY_ADRESS, address);
     }
 
 }

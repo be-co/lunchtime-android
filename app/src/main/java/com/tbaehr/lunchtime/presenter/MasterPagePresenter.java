@@ -689,7 +689,6 @@ import android.view.View;
 
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.localization.LocationListener;
-import com.tbaehr.lunchtime.utils.LocationHelper;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
 
 import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_DASHBOARD_FRAGMENT;
@@ -797,11 +796,10 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         view.setOnTitleClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View clickedView) {
-                view.openLocationPicker(LocationHelper.getLocations(), LocationHelper.getSelectedLocationIndex(), new DialogInterface.OnClickListener() {
+                view.openLocationPicker(new String[] {"Aktueller Standort", "Adresse"}, 0, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int selectedItemIndex) {
-                        LocationHelper.setSelectedLocationIndex(selectedItemIndex);
-                        toolbarTitle = LocationHelper.getSelectedLocation();
+                        toolbarTitle = "";
                         view.setToolbarTitle(toolbarTitle);
                         view.reloadOffers(CLEAR_OFFERS);
                         dialogInterface.dismiss();
@@ -841,7 +839,8 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
     }
 
     private String getDashboardTitle() {
-        return LocationHelper.getSelectedLocation();
+        // TODO: What to show here?
+        return "";
     }
 
     private String getString(@StringRes int resId) {

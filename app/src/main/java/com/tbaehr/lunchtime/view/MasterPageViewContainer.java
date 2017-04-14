@@ -694,6 +694,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DashboardFragment;
@@ -735,6 +736,9 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
 
     @BindView(R.id.app_bar_layout)
     AppBarLayout appBarLayout;
+
+    @BindView(R.id.location_mode_button)
+    ImageView locationModeButton;
 
     @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbar;
@@ -785,6 +789,11 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     @Override
     public void setOnTitleClickListener(View.OnClickListener onClickListener) {
         toolbar.setOnClickListener(onClickListener);
+    }
+
+    @Override
+    public void setLocationModeIcon(boolean listeningOnLocation) {
+        locationModeButton.setImageResource(listeningOnLocation ? R.drawable.ic_location_white : R.drawable.ic_location_off_white);
     }
 
     @Override

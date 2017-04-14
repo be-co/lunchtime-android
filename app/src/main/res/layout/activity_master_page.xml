@@ -48,15 +48,14 @@
                     app:layout_collapseMode="pin"
                     app:layout_scrollFlags="scroll|enterAlways">
 
-                    <!-- An image button (if needed)
                     <ImageView
-                        android:id="@+id/action_bar_button"
+                        android:id="@+id/location_mode_button"
                         android:layout_width="?attr/actionBarSize"
                         android:layout_height="?attr/actionBarSize"
                         android:layout_gravity="right"
                         android:paddingBottom="16dp"
                         android:paddingTop="16dp"
-                        android:src="@drawable/ic_funnel" />-->
+                        android:src="@drawable/ic_location_white" />
 
                 </android.support.v7.widget.Toolbar>
 

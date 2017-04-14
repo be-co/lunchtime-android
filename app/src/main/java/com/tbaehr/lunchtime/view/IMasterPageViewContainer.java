@@ -695,6 +695,8 @@ public interface IMasterPageViewContainer extends LocationListener {
 
     void setOnTitleClickListener(View.OnClickListener onClickListener);
 
+    void setLocationModeIcon(boolean listeningOnLocation);
+
     void showDashboardFragment();
 
     void showPreferencesFragment();

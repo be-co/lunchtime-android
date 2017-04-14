@@ -799,7 +799,14 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                 view.openLocationPicker(new String[] {"Aktueller Standort", "Adresse"}, 0, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int selectedItemIndex) {
-                        toolbarTitle = "";
+                        if (selectedItemIndex == 0) {
+                            toolbarTitle = "";
+                            view.setLocationModeIcon(true);
+                        } else {
+                            toolbarTitle = "Darmstadt Stadtmitte";
+                            view.setLocationModeIcon(false);
+                        }
+
                         view.setToolbarTitle(toolbarTitle);
                         view.reloadOffers(CLEAR_OFFERS);
                         dialogInterface.dismiss();

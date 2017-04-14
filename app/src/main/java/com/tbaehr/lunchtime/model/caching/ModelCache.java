@@ -771,9 +771,8 @@ public class ModelCache {
         return cachedDate;
     }
 
-    public String getNearby(@NonNull String locationId) {
-        final String keySync = String.format(KEY_NEARBY_OFFERS, locationId.toLowerCase());
-        return getString(keySync);
+    public String getNearby() {
+        return getString(KEY_NEARBY_OFFERS);
     }
 
     public String getRestaurantOffers(@NonNull String restaurantKey) {

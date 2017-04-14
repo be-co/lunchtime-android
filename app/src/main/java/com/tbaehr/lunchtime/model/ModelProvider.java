@@ -689,7 +689,6 @@ import com.tbaehr.lunchtime.model.web.ModelDownloader;
 import com.tbaehr.lunchtime.tracking.ITracking;
 import com.tbaehr.lunchtime.tracking.LunchtimeTracker;
 import com.tbaehr.lunchtime.utils.DateTime;
-import com.tbaehr.lunchtime.utils.LocationHelper;
 import com.tbaehr.lunchtime.utils.SharedPrefsHelper;
 
 import org.json.JSONException;
@@ -859,8 +858,7 @@ public class ModelProvider {
     }
 
     private NearbyRestaurants getNearby() throws JSONException {
-        final String locationId = LocationHelper.getSelectedLocation();
-        String nearbyJson = ModelCache.getInstance().getNearby(locationId);
+        String nearbyJson = ModelCache.getInstance().getNearby();
         if (nearbyJson != null) {
             NearbyRestaurants nearbyRestaurants = ModelParser.getInstance().parseNearbyRestaurants(nearbyJson);
             return nearbyRestaurants;

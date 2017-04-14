@@ -685,9 +685,6 @@ import android.view.ViewGroup;
 
 import com.tbaehr.lunchtime.localization.LocationListener;
 import com.tbaehr.lunchtime.presenter.DashboardPresenter;
-import com.tbaehr.lunchtime.tracking.CustomDimension;
-import com.tbaehr.lunchtime.tracking.TrackingScreen;
-import com.tbaehr.lunchtime.utils.LocationHelper;
 import com.tbaehr.lunchtime.view.DashboardViewContainer;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
@@ -709,16 +706,6 @@ public class DashboardFragment extends BaseFragment<IDashboardViewContainer, Das
         };
         viewContainer = new DashboardViewContainer(getContext(), inflater, container, listener);
         return viewContainer.getRootView();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        CustomDimension location = new CustomDimension(
-                CustomDimension.CustomDimensionIndex.KEY_LOCATION,
-                LocationHelper.getSelectedLocation()
-        );
-        tracker.trackScreenView(TrackingScreen.DASHBOARD, location);
     }
 
     @Override

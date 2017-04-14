@@ -699,6 +699,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
+import com.miguelcatalan.materialsearchview.SuggestionItem;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DashboardFragment;
 import com.tbaehr.lunchtime.controller.HelpFragment;
@@ -847,7 +848,14 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
             public boolean onQueryTextChange(String newText) {
                 //Do some magic
                 Log.v("TimTim2", "onQueryTextChange("+newText+")");
-                searchView.setSuggestions(new String[] {"Aktueller Standort", newText, "Darmstadt", "Darmstadt Stadtmitte", "Darmstadt, T-Online-Allee", "Weiterstadt", "Weiterstadt, Loop5", "Weiterstadt, Skoda"});
+                SuggestionItem[] suggestionItems = new SuggestionItem[] {
+                        new SuggestionItem(true, R.drawable.ic_location_current_grey, "Aktueller Standort"),
+                        new SuggestionItem(false, R.drawable.ic_location_grey, "Darmstadt, Stadtmitte"),
+                        new SuggestionItem(false, R.drawable.ic_location_grey, "Darmstadt, T-Online-Allee"),
+                        new SuggestionItem(false, R.drawable.ic_location_grey, "Weiterstadt, Loop5"),
+                        new SuggestionItem(false, R.drawable.ic_location_grey, "Weiterstadt, Skoda")
+                };
+                searchView.setSuggestions(suggestionItems);
                 return false;
             }
         });

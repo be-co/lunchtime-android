@@ -796,7 +796,7 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
 
     @Override
     public void setLocationModeIcon(boolean listeningOnLocation) {
-        searchItem.setIcon(listeningOnLocation ? R.drawable.ic_current_location_white : R.drawable.ic_location_white);
+        searchItem.setIcon(listeningOnLocation ? R.drawable.ic_location_current_white : R.drawable.ic_location_white);
     }
 
     @Override

@@ -676,8 +676,6 @@
  */
 package com.tbaehr.lunchtime.view;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -795,26 +793,8 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     }
 
     @Override
-    public void setOnTitleClickListener(View.OnClickListener onClickListener) {
-        toolbar.setOnClickListener(onClickListener);
-    }
-
-    @Override
     public void setLocationModeIcon(boolean listeningOnLocation) {
         searchItem.setIcon(listeningOnLocation ? R.drawable.ic_location_white : R.drawable.ic_location_off_white);
-    }
-
-    @Override
-    public void openLocationPicker(final CharSequence[] options, int checkedItemIndex, DialogInterface.OnClickListener onClickListener) {
-        new AlertDialog.Builder(activity)
-                .setTitle(R.string.choose_location)
-                .setSingleChoiceItems(options, checkedItemIndex, onClickListener)
-                .setPositiveButton(R.string._close, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .show();
     }
 
     @Override
@@ -828,7 +808,7 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     }
 
     @Override
-    public boolean inflateSearchView(Menu menu) {
+    public boolean inflateSearchView(Menu menu, final SuggestionItem[] suggestions) {
         activity.getMenuInflater().inflate(R.menu.menu_main, menu);
 
         searchItem = menu.findItem(R.id.action_search);
@@ -839,23 +819,15 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                Log.v("TimTim2", "Submitted "+query);
                 //Do some magic
-                Log.v("TimTim2", "onQueryTextSubmit("+query+")");
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 //Do some magic
-                Log.v("TimTim2", "onQueryTextChange("+newText+")");
-                SuggestionItem[] suggestionItems = new SuggestionItem[] {
-                        new SuggestionItem(true, R.drawable.ic_location_current_grey, "Aktueller Standort"),
-                        new SuggestionItem(false, R.drawable.ic_location_grey, "Darmstadt, Stadtmitte"),
-                        new SuggestionItem(false, R.drawable.ic_location_grey, "Darmstadt, T-Online-Allee"),
-                        new SuggestionItem(false, R.drawable.ic_location_grey, "Weiterstadt, Loop5"),
-                        new SuggestionItem(false, R.drawable.ic_location_grey, "Weiterstadt, Skoda")
-                };
-                searchView.setSuggestions(suggestionItems);
+                searchView.setSuggestions(suggestions);
                 return false;
             }
         });
@@ -863,18 +835,23 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
         searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
             @Override
             public void onSearchViewShown() {
-                Log.v("TimTim2", "onSearchViewShown()");
                 //Do some magic
             }
 
             @Override
             public void onSearchViewClosed() {
-                Log.v("TimTim2", "onSearchViewClosed()");
-                //Do some magic, close keyboard
+                //Do some magic
             }
         });
 
         return true;
+    }
+
+    @Override
+    public void setLocationModeIconVisibility(boolean visible) {
+        if (searchItem != null) {
+            searchItem.setVisible(visible);
+        }
     }
 
     @Override
@@ -912,9 +889,12 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
             return true;
-        } else {
-            return false;
+        } else if (searchView.isSearchOpen()) {
+            searchView.closeSearch();
+            return true;
         }
+
+        return false;
     }
 
     @Override

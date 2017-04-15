@@ -676,7 +676,6 @@
  */
 package com.tbaehr.lunchtime.presenter;
 
-import android.content.DialogInterface;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -686,8 +685,8 @@ import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
+import com.miguelcatalan.materialsearchview.SuggestionItem;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.localization.LocationListener;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
@@ -745,15 +744,6 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
     }
 
     @Override
-    public void unbindView() {
-        IMasterPageViewContainer view = getView();
-        if (view != null) {
-            view.setOnTitleClickListener(null);
-        }
-        super.unbindView();
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putString(KEY_TOOLBAR_TITLE, toolbarTitle);
         outState.putString(KEY_ACTIVE_FRAGMENT, activeFragment);
@@ -793,8 +783,9 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         final IMasterPageViewContainer view = getView();
         toolbarTitle = getDashboardTitle();
         view.setToolbarTitle(toolbarTitle);
+        view.setLocationModeIconVisibility(true);
         // TODO: Enter adress or current location (instead now)
-        view.setOnTitleClickListener(new View.OnClickListener() {
+        /*view.setOnTitleClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View clickedView) {
                 view.openLocationPicker(new String[] {"Aktueller Standort", "Adresse"}, 0, new DialogInterface.OnClickListener() {
@@ -814,7 +805,7 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                     }
                 });
             }
-        });
+        });*/
         view.showDashboardFragment();
     }
 
@@ -822,20 +813,24 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         activeFragment = TAG_PREFERENCES_FRAGMENT;
 
         IMasterPageViewContainer view = getView();
-        toolbarTitle = getString(R.string.nav_item_preferences);
-        view.setToolbarTitle(toolbarTitle);
-        view.setOnTitleClickListener(null);
-        view.showPreferencesFragment();
+        if (view != null) {
+            view.setLocationModeIconVisibility(false);
+            toolbarTitle = getString(R.string.nav_item_preferences);
+            view.setToolbarTitle(toolbarTitle);
+            view.showPreferencesFragment();
+        }
     }
 
     private void presentHelpPage() {
         activeFragment = TAG_HELP_FRAGMENT;
 
         IMasterPageViewContainer view = getView();
-        toolbarTitle = getString(R.string.nav_item_help);
-        view.setToolbarTitle(toolbarTitle);
-        view.setOnTitleClickListener(null);
-        view.showHelpFragment();
+        if (view != null) {
+            view.setLocationModeIconVisibility(false);
+            toolbarTitle = getString(R.string.nav_item_help);
+            view.setToolbarTitle(toolbarTitle);
+            view.showHelpFragment();
+        }
     }
 
     @Override
@@ -850,14 +845,21 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
     public boolean onCreateOptionsMenu(Menu menu) {
         IMasterPageViewContainer view = getView();
         if (view != null) {
-            return view.inflateSearchView(menu);
+            SuggestionItem[] suggestionItems = new SuggestionItem[] {
+                    new SuggestionItem(true, R.drawable.ic_location_current_grey, "Aktueller Standort"),
+                    new SuggestionItem(false, R.drawable.ic_location_grey, "Darmstadt, Stadtmitte"),
+                    new SuggestionItem(false, R.drawable.ic_location_grey, "Darmstadt, T-Online-Allee"),
+                    new SuggestionItem(false, R.drawable.ic_location_grey, "Weiterstadt, Loop5"),
+                    new SuggestionItem(false, R.drawable.ic_location_grey, "Weiterstadt, Skoda")
+            };
+            return view.inflateSearchView(menu, suggestionItems);
         }
 
         return false;
     }
 
     private String getDashboardTitle() {
-        // TODO: What to show here?
+        // By default empty
         return "";
     }
 
@@ -885,5 +887,12 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         }
     }
 
+    public boolean onBackPressed() {
+        IMasterPageViewContainer view = getView();
+        if (view != null) {
+            return view.onBackPressed();
+        }
+        return false;
+    }
 
 }

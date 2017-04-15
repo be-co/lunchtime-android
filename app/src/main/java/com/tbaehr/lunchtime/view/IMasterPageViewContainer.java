@@ -676,13 +676,12 @@
  */
 package com.tbaehr.lunchtime.view;
 
-import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
-import android.view.View;
 
+import com.miguelcatalan.materialsearchview.SuggestionItem;
 import com.tbaehr.lunchtime.localization.LocationListener;
 
 /**
@@ -693,8 +692,6 @@ public interface IMasterPageViewContainer extends LocationListener {
     void showToolbar(AppCompatActivity activity, NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener);
 
     void setToolbarTitle(String title);
-
-    void setOnTitleClickListener(View.OnClickListener onClickListener);
 
     void setLocationModeIcon(boolean listeningOnLocation);
 
@@ -710,11 +707,11 @@ public interface IMasterPageViewContainer extends LocationListener {
 
     void syncDrawerToggleButton();
 
-    void openLocationPicker(CharSequence[] options, int checkedItemIndex, DialogInterface.OnClickListener onClickListener);
-
     void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults);
 
     void reloadOffers(boolean clearOffers);
 
-    boolean inflateSearchView(Menu menu);
+    boolean inflateSearchView(Menu menu, SuggestionItem[] suggestions);
+
+    void setLocationModeIconVisibility(boolean visible);
 }

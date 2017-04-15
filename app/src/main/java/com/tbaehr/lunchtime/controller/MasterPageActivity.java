@@ -717,7 +717,7 @@ public class MasterPageActivity extends BaseActivity<IMasterPageViewContainer, M
 
     @Override
     public void onBackPressed() {
-        if (!view.onBackPressed()) {
+        if (!getPresenter().onBackPressed()) {
             super.onBackPressed();
         }
     }

@@ -116,5 +116,5 @@
     <string name="today">Heute</string>
 
     <string name="choose_location">Standortauswahl</string>
-    <string name="searchview_hint_enter_address">Wo willst Du essen?</string>
+    <string name="searchview_hint_enter_address">Ausgangsort festlegen</string>
 </resources>

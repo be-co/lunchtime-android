@@ -689,6 +689,12 @@ import com.tbaehr.lunchtime.localization.LocationListener;
  */
 public interface IMasterPageViewContainer extends LocationListener {
 
+    public interface MaterialSearchViewListener {
+        boolean onQueryTextSubmit(String query);
+
+        SuggestionItem[] onQueryTextChange(String newText);
+    }
+
     void showToolbar(AppCompatActivity activity, NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener);
 
     void setToolbarTitle(String title);
@@ -711,7 +717,7 @@ public interface IMasterPageViewContainer extends LocationListener {
 
     void reloadOffers(boolean clearOffers);
 
-    boolean inflateSearchView(Menu menu, SuggestionItem[] suggestions);
+    boolean inflateSearchView(Menu menu, MaterialSearchViewListener callback);
 
     void setLocationModeIconVisibility(boolean visible);
 }

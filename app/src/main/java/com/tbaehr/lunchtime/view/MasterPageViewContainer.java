@@ -753,6 +753,8 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
 
     private MasterPageActivity activity;
 
+    private MaterialSearchViewListener mSearchViewCallback;
+
     public MasterPageViewContainer(MasterPageActivity activity, FragmentManager fragmentManager) {
         this.activity = activity;
         activity.setContentView(R.layout.activity_master_page);
@@ -794,7 +796,7 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
 
     @Override
     public void setLocationModeIcon(boolean listeningOnLocation) {
-        searchItem.setIcon(listeningOnLocation ? R.drawable.ic_location_white : R.drawable.ic_location_off_white);
+        searchItem.setIcon(listeningOnLocation ? R.drawable.ic_current_location_white : R.drawable.ic_location_white);
     }
 
     @Override
@@ -808,25 +810,26 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     }
 
     @Override
-    public boolean inflateSearchView(Menu menu, final SuggestionItem[] suggestions) {
+    public boolean inflateSearchView(Menu menu, MaterialSearchViewListener searchViewCallback) {
+        Log.v("TimTim2", "inflateSearchView(..)");
         activity.getMenuInflater().inflate(R.menu.menu_main, menu);
+        mSearchViewCallback = searchViewCallback;
 
         searchItem = menu.findItem(R.id.action_search);
         searchView = (MaterialSearchView) activity.findViewById(R.id.search_view);
         searchView.setMenuItem(searchItem);
         searchView.setHint(activity.getString(R.string.searchview_hint_enter_address));
+        searchView.setSubmitOnClick(true);
 
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Log.v("TimTim2", "Submitted "+query);
-                //Do some magic
-                return false;
+                return mSearchViewCallback.onQueryTextSubmit(query);
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                //Do some magic
+                SuggestionItem[] suggestions = mSearchViewCallback.onQueryTextChange(newText);
                 searchView.setSuggestions(suggestions);
                 return false;
             }

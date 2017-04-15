@@ -713,6 +713,14 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
 
     private AppCompatActivity activity;
 
+    private SuggestionItem[] suggestionItems = new SuggestionItem[] {
+            new SuggestionItem(true, R.drawable.ic_location_current_grey, "Aktueller Standort"),
+            new SuggestionItem(false, R.drawable.ic_location_grey, "Darmstadt, Stadtmitte"),
+            new SuggestionItem(false, R.drawable.ic_location_grey, "Darmstadt, T-Online-Allee"),
+            new SuggestionItem(false, R.drawable.ic_location_grey, "Weiterstadt, Loop5"),
+            new SuggestionItem(false, R.drawable.ic_location_grey, "Weiterstadt, Skoda")
+    };
+
     public MasterPagePresenter(AppCompatActivity activity) {
         this.activity = activity;
     }
@@ -784,28 +792,6 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         toolbarTitle = getDashboardTitle();
         view.setToolbarTitle(toolbarTitle);
         view.setLocationModeIconVisibility(true);
-        // TODO: Enter adress or current location (instead now)
-        /*view.setOnTitleClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View clickedView) {
-                view.openLocationPicker(new String[] {"Aktueller Standort", "Adresse"}, 0, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int selectedItemIndex) {
-                        if (selectedItemIndex == 0) {
-                            toolbarTitle = "";
-                            view.setLocationModeIcon(true);
-                        } else {
-                            toolbarTitle = "Darmstadt Stadtmitte";
-                            view.setLocationModeIcon(false);
-                        }
-
-                        view.setToolbarTitle(toolbarTitle);
-                        view.reloadOffers(CLEAR_OFFERS);
-                        dialogInterface.dismiss();
-                    }
-                });
-            }
-        });*/
         view.showDashboardFragment();
     }
 
@@ -843,16 +829,33 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        IMasterPageViewContainer view = getView();
-        if (view != null) {
-            SuggestionItem[] suggestionItems = new SuggestionItem[] {
-                    new SuggestionItem(true, R.drawable.ic_location_current_grey, "Aktueller Standort"),
-                    new SuggestionItem(false, R.drawable.ic_location_grey, "Darmstadt, Stadtmitte"),
-                    new SuggestionItem(false, R.drawable.ic_location_grey, "Darmstadt, T-Online-Allee"),
-                    new SuggestionItem(false, R.drawable.ic_location_grey, "Weiterstadt, Loop5"),
-                    new SuggestionItem(false, R.drawable.ic_location_grey, "Weiterstadt, Skoda")
-            };
-            return view.inflateSearchView(menu, suggestionItems);
+        if (getView() != null) {
+            return getView().inflateSearchView(menu, new IMasterPageViewContainer.MaterialSearchViewListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    IMasterPageViewContainer view = getView();
+                    if (getView() == null) {
+                        return false;
+                    }
+
+                    if (query.equals(suggestionItems[0].getText())) {
+                        toolbarTitle = "";
+                        view.setLocationModeIcon(true);
+                    } else {
+                        toolbarTitle = query;
+                        view.setLocationModeIcon(false);
+                    }
+
+                    view.setToolbarTitle(toolbarTitle);
+                    view.reloadOffers(CLEAR_OFFERS);
+                    return false;
+                }
+
+                @Override
+                public SuggestionItem[] onQueryTextChange(String newText) {
+                    return suggestionItems;
+                }
+            });
         }
 
         return false;

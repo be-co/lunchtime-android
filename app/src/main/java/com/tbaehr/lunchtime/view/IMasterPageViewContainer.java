@@ -679,6 +679,7 @@ package com.tbaehr.lunchtime.view;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 
 import com.miguelcatalan.materialsearchview.SuggestionItem;
 import com.tbaehr.lunchtime.localization.LocationListener;
@@ -716,9 +717,9 @@ public interface IMasterPageViewContainer extends LocationListener {
 
     void reloadOffers(boolean clearOffers);
 
-    //void inflateSearchView(MaterialSearchViewListener callback);
+    void inflateSearchView(MaterialSearchViewListener callback);
 
-    //boolean inflateLocationModeIcon(Menu menu);
+    boolean inflateLocationModeIcon(Menu menu, boolean listeningOnLocation);
 
     void setLocationModeIconVisibility(boolean visible);
 }

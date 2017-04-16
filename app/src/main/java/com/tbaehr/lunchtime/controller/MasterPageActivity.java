@@ -678,6 +678,8 @@ package com.tbaehr.lunchtime.controller;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
@@ -686,6 +688,8 @@ import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
 import com.tbaehr.lunchtime.view.MasterPageViewContainer;
 
 public class MasterPageActivity extends BaseActivity<IMasterPageViewContainer, MasterPagePresenter> {
+
+    private static final String TAG = "MasterPageActivity";
 
     private IMasterPageViewContainer mView;
 
@@ -702,6 +706,7 @@ public class MasterPageActivity extends BaseActivity<IMasterPageViewContainer, M
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+        Log.v("TimTim2", "onPostCreate");
         getPresenter().onPostCreate(savedInstanceState);
     }
 
@@ -727,26 +732,20 @@ public class MasterPageActivity extends BaseActivity<IMasterPageViewContainer, M
         }
     }
 
-    /*@Override
+    @Override
+    public void onPresenterProvided(MasterPagePresenter presenter) {
+        super.onPresenterProvided(presenter);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        searchItem = menu.findItem(R.id.action_search);
-        searchView = (MaterialSearchView) findViewById(R.id.search_view);
-        searchView.setMenuItem(searchItem);
-
-        return true;
-
-        /*mMenu = menu;
-        if (mPresenter == null) {
-            mPresenter = getPresenter();
-        }
-        if (mPresenter != null) {
-            return mPresenter.onCreateOptionsMenu(mMenu);
+        if (getPresenter() != null) {
+            return getPresenter().onCreateOptionsMenu(menu);
         } else {
-            Log.e("TimTim2", "Could not inflate menu");
+            Log.e(TAG, "Could not inflate menu");
             return false;
         }
-    }*/
+    }
 
     @Override
     protected void onDestroy() {

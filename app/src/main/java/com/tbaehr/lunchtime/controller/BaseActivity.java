@@ -780,9 +780,9 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     protected String mLastUpdateTime;
 
-    private P presenter;
+    private P mPresenter;
 
-    protected ITracking tracker;
+    protected ITracking mTracker;
 
     /**
      * Tracks the status of the location updates request. Value changes when the user presses the
@@ -798,7 +798,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tracker = ((LunchtimeApplication) getApplication()).getTracker();
+        mTracker = ((LunchtimeApplication) getApplication()).getTracker();
 
         mLastUpdateTime = "";
 
@@ -824,13 +824,13 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
             startLocationUpdates();
         }
-        presenter.onResume();
+        mPresenter.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        presenter.onPause();
+        mPresenter.onPause();
         if (mGoogleApiClient.isConnected()) {
             stopLocationUpdates();
         }
@@ -840,12 +840,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     public void onStop() {
         super.onStop();
         mGoogleApiClient.disconnect();
-    }
-
-    @Override
-    protected void onDestroy() {
-        presenter = null;
-        super.onDestroy();
     }
 
     // Android Lifecycle
@@ -929,7 +923,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     // BEGIN
 
     public P getPresenter() {
-        return presenter;
+        return mPresenter;
     }
 
     @Override
@@ -940,7 +934,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     @Override
     public void onPresenterProvided(P presenter) {
         super.onPresenterProvided(presenter);
-        this.presenter = presenter;
+        this.mPresenter = presenter;
     }
 
     private void tellPresenterLocationChanged() {
@@ -1053,7 +1047,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     // END
 
     public ITracking getTracker() {
-        return tracker;
+        return mTracker;
     }
 
     /**

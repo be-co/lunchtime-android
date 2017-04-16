@@ -682,12 +682,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.miguelcatalan.materialsearchview.SuggestionItem;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.BaseActivity;
 import com.tbaehr.lunchtime.localization.LocationListener;
+import com.tbaehr.lunchtime.utils.LocationHelper;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
 
 import java.util.HashMap;
@@ -727,7 +729,7 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         fillOfflineModeLocationSuggestions();
 
         if (savedInstanceState == null) {
-            toolbarTitle = getDashboardTitle();
+            toolbarTitle = "";
             activeFragment = TAG_DASHBOARD_FRAGMENT;
         } else {
             toolbarTitle = savedInstanceState.getString(KEY_TOOLBAR_TITLE);
@@ -787,7 +789,7 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
             presentPreferencesPage();
         }
 
-        /*IMasterPageViewContainer.MaterialSearchViewListener listener = new IMasterPageViewContainer.MaterialSearchViewListener() {
+        IMasterPageViewContainer.MaterialSearchViewListener listener = new IMasterPageViewContainer.MaterialSearchViewListener() {
             SuggestionItem[] suggestionItems = getSuggestionItems();
 
             @Override
@@ -827,7 +829,7 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                 return suggestionItems;
             }
         };
-        view.inflateSearchView(listener);*/
+        view.inflateSearchView(listener);
     }
 
     @Override
@@ -868,10 +870,19 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         activeFragment = TAG_DASHBOARD_FRAGMENT;
 
         final IMasterPageViewContainer view = getView();
-        toolbarTitle = getDashboardTitle();
-        view.setToolbarTitle(toolbarTitle);
-        view.setLocationModeIconVisibility(true);
-        view.showDashboardFragment();
+        if (view != null) {
+            view.setLocationModeIconVisibility(true);
+            boolean modeCurrentLocation = LocationHelper.getLocationMode().equals(LocationHelper.LocationMode.CURRENT_LOCATION);
+            if (modeCurrentLocation) {
+                toolbarTitle = "";
+                view.setLocationModeIcon(true);
+            } else {
+                toolbarTitle = LocationHelper.getPinnedLocationName();
+                view.setLocationModeIcon(false);
+            }
+            view.setToolbarTitle(toolbarTitle);
+            view.showDashboardFragment();
+        }
     }
 
     private void presentPreferencesPage() {
@@ -906,18 +917,14 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         super.onDestroy();
     }
 
-    /*@Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (getView() != null) {
-            return getView().inflateLocationModeIcon(menu);
+            boolean modeCurrentLocation = LocationHelper.getLocationMode().equals(LocationHelper.LocationMode.CURRENT_LOCATION);
+            return getView().inflateLocationModeIcon(menu, modeCurrentLocation);
         }
 
         return false;
-    }*/
-
-    private String getDashboardTitle() {
-        // By default empty
-        return "";
     }
 
     private String getString(@StringRes int resId) {

@@ -691,10 +691,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
+import com.miguelcatalan.materialsearchview.SuggestionItem;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DashboardFragment;
 import com.tbaehr.lunchtime.controller.HelpFragment;
@@ -811,20 +813,19 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
         fragmentHolder.reloadOffers(clearOffers);
     }
 
-    /*@Override
-    public boolean inflateLocationModeIcon(Menu menu) {
-        Log.v("TimTim2", "inflateLocationModeIcon(..)");
+    @Override
+    public boolean inflateLocationModeIcon(Menu menu, boolean listeningOnLocation) {
         activity.getMenuInflater().inflate(R.menu.menu_main, menu);
         searchItem = menu.findItem(R.id.action_search);
         searchView = (MaterialSearchView) activity.findViewById(R.id.search_view);
         searchView.setMenuItem(searchItem);
+        setLocationModeIcon(listeningOnLocation);
 
         return true;
-    }*/
+    }
 
-    /*@Override
+    @Override
     public void inflateSearchView(MaterialSearchViewListener searchViewCallback) {
-        Log.v("TimTim2", "inflateSearchView(..)");
         mSearchViewCallback = searchViewCallback;
 
         activity.searchView = (MaterialSearchView) activity.findViewById(R.id.search_view);
@@ -856,7 +857,7 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
                 //Do some magic
             }
         });
-    }*/
+    }
 
     @Override
     public void setLocationModeIconVisibility(boolean visible) {

@@ -1172,6 +1172,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         if (LocationHelper.getLocationMode().equals(LocationHelper.LocationMode.ADDRESS)) {
             Location enteredLocation = LocationHelper.getPinnedLocation();
             onLocationChanged(enteredLocation);
+            return;
         }
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED

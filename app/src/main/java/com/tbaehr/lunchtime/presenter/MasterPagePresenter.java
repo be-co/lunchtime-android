@@ -682,14 +682,15 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
-import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.miguelcatalan.materialsearchview.SuggestionItem;
 import com.tbaehr.lunchtime.R;
+import com.tbaehr.lunchtime.controller.BaseActivity;
 import com.tbaehr.lunchtime.localization.LocationListener;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
+
+import java.util.HashMap;
 
 import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_DASHBOARD_FRAGMENT;
 import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_HELP_FRAGMENT;
@@ -711,23 +712,19 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
 
     private String activeFragment;
 
-    private AppCompatActivity activity;
+    private BaseActivity activity;
 
-    private SuggestionItem[] suggestionItems = new SuggestionItem[] {
-            new SuggestionItem(true, R.drawable.ic_location_current_grey, "Aktueller Standort"),
-            new SuggestionItem(false, R.drawable.ic_location_grey, "Darmstadt, Stadtmitte"),
-            new SuggestionItem(false, R.drawable.ic_location_grey, "Darmstadt, T-Online-Allee"),
-            new SuggestionItem(false, R.drawable.ic_location_grey, "Weiterstadt, Loop5"),
-            new SuggestionItem(false, R.drawable.ic_location_grey, "Weiterstadt, Skoda")
-    };
+    private HashMap<String, Location> offlineModeLocations;
 
-    public MasterPagePresenter(AppCompatActivity activity) {
+    public MasterPagePresenter(BaseActivity activity) {
         this.activity = activity;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        fillOfflineModeLocationSuggestions();
 
         if (savedInstanceState == null) {
             toolbarTitle = getDashboardTitle();
@@ -736,6 +733,44 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
             toolbarTitle = savedInstanceState.getString(KEY_TOOLBAR_TITLE);
             activeFragment = savedInstanceState.getString(KEY_ACTIVE_FRAGMENT);
         }
+    }
+
+    private SuggestionItem[] getSuggestionItems() {
+        SuggestionItem[] suggestionItems = new SuggestionItem[offlineModeLocations.keySet().size()+1];
+        suggestionItems[0] = new SuggestionItem(true, R.drawable.ic_location_current_grey, activity.getString(R.string.searchview_current_location));
+        String[] offlineSuggestions = offlineModeLocations.keySet().toArray(new String[0]);
+        for (int i = 1; i < suggestionItems.length; i++) {
+            suggestionItems[i] = new SuggestionItem(false, R.drawable.ic_location_grey, offlineSuggestions[i-1]);
+        }
+        return suggestionItems;
+    }
+
+    private void fillOfflineModeLocationSuggestions() {
+        offlineModeLocations = new HashMap<>();
+
+        Location daStadtmitte = new Location("persistent");
+        daStadtmitte.setLatitude(49.872828d);
+        daStadtmitte.setLongitude(8.651212d);
+        daStadtmitte.setAccuracy(1);
+        offlineModeLocations.put("Darmstadt, Stadtmitte", daStadtmitte);
+
+        Location daT_OnlineAlle = new Location("persistent");
+        daT_OnlineAlle.setLatitude(49.864311d);
+        daT_OnlineAlle.setLongitude(8.626370d);
+        daT_OnlineAlle.setAccuracy(1);
+        offlineModeLocations.put("Darmstadt, T-Online-Allee", daT_OnlineAlle);
+
+        Location weiterstadtLoop5 = new Location("persistent");
+        weiterstadtLoop5.setLatitude(49.892242d);
+        weiterstadtLoop5.setLongitude(8.606656d);
+        weiterstadtLoop5.setAccuracy(1);
+        offlineModeLocations.put("Weiterstadt, Loop5", weiterstadtLoop5);
+
+        Location frankfurtPlatzDerEinheit = new Location("persistent");
+        frankfurtPlatzDerEinheit.setLatitude(50.111500d);
+        frankfurtPlatzDerEinheit.setLongitude(8.654205);
+        frankfurtPlatzDerEinheit.setAccuracy(1);
+        offlineModeLocations.put("Frankfurt, Platz der Einheit", frankfurtPlatzDerEinheit);
     }
 
     @Override
@@ -748,7 +783,51 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
             presentDashboard();
         } else if (activeFragment.equals(TAG_HELP_FRAGMENT)) {
             presentHelpPage();
+        } else if (activeFragment.equals(TAG_PREFERENCES_FRAGMENT)) {
+            presentPreferencesPage();
         }
+
+        /*IMasterPageViewContainer.MaterialSearchViewListener listener = new IMasterPageViewContainer.MaterialSearchViewListener() {
+            SuggestionItem[] suggestionItems = getSuggestionItems();
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                IMasterPageViewContainer view = getView();
+                if (getView() == null) {
+                    return false;
+                }
+
+                if (query.equals(suggestionItems[0].getText())) {
+                    toolbarTitle = "";
+                    view.setLocationModeIcon(true);
+                    LocationHelper.setLocationMode(LocationHelper.LocationMode.CURRENT_LOCATION);
+                    activity.requestLocationUpdates();
+                } else {
+                    toolbarTitle = query;
+                    view.setLocationModeIcon(false);
+                    LocationHelper.setLocationMode(LocationHelper.LocationMode.ADDRESS);
+
+                    if (offlineModeLocations.containsKey(query)) {
+                        Location pinnedLocation = offlineModeLocations.get(query);
+                        LocationHelper.setPinnedLocation(query, pinnedLocation);
+                        onLocationChanged(pinnedLocation);
+                    } else {
+                        // TODO: Implementation
+                    }
+                    activity.stopLocationUpdates();
+                }
+
+                view.setToolbarTitle(toolbarTitle);
+                view.reloadOffers(CLEAR_OFFERS);
+                return false;
+            }
+
+            @Override
+            public SuggestionItem[] onQueryTextChange(String newText) {
+                return suggestionItems;
+            }
+        };
+        view.inflateSearchView(listener);*/
     }
 
     @Override
@@ -827,39 +906,14 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         super.onDestroy();
     }
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (getView() != null) {
-            return getView().inflateSearchView(menu, new IMasterPageViewContainer.MaterialSearchViewListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    IMasterPageViewContainer view = getView();
-                    if (getView() == null) {
-                        return false;
-                    }
-
-                    if (query.equals(suggestionItems[0].getText())) {
-                        toolbarTitle = "";
-                        view.setLocationModeIcon(true);
-                    } else {
-                        toolbarTitle = query;
-                        view.setLocationModeIcon(false);
-                    }
-
-                    view.setToolbarTitle(toolbarTitle);
-                    view.reloadOffers(CLEAR_OFFERS);
-                    return false;
-                }
-
-                @Override
-                public SuggestionItem[] onQueryTextChange(String newText) {
-                    return suggestionItems;
-                }
-            });
+            return getView().inflateLocationModeIcon(menu);
         }
 
         return false;
-    }
+    }*/
 
     private String getDashboardTitle() {
         // By default empty

@@ -117,4 +117,5 @@
 
     <string name="choose_location">Standortauswahl</string>
     <string name="searchview_hint_enter_address">Ausgangsort festlegen</string>
+    <string name="searchview_current_location">Aktueller Standort</string>
 </resources>

@@ -710,6 +710,7 @@ import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.presenter.CustomBasePresenter;
 import com.tbaehr.lunchtime.tracking.ITracking;
+import com.tbaehr.lunchtime.utils.LocationHelper;
 import com.tbaehr.lunchtime.utils.SharedPrefsHelper;
 
 import java.text.DateFormat;
@@ -1174,6 +1175,11 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * Usually called inside onResume()
      */
     public void requestLocationUpdates() {
+        if (LocationHelper.getLocationMode().equals(LocationHelper.LocationMode.ADDRESS)) {
+            Location enteredLocation = LocationHelper.getPinnedLocation();
+            onLocationChanged(enteredLocation);
+        }
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             alertDialogRequestingLocationPermission();

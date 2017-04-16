@@ -691,13 +691,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
-import com.miguelcatalan.materialsearchview.SuggestionItem;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DashboardFragment;
 import com.tbaehr.lunchtime.controller.HelpFragment;
@@ -762,6 +759,9 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
         View rootView = activity.findViewById(R.id.drawer_layout);
         ButterKnife.bind(this, rootView);
         fragmentHolder = new FragmentHolder(fragmentManager);
+
+        searchItem = activity.searchItem;
+        searchView = activity.searchView;
     }
 
     @Override
@@ -796,7 +796,9 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
 
     @Override
     public void setLocationModeIcon(boolean listeningOnLocation) {
-        searchItem.setIcon(listeningOnLocation ? R.drawable.ic_location_current_white : R.drawable.ic_location_white);
+        if (searchItem != null) {
+            searchItem.setIcon(listeningOnLocation ? R.drawable.ic_location_current_white : R.drawable.ic_location_white);
+        }
     }
 
     @Override
@@ -809,19 +811,27 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
         fragmentHolder.reloadOffers(clearOffers);
     }
 
-    @Override
-    public boolean inflateSearchView(Menu menu, MaterialSearchViewListener searchViewCallback) {
-        Log.v("TimTim2", "inflateSearchView(..)");
+    /*@Override
+    public boolean inflateLocationModeIcon(Menu menu) {
+        Log.v("TimTim2", "inflateLocationModeIcon(..)");
         activity.getMenuInflater().inflate(R.menu.menu_main, menu);
-        mSearchViewCallback = searchViewCallback;
-
         searchItem = menu.findItem(R.id.action_search);
         searchView = (MaterialSearchView) activity.findViewById(R.id.search_view);
         searchView.setMenuItem(searchItem);
-        searchView.setHint(activity.getString(R.string.searchview_hint_enter_address));
-        searchView.setSubmitOnClick(true);
 
-        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+        return true;
+    }*/
+
+    /*@Override
+    public void inflateSearchView(MaterialSearchViewListener searchViewCallback) {
+        Log.v("TimTim2", "inflateSearchView(..)");
+        mSearchViewCallback = searchViewCallback;
+
+        activity.searchView = (MaterialSearchView) activity.findViewById(R.id.search_view);
+        activity.searchView.setHint(activity.getString(R.string.searchview_hint_enter_address));
+        activity.searchView.setSubmitOnClick(true);
+
+        activity.searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return mSearchViewCallback.onQueryTextSubmit(query);
@@ -830,12 +840,12 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
             @Override
             public boolean onQueryTextChange(String newText) {
                 SuggestionItem[] suggestions = mSearchViewCallback.onQueryTextChange(newText);
-                searchView.setSuggestions(suggestions);
+                activity.searchView.setSuggestions(suggestions);
                 return false;
             }
         });
 
-        searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+        activity.searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
             @Override
             public void onSearchViewShown() {
                 //Do some magic
@@ -846,9 +856,7 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
                 //Do some magic
             }
         });
-
-        return true;
-    }
+    }*/
 
     @Override
     public void setLocationModeIconVisibility(boolean visible) {

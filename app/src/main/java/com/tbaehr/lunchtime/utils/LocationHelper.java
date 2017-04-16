@@ -676,6 +676,8 @@
  */
 package com.tbaehr.lunchtime.utils;
 
+import android.location.Location;
+
 import com.tbaehr.lunchtime.model.ModelProvider;
 
 /**
@@ -690,9 +692,13 @@ public class LocationHelper {
 
     private static final String KEY_ADRESS = "entered address";
 
-    private static LocationMode mLocationMode;
+    private static final String KEY_PINNED_LOCATION = "pinned location";
 
-    private static String mAddress;
+    private static LocationMode mLocationMode = LocationMode.CURRENT_LOCATION;
+
+    private static String mAddressQualifier;
+
+    private static Location mPinnedLocation;
 
     public static void setLocationMode(LocationMode locationMode) {
         mLocationMode = locationMode;
@@ -702,10 +708,25 @@ public class LocationHelper {
         return mLocationMode;
     }
 
-    public static void setAddress(String address) {
-        mAddress = address;
+    public static Location getPinnedLocation() {
+        if (mPinnedLocation == null) {
+            mPinnedLocation = SharedPrefsHelper.getLocation(KEY_PINNED_LOCATION);
+        }
+        return mPinnedLocation;
+    }
+
+    public static String getPinnedLocationName() {
+        return mAddressQualifier;
+    }
+
+    public static void setPinnedLocation(String pinnedLocationName, Location pinnedLocation) {
         ModelProvider.getInstance().resetLastSync();
-        SharedPrefsHelper.putString(KEY_ADRESS, address);
+
+        mAddressQualifier = pinnedLocationName;
+        SharedPrefsHelper.putString(KEY_ADRESS, pinnedLocationName);
+
+        mPinnedLocation = pinnedLocation;
+        SharedPrefsHelper.putLocation(KEY_PINNED_LOCATION, pinnedLocation);
     }
 
 }

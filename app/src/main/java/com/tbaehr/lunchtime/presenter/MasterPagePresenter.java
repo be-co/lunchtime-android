@@ -689,6 +689,7 @@ import com.miguelcatalan.materialsearchview.SuggestionItem;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.BaseActivity;
 import com.tbaehr.lunchtime.localization.LocationListener;
+import com.tbaehr.lunchtime.model.ModelProvider;
 import com.tbaehr.lunchtime.utils.LocationHelper;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
 
@@ -802,7 +803,10 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                 if (query.equals(suggestionItems[0].getText())) {
                     toolbarTitle = "";
                     view.setLocationModeIcon(true);
-                    LocationHelper.setLocationMode(LocationHelper.LocationMode.CURRENT_LOCATION);
+                    if (LocationHelper.getLocationMode().equals(LocationHelper.LocationMode.ADDRESS)) {
+                        LocationHelper.setLocationMode(LocationHelper.LocationMode.CURRENT_LOCATION);
+                        ModelProvider.getInstance().resetLastSync();
+                    }
                     activity.requestLocationUpdates();
                 } else {
                     toolbarTitle = query;

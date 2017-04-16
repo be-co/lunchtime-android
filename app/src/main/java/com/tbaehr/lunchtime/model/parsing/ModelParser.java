@@ -914,7 +914,7 @@ public class ModelParser {
                 ingredientList.add(Offer.Ingredient.PORK);
             }
         }
-        if (contains(offerText, "Beef", "Hirsch", "Lamm", "Ochse", "Wildbraten", "Rumpsteak", "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Rindswurst", "Carne", "Hacksteak", "Bockwurst")) {
+        if (contains(offerText, "Kalb", "Beef", "Hirsch", "Lamm", "Ochse", "Wildbraten", "Rumpsteak", "Wildgeschnetzeltes", "Wildgulasch", "Hack", "Rind", "Rindswurst", "Carne", "Hacksteak", "Bockwurst")) {
             ingredientList.add(Offer.Ingredient.COW);
         }
         if (contains(offerText, "Chicken", "Ente", "Coq", "Gans", "Geflügel", "Hähnchen", "Huhn", "Hühner", "Pute", "Truthahn")) {

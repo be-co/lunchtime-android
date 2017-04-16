@@ -823,6 +823,8 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         super.onResume();
         if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
             startLocationUpdates();
+        } else {
+            mGoogleApiClient.connect();
         }
         mPresenter.onResume();
     }
@@ -1088,7 +1090,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         // application will never receive updates faster than this value.
         mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
 
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
     }
 
     /**

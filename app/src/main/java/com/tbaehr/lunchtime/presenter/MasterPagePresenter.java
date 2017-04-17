@@ -823,6 +823,7 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                     toolbarTitle = query;
                     view.setLocationModeIcon(false);
                     LocationHelper.setLocationMode(LocationHelper.LocationMode.ADDRESS);
+                    activity.stopLocationUpdates();
 
                     if (offlineModeLocations.containsKey(query)) {
                         Location pinnedLocation = offlineModeLocations.get(query);
@@ -868,7 +869,6 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                             }
                         }.execute();
                     }
-                    activity.stopLocationUpdates();
                 }
 
                 view.setToolbarTitle(toolbarTitle);
@@ -884,7 +884,7 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                     @Override
                     protected SuggestionItem[] doInBackground(Void... params) {
                         try {
-                            if (newText.isEmpty()) {
+                            if (newText.isEmpty() || newText.equals(suggestionItems[0].getText())) {
                                 return suggestionItems;
                             }
 

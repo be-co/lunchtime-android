@@ -715,7 +715,7 @@ public interface IMasterPageViewContainer extends LocationListener {
 
     void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults);
 
-    void reloadOffers(boolean clearOffers);
+    void reloadOffers(boolean silent, boolean clearOffers);
 
     void inflateSearchView(MaterialSearchViewListener callback);
 

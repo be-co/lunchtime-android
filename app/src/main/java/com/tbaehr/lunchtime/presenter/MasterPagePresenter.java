@@ -711,6 +711,8 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
 
     private final static boolean CLEAR_OFFERS = true;
 
+    private static final boolean NON_SILENT_REFRESH = false;
+
     private String toolbarTitle;
 
     private String activeFragment;
@@ -806,6 +808,7 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                     if (LocationHelper.getLocationMode().equals(LocationHelper.LocationMode.ADDRESS)) {
                         LocationHelper.setLocationMode(LocationHelper.LocationMode.CURRENT_LOCATION);
                         ModelProvider.getInstance().resetLastSync();
+                        view.reloadOffers(NON_SILENT_REFRESH, CLEAR_OFFERS);
                     }
                     activity.requestLocationUpdates();
                 } else {
@@ -823,10 +826,10 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                         // 2. Feedback inside UI that something is happening, progress bar with message or smth.
                     }
                     activity.stopLocationUpdates();
+                    view.reloadOffers(NON_SILENT_REFRESH, CLEAR_OFFERS);
                 }
 
                 view.setToolbarTitle(toolbarTitle);
-                view.reloadOffers(CLEAR_OFFERS);
                 return false;
             }
 

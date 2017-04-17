@@ -743,7 +743,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         if (cachedOffers == null || cachedOffers.size() == 0) {
             getView().showLoadingOffers();
         }
-        refreshOffers(false);
+        refreshOffers(true, false);
     }
 
     @Override
@@ -786,7 +786,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        refreshOffers(false);
+                        refreshOffers(true, false);
                     }
                 });
             }
@@ -994,7 +994,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         activity.startActivity(openFetchOrderActivityIntent);
     }
 
-    public void refreshOffers(boolean forceUpdate) {
+    public void refreshOffers(boolean silentRefresh, boolean forceUpdate) {
         Log.v("TimTim", "DashboardPresenter.refreshOffers("+forceUpdate+")");
         IDashboardViewContainer view = getView();
 
@@ -1005,7 +1005,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
             return;
         }
 
-        if (forceUpdate && view != null) {
+        if (!silentRefresh && view != null) {
             view.clearOffers();
             view.showLoadingOffers();
         }
@@ -1016,7 +1016,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_REQUEST_CODE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             cachedOffers = null;
-            refreshOffers(true);
+            refreshOffers(false, true);
         }
     }
 
@@ -1024,7 +1024,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     public void onLocationChanged(Location location) {
         lastKnownLocation = location;
         Log.i("TimTim", "DashboardPresenter.onLocationChanged(" + location + ")");
-        refreshOffers(false);
+        refreshOffers(true, false);
     }
 
     @Override

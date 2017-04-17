@@ -1173,7 +1173,8 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     public void requestLocationUpdates() {
         if (LocationHelper.getLocationMode().equals(LocationHelper.LocationMode.ADDRESS)) {
             Location enteredLocation = LocationHelper.getPinnedLocation();
-            onLocationChanged(enteredLocation);
+            mCurrentLocation = enteredLocation;
+            tellPresenterLocationChanged();
             return;
         }
 

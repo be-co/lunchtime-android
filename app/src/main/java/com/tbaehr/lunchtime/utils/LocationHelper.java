@@ -735,17 +735,16 @@ public class LocationHelper {
         SharedPrefsHelper.putLocation(KEY_PINNED_LOCATION, pinnedLocation);
     }
 
-    public static Address getAddressFromPlace(String enteredAddress) throws IOException {
+    public static List<Address> getAddressFromPlace(String enteredAddress) throws IOException {
         Geocoder coder = new Geocoder(LunchtimeApplication.getContext());
-        List<Address> address;
+        List<Address> foundPlaces;
 
-        address = coder.getFromLocationName(enteredAddress, 5);
-        if (address == null || address.size() == 0) {
+        foundPlaces = coder.getFromLocationName(enteredAddress, 5);
+        if (foundPlaces == null || foundPlaces.size() == 0) {
             throw new IOException("Could not find a place for the entered address: "+enteredAddress);
         }
 
-        Address location = address.get(0);
-        return location;
+        return foundPlaces;
     }
 
 }

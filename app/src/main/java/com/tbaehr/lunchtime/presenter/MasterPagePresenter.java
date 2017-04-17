@@ -698,6 +698,7 @@ import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_DASHBOARD_FRAGMENT;
 import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_HELP_FRAGMENT;
@@ -831,8 +832,10 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                             @Override
                             protected Address doInBackground(Void... params) {
                                 try {
-                                    Address address = LocationHelper.getAddressFromPlace(query);
-                                    return address;
+                                    List<Address> foundPlaces = LocationHelper.getAddressFromPlace(query);
+                                    if (foundPlaces.size() > 0) {
+                                        return foundPlaces.get(0);
+                                    }
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }

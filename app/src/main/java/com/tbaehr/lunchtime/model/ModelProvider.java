@@ -680,6 +680,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.model.caching.ModelCache;
@@ -910,11 +911,7 @@ public class ModelProvider {
                         }
 
                         private void publishOffers() {
-                            try {
-                                callback.pickUp(stripByDistance(allOffers));
-                            } catch (RestaurantOffers.DistanceNotAvailableException e) {
-                                callback.failed();
-                            }
+                            callback.pickUp(stripByDistance(allOffers));
                         }
                     });
                 }
@@ -959,15 +956,19 @@ public class ModelProvider {
         return stripByDistance(allOffers);
     }
 
-    private List<RestaurantOffers> stripByDistance(Set<RestaurantOffers> inputOffers) throws RestaurantOffers.DistanceNotAvailableException {
+    private List<RestaurantOffers> stripByDistance(Set<RestaurantOffers> inputOffers) {
         List<RestaurantOffers> output = new ArrayList<>();
 
         for (RestaurantOffers offers : inputOffers) {
-            float distance = offers.getDistanceInMeters();
-            if (distance > RADIUS[selectedRadius]) {
-                continue;
+            try {
+                float distance = offers.getDistanceInMeters();
+                if (distance > RADIUS[selectedRadius]) {
+                    continue;
+                }
+                output.add(offers);
+            } catch (RestaurantOffers.DistanceNotAvailableException e) {
+                Log.e("TimTim", "Distance for "+offers.getRestaurantId()+" is not available.");
             }
-            output.add(offers);
         }
 
         if (output.size() < MINIMUM_OFFER_SECTIONS) {

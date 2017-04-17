@@ -676,7 +676,9 @@
  */
 package com.tbaehr.lunchtime.presenter;
 
+import android.location.Address;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -684,6 +686,7 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.miguelcatalan.materialsearchview.SuggestionItem;
 import com.tbaehr.lunchtime.R;
@@ -693,6 +696,7 @@ import com.tbaehr.lunchtime.model.ModelProvider;
 import com.tbaehr.lunchtime.utils.LocationHelper;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_DASHBOARD_FRAGMENT;
@@ -796,8 +800,8 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
             SuggestionItem[] suggestionItems = getSuggestionItems();
 
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                IMasterPageViewContainer view = getView();
+            public boolean onQueryTextSubmit(final String query) {
+                final IMasterPageViewContainer view = getView();
                 if (getView() == null) {
                     return false;
                 }
@@ -820,13 +824,42 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                         Location pinnedLocation = offlineModeLocations.get(query);
                         LocationHelper.setPinnedLocation(query, pinnedLocation);
                         onLocationChanged(pinnedLocation);
+                        view.reloadOffers(NON_SILENT_REFRESH, CLEAR_OFFERS);
                     } else {
-                        // TODO: Implementation
-                        // 1. Async job try to find location from entered "address"
-                        // 2. Feedback inside UI that something is happening, progress bar with message or smth.
+                        view.onLocationLookupStarted();
+                        new AsyncTask<Void, Void, Address>() {
+                            @Override
+                            protected Address doInBackground(Void... params) {
+                                try {
+                                    Address address = LocationHelper.getAddressFromPlace(query);
+                                    return address;
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Address address) {
+                                super.onPostExecute(address);
+
+                                Location pinnedLocation = new Location("Geocoder");
+                                pinnedLocation.setLatitude(address.getLatitude());
+                                pinnedLocation.setLongitude(address.getLongitude());
+
+                                if (pinnedLocation != null) {
+                                    LocationHelper.setPinnedLocation(address.getFeatureName(), pinnedLocation);
+                                    onLocationChanged(pinnedLocation);
+                                } else {
+                                    Toast.makeText(activity, R.string.failed_to_resolve_place, Toast.LENGTH_SHORT).show();
+                                    LocationHelper.setLocationMode(LocationHelper.LocationMode.CURRENT_LOCATION);
+                                    view.reloadOffers(NON_SILENT_REFRESH, CLEAR_OFFERS);
+                                    presentDashboard();
+                                }
+                            }
+                        }.execute();
                     }
                     activity.stopLocationUpdates();
-                    view.reloadOffers(NON_SILENT_REFRESH, CLEAR_OFFERS);
                 }
 
                 view.setToolbarTitle(toolbarTitle);

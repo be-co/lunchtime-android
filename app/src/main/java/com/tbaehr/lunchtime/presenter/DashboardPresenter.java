@@ -995,7 +995,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     }
 
     public void refreshOffers(boolean silentRefresh, boolean forceUpdate) {
-        Log.v("TimTim", "DashboardPresenter.refreshOffers("+forceUpdate+")");
+        Log.v("TimTim", "DashboardPresenter.refreshOffers | "+(forceUpdate?"forced update":"")+(silentRefresh?", refresh silent":"")+")");
         IDashboardViewContainer view = getView();
 
         if (lastKnownLocation == null) {

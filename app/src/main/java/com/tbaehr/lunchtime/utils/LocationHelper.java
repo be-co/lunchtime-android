@@ -676,9 +676,15 @@
  */
 package com.tbaehr.lunchtime.utils;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 
+import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.model.ModelProvider;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by timo.baehr@gmail.com on 21.02.17.
@@ -727,6 +733,19 @@ public class LocationHelper {
 
         mPinnedLocation = pinnedLocation;
         SharedPrefsHelper.putLocation(KEY_PINNED_LOCATION, pinnedLocation);
+    }
+
+    public static Address getAddressFromPlace(String enteredAddress) throws IOException {
+        Geocoder coder = new Geocoder(LunchtimeApplication.getContext());
+        List<Address> address;
+
+        address = coder.getFromLocationName(enteredAddress, 5);
+        if (address == null || address.size() == 0) {
+            throw new IOException("Could not find a place for the entered address.");
+        }
+
+        Address location = address.get(0);
+        return location;
     }
 
 }

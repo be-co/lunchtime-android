@@ -854,7 +854,7 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                                     pinnedLocation.setLatitude(address.getLatitude());
                                     pinnedLocation.setLongitude(address.getLongitude());
 
-                                    String title = address.getFeatureName()+", "+address.getAdminArea();
+                                    String title = addressToString(address);
                                     LocationHelper.setPinnedLocation(title, pinnedLocation);
                                     view.setToolbarTitle(title);
                                     onLocationChanged(pinnedLocation);
@@ -885,7 +885,7 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                     protected SuggestionItem[] doInBackground(Void... params) {
                         try {
                             if (newText.isEmpty()) {
-                                return null;
+                                return suggestionItems;
                             }
 
                             List<Address> foundPlaces = LocationHelper.getAddressFromPlace(newText);

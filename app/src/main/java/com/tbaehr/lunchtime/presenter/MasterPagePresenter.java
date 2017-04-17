@@ -819,6 +819,8 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                         onLocationChanged(pinnedLocation);
                     } else {
                         // TODO: Implementation
+                        // 1. Async job try to find location from entered "address"
+                        // 2. Feedback inside UI that something is happening, progress bar with message or smth.
                     }
                     activity.stopLocationUpdates();
                 }

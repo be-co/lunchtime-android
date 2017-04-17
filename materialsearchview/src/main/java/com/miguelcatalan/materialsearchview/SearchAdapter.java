@@ -1,6 +1,8 @@
 package com.miguelcatalan.materialsearchview;
 
 import android.content.Context;
+import android.os.Build;
+import android.text.Html;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +26,7 @@ public class SearchAdapter extends BaseAdapter implements Filterable {
     private ArrayList<SuggestionItem> data;
     private SuggestionItem[] suggestions;
     private LayoutInflater inflater;
+    private CharSequence mConstraint;
     private boolean ellipsize;
 
     public SearchAdapter(Context context, SuggestionItem[] suggestions) {
@@ -45,6 +48,7 @@ public class SearchAdapter extends BaseAdapter implements Filterable {
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults filterResults = new FilterResults();
+                mConstraint = constraint;
 
                 // Retrieve the autocomplete results.
                 List<SuggestionItem> searchData = new ArrayList<>();
@@ -58,7 +62,7 @@ public class SearchAdapter extends BaseAdapter implements Filterable {
                 } else {
                     for (SuggestionItem suggestionItem : suggestions) {
                         String suggestionText = suggestionItem.getText();
-                        if (suggestionItem.isSticky() || suggestionText.toLowerCase().startsWith(constraint.toString().toLowerCase())) {
+                        if (suggestionItem.isSticky() || suggestionText.toLowerCase().contains(constraint.toString().toLowerCase())) {
                             searchData.add(suggestionItem);
                         }
                     }
@@ -111,7 +115,13 @@ public class SearchAdapter extends BaseAdapter implements Filterable {
 
         SuggestionItem currentListData = getItem(position);
 
-        viewHolder.textView.setText(currentListData.getText());
+        CharSequence suggestionText = fromHtml(currentListData.getText().replace(mConstraint, "<b>"+mConstraint+"</b>"));
+        if (mConstraint.length() > 0) {
+            CharSequence contraintCapital = String.valueOf(mConstraint.charAt(0)).toUpperCase() + mConstraint.subSequence(1, mConstraint.length());
+            suggestionText = fromHtml(currentListData.getText().replace(contraintCapital, "<b>"+contraintCapital+"</b>"));
+        }
+
+        viewHolder.textView.setText(suggestionText);
         viewHolder.imageView.setImageResource(currentListData.getIconRes());
         if (ellipsize) {
             viewHolder.textView.setSingleLine();
@@ -119,6 +129,14 @@ public class SearchAdapter extends BaseAdapter implements Filterable {
         }
 
         return convertView;
+    }
+
+    private CharSequence fromHtml(String text) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            return Html.fromHtml(text);
+        }
     }
 
     private class SuggestionsViewHolder {

@@ -851,8 +851,11 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                                     pinnedLocation.setLatitude(address.getLatitude());
                                     pinnedLocation.setLongitude(address.getLongitude());
 
-                                    LocationHelper.setPinnedLocation(address.getFeatureName(), pinnedLocation);
+                                    String title = address.getFeatureName()+", "+address.getAdminArea();
+                                    LocationHelper.setPinnedLocation(title, pinnedLocation);
+                                    view.setToolbarTitle(title);
                                     onLocationChanged(pinnedLocation);
+                                    activity.stopLocationUpdates();
                                 } else {
                                     Toast.makeText(activity, R.string.failed_to_resolve_place, Toast.LENGTH_LONG).show();
                                     LocationHelper.setLocationMode(LocationHelper.LocationMode.CURRENT_LOCATION);

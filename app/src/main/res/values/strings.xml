@@ -117,6 +117,6 @@
     <string name="choose_location">Choose location</string>
     <string name="searchview_hint_enter_address">Where do you want to eat?</string>
     <string name="searchview_current_location">Aktueller Standort</string>
-    <string name="failed_to_resolve_place">Failed to resolve entered place</string>
+    <string name="failed_to_resolve_place">Failed to resolve entered place. Switching to mode "current location".</string>
 
 </resources>

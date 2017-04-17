@@ -843,15 +843,15 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
                             protected void onPostExecute(Address address) {
                                 super.onPostExecute(address);
 
-                                Location pinnedLocation = new Location("Geocoder");
-                                pinnedLocation.setLatitude(address.getLatitude());
-                                pinnedLocation.setLongitude(address.getLongitude());
+                                if (address != null) {
+                                    Location pinnedLocation = new Location("Geocoder");
+                                    pinnedLocation.setLatitude(address.getLatitude());
+                                    pinnedLocation.setLongitude(address.getLongitude());
 
-                                if (pinnedLocation != null) {
                                     LocationHelper.setPinnedLocation(address.getFeatureName(), pinnedLocation);
                                     onLocationChanged(pinnedLocation);
                                 } else {
-                                    Toast.makeText(activity, R.string.failed_to_resolve_place, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(activity, R.string.failed_to_resolve_place, Toast.LENGTH_LONG).show();
                                     LocationHelper.setLocationMode(LocationHelper.LocationMode.CURRENT_LOCATION);
                                     view.reloadOffers(NON_SILENT_REFRESH, CLEAR_OFFERS);
                                     presentDashboard();

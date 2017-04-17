@@ -741,7 +741,7 @@ public class LocationHelper {
 
         address = coder.getFromLocationName(enteredAddress, 5);
         if (address == null || address.size() == 0) {
-            throw new IOException("Could not find a place for the entered address.");
+            throw new IOException("Could not find a place for the entered address: "+enteredAddress);
         }
 
         Address location = address.get(0);

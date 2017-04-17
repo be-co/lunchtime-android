@@ -692,7 +692,7 @@ public interface IMasterPageViewContainer extends LocationListener {
     public interface MaterialSearchViewListener {
         boolean onQueryTextSubmit(String query);
 
-        SuggestionItem[] onQueryTextChange(String newText);
+        void onQueryTextChange(String newText);
     }
 
     void showToolbar(AppCompatActivity activity, NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener);
@@ -720,6 +720,8 @@ public interface IMasterPageViewContainer extends LocationListener {
     void inflateSearchView(MaterialSearchViewListener callback);
 
     boolean inflateLocationModeIcon(Menu menu, boolean listeningOnLocation);
+
+    void setSearchViewSuggestions(SuggestionItem[] suggestions);
 
     void setLocationModeIconVisibility(boolean visible);
 }

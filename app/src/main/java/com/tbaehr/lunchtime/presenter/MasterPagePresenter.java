@@ -684,6 +684,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -800,6 +801,8 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         IMasterPageViewContainer.MaterialSearchViewListener listener = new IMasterPageViewContainer.MaterialSearchViewListener() {
             SuggestionItem[] suggestionItems = getSuggestionItems();
 
+            AsyncTask mTask;
+
             @Override
             public boolean onQueryTextSubmit(final String query) {
                 final IMasterPageViewContainer view = getView();
@@ -873,11 +876,72 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
             }
 
             @Override
-            public SuggestionItem[] onQueryTextChange(String newText) {
-                return suggestionItems;
+            public void onQueryTextChange(final String newText) {
+                if (mTask != null) {
+                    mTask.cancel(true);
+                }
+                mTask = new AsyncTask<Void, Void, SuggestionItem[]>() {
+                    @Override
+                    protected SuggestionItem[] doInBackground(Void... params) {
+                        try {
+                            if (newText.isEmpty()) {
+                                return null;
+                            }
+
+                            List<Address> foundPlaces = LocationHelper.getAddressFromPlace(newText);
+                            SuggestionItem[] suggestions = new SuggestionItem[suggestionItems.length + foundPlaces.size()];
+                            suggestions[0] = suggestionItems[0];
+                            int i;
+                            if (foundPlaces.size() == 0) {
+                                return suggestionItems;
+                            }
+                            for (i = 0; i < foundPlaces.size(); i++) {
+                                suggestions[i+1] = new SuggestionItem(false, R.drawable.ic_location_grey, addressToString(foundPlaces.get(i)));
+                            }
+                            i++;
+                            for (int j = 1; j < suggestionItems.length; j++) {
+                                SuggestionItem suggestionItem = suggestionItems[j];
+                                suggestions[i] = suggestionItem;
+                                i++;
+                            }
+
+                            StringBuilder sb = new StringBuilder("[");
+                            for (SuggestionItem s : suggestions) {
+                                sb.append(s.getText()).append(", ");
+                            }
+                            sb.append("]");
+                            Log.v("TimTim", sb.toString());
+
+                            return suggestions;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        return suggestionItems;
+                    }
+
+                    @Override
+                    protected void onPostExecute(SuggestionItem[] suggestionItems) {
+                        super.onPostExecute(suggestionItems);
+                        mTask = null;
+                        if (suggestionItems != null) {
+                            view.setSearchViewSuggestions(suggestionItems);
+                        }
+                    }
+                }.execute();
             }
         };
         view.inflateSearchView(listener);
+    }
+
+    private String addressToString(Address address) {
+        StringBuilder sb = new StringBuilder();
+        if (address.getLocality() != null) {
+            sb.append(address.getLocality());
+        }
+        if (address.getAdminArea() != null) {
+            sb.append(", ").append(address.getAdminArea());
+        }
+        return sb.toString();
     }
 
     @Override

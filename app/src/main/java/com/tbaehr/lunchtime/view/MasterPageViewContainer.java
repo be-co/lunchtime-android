@@ -840,8 +840,7 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                SuggestionItem[] suggestions = mSearchViewCallback.onQueryTextChange(newText);
-                activity.searchView.setSuggestions(suggestions);
+                mSearchViewCallback.onQueryTextChange(newText);
                 return false;
             }
         });
@@ -857,6 +856,11 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
                 //Do some magic
             }
         });
+    }
+
+    @Override
+    public void setSearchViewSuggestions(SuggestionItem[] suggestions) {
+        activity.searchView.setSuggestions(suggestions);
     }
 
     @Override

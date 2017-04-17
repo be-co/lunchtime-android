@@ -684,6 +684,7 @@ import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.model.ModelProvider;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -737,11 +738,19 @@ public class LocationHelper {
 
     public static List<Address> getAddressFromPlace(String enteredAddress) throws IOException {
         Geocoder coder = new Geocoder(LunchtimeApplication.getContext());
-        List<Address> foundPlaces;
+        List<Address> foundPlacesTemp;
 
-        foundPlaces = coder.getFromLocationName(enteredAddress, 5);
-        if (foundPlaces == null || foundPlaces.size() == 0) {
+        foundPlacesTemp = coder.getFromLocationName(enteredAddress, 5);
+        if (foundPlacesTemp == null || foundPlacesTemp.size() == 0) {
             throw new IOException("Could not find a place for the entered address: "+enteredAddress);
+        }
+
+        List<Address> foundPlaces = new ArrayList<>();
+        for (Address address : foundPlacesTemp) {
+            String countryCode = address.getCountryCode();
+            if (countryCode != null && "DE".equals(countryCode)) {
+                foundPlaces.add(address);
+            }
         }
 
         return foundPlaces;

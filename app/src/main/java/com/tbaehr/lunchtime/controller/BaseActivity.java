@@ -1187,6 +1187,8 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         mRequestingLocationUpdates = true;
         if (mGoogleApiClient.isConnected()) {
             startLocationUpdates();
+        } else {
+            mGoogleApiClient.connect();
         }
     }
 

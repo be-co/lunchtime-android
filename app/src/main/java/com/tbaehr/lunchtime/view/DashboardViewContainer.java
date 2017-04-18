@@ -731,6 +731,8 @@ public class DashboardViewContainer implements IDashboardViewContainer {
     @BindView(R.id.progress_bar_loading)
     LinearLayout progressBarLoading;
 
+    private Button mLoadMoreButton;
+
     private OnCheckLocationSettingsListener listener;
 
     private HashMap<String, HorizontalSliderView> sliderViewMap = new HashMap<>();
@@ -761,18 +763,24 @@ public class DashboardViewContainer implements IDashboardViewContainer {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         params.gravity = Gravity.CENTER;
-        Button loadMoreButton = new Button(new ContextThemeWrapper(context, style), null, style);
-        loadMoreButton.setText(R.string.load_more);
-        loadMoreButton.setLayoutParams(params);
+        mLoadMoreButton = new Button(new ContextThemeWrapper(context, style), null, style);
+        mLoadMoreButton.setText(R.string.load_more);
+        mLoadMoreButton.setLayoutParams(params);
 
-        loadMoreButton.setOnClickListener(new View.OnClickListener() {
+        mLoadMoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 listener.onLoadMoreClicked();
             }
         });
 
-        viewContainer.addView(loadMoreButton);
+        viewContainer.addView(mLoadMoreButton);
+    }
+
+    @Override
+    public void hideLoadMoreButton() {
+        viewContainer.removeView(mLoadMoreButton);
+        mLoadMoreButton = null;
     }
 
     @Override

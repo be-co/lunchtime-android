@@ -749,6 +749,10 @@ public class ModelProvider {
 
     private static int selectedRadius = 0;
 
+    private static int strippedOffersSizeOld = 0;
+
+    private static boolean strippedOffersSizeChanged = true;
+
     private static ModelProvider instance;
 
     private static ITracking tracker;
@@ -773,6 +777,8 @@ public class ModelProvider {
     public void resetLastSync() {
         lastSync = -1;
         selectedRadius = 0;
+        strippedOffersSizeOld = 0;
+        strippedOffersSizeChanged = true;
     }
 
     private void getNearbyAsync(@NonNull final NearbyChangeListener callback, boolean forceUpdate) {
@@ -937,7 +943,12 @@ public class ModelProvider {
     }
 
     public boolean canLoadMoreOffers() {
-        return RADIUS.length - 2 > selectedRadius;
+        List<RestaurantOffers> strippedOffers = stripByDistance(allOffers);
+        if (strippedOffers.size() == strippedOffersSizeOld) {
+            strippedOffersSizeChanged = false;
+        }
+        strippedOffersSizeOld = strippedOffers.size();
+        return RADIUS.length - 2 > selectedRadius && strippedOffersSizeChanged;
     }
 
     private boolean increaseMoreOffersCounter() {
@@ -949,11 +960,10 @@ public class ModelProvider {
     }
 
     public List<RestaurantOffers> loadMoreOffers() throws RestaurantOffers.DistanceNotAvailableException {
-        if (!increaseMoreOffersCounter()) {
-            return stripByDistance(allOffers);
-        }
-
-        return stripByDistance(allOffers);
+        increaseMoreOffersCounter();
+        List<RestaurantOffers> strippedOffers = stripByDistance(allOffers);
+        strippedOffersSizeOld = strippedOffers.size();
+        return strippedOffers;
     }
 
     private List<RestaurantOffers> stripByDistance(Set<RestaurantOffers> inputOffers) {

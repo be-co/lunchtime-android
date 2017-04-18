@@ -954,12 +954,15 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
     private void loadMoreOffers() {
         ModelProvider provider = ModelProvider.getInstance();
+        IDashboardViewContainer view = getView();
+        if (view == null) {
+            return;
+        }
         if (provider.canLoadMoreOffers()) {
             List<RestaurantOffers> offers = null;
             try {
                 offers = provider.loadMoreOffers();
             } catch (RestaurantOffers.DistanceNotAvailableException e) {
-                IDashboardViewContainer view = getView();
                 if (view != null) {
                     view.showLocationUnknown();
                     return;
@@ -967,6 +970,8 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
             }
             Log.v("TimTim", "Received "+offers.size()+" offer sections.");
             pickUp(offers);
+        } else {
+            view.hideLoadMoreButton();
         }
     }
 

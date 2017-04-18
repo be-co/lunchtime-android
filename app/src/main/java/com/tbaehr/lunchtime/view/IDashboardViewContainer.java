@@ -715,4 +715,6 @@ public interface IDashboardViewContainer {
     void showSearchingLocation();
 
     void showLocationUnknown();
+
+    void hideLoadMoreButton();
 }

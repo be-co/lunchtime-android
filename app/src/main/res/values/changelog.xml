@@ -1,7 +1,7 @@
 <resources>
     <string name="changelog_header">Changelog</string>
     <string name="changelog"><b>2017.04.22 Alpha (v22)</b>
-        \n•
+        \n•  Load more offers disappears if no further offers are available
         \n\n<b>2017.04.17 Alpha (v21)</b>
         \n•  Support for fix locations and switching between fix and current location
         \n\n<b>2017.04.16 Alpha (v20)</b>

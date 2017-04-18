@@ -952,7 +952,7 @@ public class ModelProvider {
     }
 
     private boolean increaseMoreOffersCounter() {
-        if (canLoadMoreOffers()) {
+        if (RADIUS.length - 2 > selectedRadius) {
             selectedRadius++;
             return true;
         }

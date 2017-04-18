@@ -780,7 +780,7 @@ public class Offer {
                     endDate.updateToNextDay();
                     startDate.updateToNextDay();
                     // if friday shift to monday
-                    if (!(endDate.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY)) {
+                    if (now.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) {
                         endDate.updateToNextDay();
                         startDate.updateToNextDay();
                         endDate.updateToNextDay();
@@ -790,7 +790,7 @@ public class Offer {
                     endDate.updateToNextDay();
                     startDate.updateToNextDay();
                     // if saturday shift to monday
-                    if (!(endDate.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY)) {
+                    if (now.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
                         endDate.updateToNextDay();
                         startDate.updateToNextDay();
                     }

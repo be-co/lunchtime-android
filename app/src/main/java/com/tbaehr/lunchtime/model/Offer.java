@@ -774,6 +774,28 @@ public class Offer {
             try {
                 startDate = DateUtils.createWeekdayDateFromString(starts);
                 endDate = DateUtils.createWeekdayDateFromString(ends);
+                DateTime now = new DateTime();
+
+                if (starts.startsWith("MoFr") && now.after(endDate)) {
+                    endDate.updateToNextDay();
+                    startDate.updateToNextDay();
+                    // if friday shift to monday
+                    if (!(endDate.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY)) {
+                        endDate.updateToNextDay();
+                        startDate.updateToNextDay();
+                        endDate.updateToNextDay();
+                        startDate.updateToNextDay();
+                    }
+                } else if (starts.startsWith("MoSa") && now.after(endDate)) {
+                    endDate.updateToNextDay();
+                    startDate.updateToNextDay();
+                    // if saturday shift to monday
+                    if (!(endDate.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY)) {
+                        endDate.updateToNextDay();
+                        startDate.updateToNextDay();
+                    }
+                }
+
                 // TODO: Mark this offer as "fix offer" that is offered periodically
             } catch (ParseException parseException) {
                 String errorMessage = String.format("Invalid offer %1$s for restaurant %2$s, start date %3$s or end date %4$s could not be parsed.", title, restaurantId, starts, ends);

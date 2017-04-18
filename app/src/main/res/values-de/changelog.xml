@@ -2,6 +2,7 @@
     <string name="changelog_header">Versionshistorie</string>
     <string name="changelog">
         <b>2017.04.22 Alpha (v22)</b>
+        \n•  Eingabe fixer Ausgangsorte entfernt
         \n•  Weitere Angebote laden wird ausgeblendet falls keine weiteren Angebote im Umkraus von 5km zu finden sind
         \n\n<b>2017.04.17 Alpha (v21)</b>
         \n•  Eingabe von fixen Ausgangsorten für Angebotsanzeige (Wechsel zw. aktuellem Standort und Fixort möglich)

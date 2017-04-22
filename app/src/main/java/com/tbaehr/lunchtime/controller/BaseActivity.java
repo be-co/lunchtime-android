@@ -710,6 +710,8 @@ import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.presenter.CustomBasePresenter;
 import com.tbaehr.lunchtime.tracking.ITracking;
+import com.tbaehr.lunchtime.utils.LocationHelper;
+import com.tbaehr.lunchtime.utils.SharedPrefsHelper;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -778,15 +780,15 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     protected String mLastUpdateTime;
 
-    private P presenter;
+    private P mPresenter;
 
-    protected ITracking tracker;
+    protected ITracking mTracker;
 
     /**
      * Tracks the status of the location updates request. Value changes when the user presses the
      * Start Updates and Stop Updates buttons.
      */
-    protected Boolean mRequestingLocationUpdates;
+    protected boolean mRequestingLocationUpdates = false;
 
     private boolean permissionDialogVisible = false;
 
@@ -796,9 +798,8 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tracker = ((LunchtimeApplication) getApplication()).getTracker();
+        mTracker = ((LunchtimeApplication) getApplication()).getTracker();
 
-        mRequestingLocationUpdates = false;
         mLastUpdateTime = "";
 
         // Update values using data stored in the Bundle.
@@ -822,14 +823,16 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         super.onResume();
         if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
             startLocationUpdates();
+        } else {
+            mGoogleApiClient.connect();
         }
-        presenter.onResume();
+        mPresenter.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        presenter.onPause();
+        mPresenter.onPause();
         if (mGoogleApiClient.isConnected()) {
             stopLocationUpdates();
         }
@@ -839,12 +842,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     public void onStop() {
         super.onStop();
         mGoogleApiClient.disconnect();
-    }
-
-    @Override
-    protected void onDestroy() {
-        presenter = null;
-        super.onDestroy();
     }
 
     // Android Lifecycle
@@ -928,7 +925,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     // BEGIN
 
     public P getPresenter() {
-        return presenter;
+        return mPresenter;
     }
 
     @Override
@@ -939,13 +936,21 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     @Override
     public void onPresenterProvided(P presenter) {
         super.onPresenterProvided(presenter);
-        this.presenter = presenter;
+        this.mPresenter = presenter;
     }
 
     private void tellPresenterLocationChanged() {
+        Log.v("TimTim", "tellPresenterLocationChanged()");
         CustomBasePresenter presenter = getPresenter();
         if (presenter != null && presenter instanceof com.tbaehr.lunchtime.localization.LocationListener) {
             ((com.tbaehr.lunchtime.localization.LocationListener) presenter).onLocationChanged(mCurrentLocation);
+        }
+    }
+
+    private void tellPresenterLocationLookupStarted() {
+        CustomBasePresenter presenter = getPresenter();
+        if (presenter != null && presenter instanceof com.tbaehr.lunchtime.localization.LocationListener) {
+            ((com.tbaehr.lunchtime.localization.LocationListener) presenter).onLocationLookupStarted();
         }
     }
 
@@ -994,8 +999,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * {@link com.google.android.gms.location.SettingsApi#checkLocationSettings(GoogleApiClient,
      * LocationSettingsRequest)} method, with the results provided through a {@code PendingResult}.
      */
-    protected void checkLocationSettings() {
-        Log.i(TAG, "checkLocationSettings()");
+    public void checkLocationSettings() {
         PendingResult<LocationSettingsResult> result =
                 LocationServices.SettingsApi.checkLocationSettings(
                         mGoogleApiClient,
@@ -1014,10 +1018,12 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     @Override
     public void onResult(LocationSettingsResult locationSettingsResult) {
+        Log.v("TimTim", "onResult");
         final Status status = locationSettingsResult.getStatus();
         switch (status.getStatusCode()) {
             case LocationSettingsStatusCodes.SUCCESS:
                 // All location settings are satisfied.
+                tellPresenterLocationLookupStarted();
                 startLocationUpdates();
                 break;
             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
@@ -1043,7 +1049,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     // END
 
     public ITracking getTracker() {
-        return tracker;
+        return mTracker;
     }
 
     /**
@@ -1084,7 +1090,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         // application will never receive updates faster than this value.
         mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
 
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
     }
 
     /**
@@ -1100,12 +1106,14 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.v("TimTim", "onActivityResult("+requestCode+", "+requestCode+", "+data+")");
         switch (requestCode) {
             // Check for the integer request code originally supplied to startResolutionForResult()
             case REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
                     // User agreed to make required location settings changes
                     case Activity.RESULT_OK:
+                        tellPresenterLocationLookupStarted();
                         startLocationUpdates();
                         break;
                     // User chose not to make required location settings changes
@@ -1120,10 +1128,10 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * Requests location updates from the FusedLocationApi.
      */
     protected void startLocationUpdates() {
+        Log.v("TimTim", "startLocationUpdates()");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             alertDialogRequestingLocationPermission();
-            //checkLocationSettings();
             return;
         }
 
@@ -1159,14 +1167,17 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         }
     }
 
-    public Location getLastKnownLocation() {
-        return mCurrentLocation;
-    }
-
     /**
      * Usually called inside onResume()
      */
     public void requestLocationUpdates() {
+        if (LocationHelper.getLocationMode().equals(LocationHelper.LocationMode.ADDRESS)) {
+            Location enteredLocation = LocationHelper.getPinnedLocation();
+            mCurrentLocation = enteredLocation;
+            tellPresenterLocationChanged();
+            return;
+        }
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             alertDialogRequestingLocationPermission();
@@ -1176,6 +1187,8 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         mRequestingLocationUpdates = true;
         if (mGoogleApiClient.isConnected()) {
             startLocationUpdates();
+        } else {
+            mGoogleApiClient.connect();
         }
     }
 
@@ -1184,6 +1197,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     @Override
     public void onConnected(Bundle connectionHint) {
+        Log.v("TimTim", "onConnected("+connectionHint+")");
         if (!mRequestingLocationUpdates) {
             return;
         }
@@ -1205,10 +1219,8 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         // user launches the activity,
         // moves to a new location, and then changes the device orientation, the original location
         // is displayed as the activity is re-created.
-        if (mCurrentLocation == null) {
-            mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            onLocationChanged(mCurrentLocation);
-        }
+        mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        onLocationChanged(mCurrentLocation);
 
         startLocationUpdates();
     }
@@ -1218,18 +1230,22 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     @Override
     public void onLocationChanged(Location location) {
+        Log.v("TimTim", "onLocationChanged("+location+")");
         mCurrentLocation = location;
+        SharedPrefsHelper.putLocation(KEY_LOCATION, mCurrentLocation);
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         tellPresenterLocationChanged();
     }
 
     @Override
     public void onConnectionSuspended(int cause) {
+        Log.v("TimTim", "onConnectionSuspended("+cause+")");
         // ;
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
+        Log.v("TimTim", "onConnectionSuspended("+result+")");
         // ;
     }
 }

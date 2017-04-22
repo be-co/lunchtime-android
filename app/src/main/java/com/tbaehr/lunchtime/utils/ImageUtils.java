@@ -34,10 +34,16 @@ public class ImageUtils {
                 Bitmap bitmap;
                 if (!image.exists()) {
                     bitmap = loadBitmapFromServerAndSaveToMemory(url, image);
+                    drawablesResult.add(new BitmapDrawable(LunchtimeApplication.getContext().getResources(), bitmap));
                 } else {
-                    bitmap = loadBitmapFromMemory(image);
+                    try {
+                        bitmap = loadBitmapFromMemory(image);
+                        drawablesResult.add(new BitmapDrawable(LunchtimeApplication.getContext().getResources(), bitmap));
+                    } catch (OutOfMemoryError e) {
+                        // Images can have maximum 4096x4096 px
+                        e.printStackTrace();
+                    }
                 }
-                drawablesResult.add(new BitmapDrawable(LunchtimeApplication.getContext().getResources(), bitmap));
             }
         }
 

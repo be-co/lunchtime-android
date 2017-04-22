@@ -711,13 +711,15 @@ public class DateUtils {
         String parsedWeekDay = parsed[0];
         String[] parsedTime = parsed[1].split(":");
         if (parsed.length == 3) {
+            DateTime now = new DateTime();
+
             int hours = Integer.valueOf(parsedTime[0]);
             int minutes = Integer.valueOf(parsedTime[1]);
             int weekDay;
             int today;
             switch (parsedWeekDay) {
                 case "MoFr":
-                    today = new DateTime().get(Calendar.DAY_OF_WEEK);
+                    today = now.get(Calendar.DAY_OF_WEEK);
                     if (today == Calendar.MONDAY
                             || today == Calendar.TUESDAY
                             || today == Calendar.WEDNESDAY
@@ -729,7 +731,7 @@ public class DateUtils {
                     }
                     break;
                 case "MoSa":
-                    today = new DateTime().get(Calendar.DAY_OF_WEEK);
+                    today = now.get(Calendar.DAY_OF_WEEK);
                     if (today == Calendar.MONDAY
                             || today == Calendar.TUESDAY
                             || today == Calendar.WEDNESDAY

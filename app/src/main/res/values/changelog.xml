@@ -1,6 +1,16 @@
 <resources>
     <string name="changelog_header">Changelog</string>
-    <string name="changelog"><b>2017.04.16 Alpha (v20)</b>
+    <string name="changelog"><b>2017.04.22 Alpha (v22)</b>
+        \n•  Removed the feature to enter fix places inside search view
+        \n•  Load more offers disappears if no further offers are available
+        \n\n<b>2017.04.17 Alpha (v21)</b>
+        \n•  Support for fix locations and switching between fix and current location
+        \n\n<b>2017.04.16 Alpha (v20)</b>
+        \n•  Show limited amount of offers (radius 5km from current location)
+        \n•  Radius can be increased step-wise to show more offers
+        \n•  Message if no offers are in range
+        \n•  Fix location settings out inside the app
+        \n•  Caching of last know location
         \n•  (Fix) Crash at connection timeout when opening detail page
         \n\n<b>2017.04.09 Alpha (v19)</b>
         \n•  Support for parsing RFC3339 date, MEZ, …

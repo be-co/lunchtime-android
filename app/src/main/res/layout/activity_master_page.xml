@@ -46,19 +46,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     app:layout_collapseMode="pin"
-                    app:layout_scrollFlags="scroll|enterAlways">
-
-                    <!-- An image button (if needed)
-                    <ImageView
-                        android:id="@+id/action_bar_button"
-                        android:layout_width="?attr/actionBarSize"
-                        android:layout_height="?attr/actionBarSize"
-                        android:layout_gravity="right"
-                        android:paddingBottom="16dp"
-                        android:paddingTop="16dp"
-                        android:src="@drawable/ic_funnel" />-->
-
-                </android.support.v7.widget.Toolbar>
+                    app:layout_scrollFlags="scroll|enterAlways" />
 
             </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -79,6 +67,12 @@
         </android.support.v4.widget.NestedScrollView>
 
     </android.support.design.widget.CoordinatorLayout>
+
+    <com.miguelcatalan.materialsearchview.MaterialSearchView
+        android:id="@+id/search_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/searchview_hint_enter_address" />
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"

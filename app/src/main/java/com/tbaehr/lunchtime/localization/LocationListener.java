@@ -14,4 +14,6 @@ public interface LocationListener {
      */
     void onLocationChanged(Location location);
 
+    void onLocationLookupStarted();
+
 }

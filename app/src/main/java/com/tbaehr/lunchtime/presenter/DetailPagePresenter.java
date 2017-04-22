@@ -951,9 +951,10 @@ public class DetailPagePresenter extends CustomBasePresenter<IDetailPageViewCont
             String parking = restaurant.getParkingInformation();
             String paymentMethods = restaurant.getPaymentMethods();
             String phone = restaurant.getPhoneNumber();
-            String url = null;
-            if (restaurant.getUrl() != null) {
-                url = restaurant.getUrl().replace("http://www.", "");
+            String url = restaurant.getUrl();
+            if (url != null) {
+                url = url.replace("http://www.", "");
+                url = url.replace("https://www.", "");
             }
             view.setRestaurantData(this, shortDescription, longDescription, location, openingTimes, parking, paymentMethods, openingTimesExpanded, phone, url);
             view.setTitle(restaurant.getName());

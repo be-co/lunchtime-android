@@ -1,6 +1,17 @@
 <resources>
     <string name="changelog_header">Versionshistorie</string>
-    <string name="changelog"><b>2017.04.16 Alpha (v20)</b>
+    <string name="changelog">
+        <b>2017.04.22 Alpha (v22)</b>
+        \n•  Eingabe fixer Ausgangsorte entfernt
+        \n•  Weitere Angebote laden wird ausgeblendet falls keine weiteren Angebote im Umkraus von 5km zu finden sind
+        \n\n<b>2017.04.17 Alpha (v21)</b>
+        \n•  Eingabe von fixen Ausgangsorten für Angebotsanzeige (Wechsel zw. aktuellem Standort und Fixort möglich)
+        \n\n<b>2017.04.16 Alpha (v20)</b>
+        \n•  Begrenzung der Angebote auf maximum 5km zum aktuellen Standort
+        \n•  Radius erhöhen um jeweils 500m um weitere Angebote anzuzeigen
+        \n•  Meldung, wenn im Umkreis von 5km keine Angebote verfügbar sind
+        \n•  Standorteinstellungen korrigieren aus der App heraus
+        \n•  Caching des zuletzt bekannten Standorts
         \n•  (Fix) Crash bei Verbindungszeitüberschreitung beim Öffnen der Detailseite
         \n\n<b>2017.04.09 Alpha (v19)</b>
         \n•  Unterstützung für Datumsformat RFC3339, MEZ, …

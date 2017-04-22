@@ -30,6 +30,8 @@
         \n\nClick \"Accept\" inside the upcoming dialog.
     </string>
     <string name="error_location">Location not available</string>
+    <string name="message_location_unknown">Your Location is not available. Hence, Lunchtime cannot show you the nearby offers.\n\nIn future you can alternatively enter an adress.</string>
+    <string name="message_location_settings_check">Check settings</string>
     <string name="distance_not_available">\?km</string>
     <string name="distance_less100">&lt; 0,1 km</string>
     <string name="distance_km_m" formatted="false">%d,%d km</string>
@@ -39,7 +41,7 @@
     <string name="starts">Starts </string>
     <string name="ends">Ends </string>
     <string name="expired">Expired</string>
-    <string name="no_offers">No offers available</string>
+    <string name="no_offers">Lunchtime does not have found any offers in range.\n\nDo you like to share your favorite restaurant? <a href="mailto:info@lunchtimeapp.de?Subject=Restaurantvorschlag">info@lunchtimeapp.de</a></string>
     <string name="excellentChoice">Excellent choice!</string>
     <string name="no_offers_today1">No offers for today, my friends think you are a cooking genius.</string>
     <string name="no_offers_today2">No offers for today, the secret to a clean kitchen is simple, don\'t cook.</string>
@@ -47,9 +49,11 @@
     <string name="no_offers_today4">No offers for today, a messy kitchen is a sign of happiness.</string>
     <string name="no_offers_today5">No offers for today. The onions aren\'t making me cry, it\'s being in the kitchen in general.</string>
     <string name="status_loading">Loading offers</string>
+    <string name="status_location_lookup">Searching for location</string>
     <string name="status_offer_sync_failed">Updating offers unfortunately failed.</string>
     <string name="status_restaurant_download_failed">Downloading restaurant data  unfortunately failed.</string>
     <string name="status_title_restaurant_download_failed">Failed to download</string>
+    <string name="load_more">Show more</string>
 
     <!-- Preferences page -->
     <string name="preferences_your_date_headline">Your personal data</string>
@@ -111,5 +115,8 @@
     <string name="and">,</string>
     <string name="today">Today</string>
     <string name="choose_location">Choose location</string>
+    <string name="searchview_hint_enter_address">Where do you want to eat?</string>
+    <string name="searchview_current_location">Aktueller Standort</string>
+    <string name="failed_to_resolve_place">Failed to resolve entered place. Switching to mode "current location".</string>
 
 </resources>

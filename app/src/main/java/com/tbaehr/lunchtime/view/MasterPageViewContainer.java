@@ -676,8 +676,6 @@
  */
 package com.tbaehr.lunchtime.view;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -693,8 +691,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
+import com.miguelcatalan.materialsearchview.SuggestionItem;
 import com.tbaehr.lunchtime.R;
 import com.tbaehr.lunchtime.controller.DashboardFragment;
 import com.tbaehr.lunchtime.controller.HelpFragment;
@@ -736,12 +738,21 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     @BindView(R.id.app_bar_layout)
     AppBarLayout appBarLayout;
 
+    /**
+     * The location mode picker item inside the toolbar.
+     */
+    MenuItem searchItem;
+
+    MaterialSearchView searchView;
+
     @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbar;
 
     private FragmentHolder fragmentHolder;
 
     private MasterPageActivity activity;
+
+    private MaterialSearchViewListener mSearchViewCallback;
 
     public MasterPageViewContainer(MasterPageActivity activity, FragmentManager fragmentManager) {
         this.activity = activity;
@@ -750,6 +761,9 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
         View rootView = activity.findViewById(R.id.drawer_layout);
         ButterKnife.bind(this, rootView);
         fragmentHolder = new FragmentHolder(fragmentManager);
+
+        searchItem = activity.searchItem;
+        searchView = activity.searchView;
     }
 
     @Override
@@ -783,21 +797,10 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     }
 
     @Override
-    public void setOnTitleClickListener(View.OnClickListener onClickListener) {
-        toolbar.setOnClickListener(onClickListener);
-    }
-
-    @Override
-    public void openLocationPicker(final CharSequence[] options, int checkedItemIndex, DialogInterface.OnClickListener onClickListener) {
-        new AlertDialog.Builder(activity)
-                .setTitle(R.string.choose_location)
-                .setSingleChoiceItems(options, checkedItemIndex, onClickListener)
-                .setPositiveButton(R.string._close, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .show();
+    public void setLocationModeIcon(boolean listeningOnLocation) {
+        if (searchItem != null) {
+            searchItem.setIcon(listeningOnLocation ? R.drawable.ic_location_current_white : R.drawable.ic_location_white);
+        }
     }
 
     @Override
@@ -806,13 +809,75 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
     }
 
     @Override
-    public void reloadOffers(boolean clearOffers) {
-        fragmentHolder.reloadOffers(clearOffers);
+    public void reloadOffers(boolean silent, boolean clearOffers) {
+        fragmentHolder.reloadOffers(silent, clearOffers);
+    }
+
+    @Override
+    public boolean inflateLocationModeIcon(Menu menu, boolean listeningOnLocation) {
+        activity.getMenuInflater().inflate(R.menu.menu_main, menu);
+        searchItem = menu.findItem(R.id.action_search);
+        searchView = (MaterialSearchView) activity.findViewById(R.id.search_view);
+        searchView.setMenuItem(searchItem);
+        setLocationModeIcon(listeningOnLocation);
+
+        return true;
+    }
+
+    @Override
+    public void inflateSearchView(MaterialSearchViewListener searchViewCallback) {
+        mSearchViewCallback = searchViewCallback;
+
+        activity.searchView = (MaterialSearchView) activity.findViewById(R.id.search_view);
+        activity.searchView.setHint(activity.getString(R.string.searchview_hint_enter_address));
+        activity.searchView.setSubmitOnClick(true);
+
+        activity.searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return mSearchViewCallback.onQueryTextSubmit(query);
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mSearchViewCallback.onQueryTextChange(newText);
+                return false;
+            }
+        });
+
+        activity.searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+            @Override
+            public void onSearchViewShown() {
+                //Do some magic
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                //Do some magic
+            }
+        });
+    }
+
+    @Override
+    public void setSearchViewSuggestions(SuggestionItem[] suggestions) {
+        activity.searchView.setSuggestions(suggestions);
+    }
+
+    @Override
+    public void setLocationModeIconVisibility(boolean visible) {
+        if (searchItem != null) {
+            searchItem.setVisible(visible);
+        }
     }
 
     @Override
     public void onLocationChanged(Location location) {
         fragmentHolder.onLocationChanged(location);
+    }
+
+    @Override
+    public void onLocationLookupStarted() {
+        fragmentHolder.onLocationLookupStarted();
     }
 
     @Override
@@ -840,9 +905,12 @@ public class MasterPageViewContainer implements IMasterPageViewContainer {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
             return true;
-        } else {
-            return false;
+        } else if (searchView.isSearchOpen()) {
+            searchView.closeSearch();
+            return true;
         }
+
+        return false;
     }
 
     @Override
@@ -886,8 +954,8 @@ class FragmentHolder {
         activeFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    void reloadOffers(boolean clearOffers) {
-        dashboard.reloadOffers(clearOffers);
+    void reloadOffers(boolean silent, boolean clearOffers) {
+        dashboard.reloadOffers(silent, clearOffers);
     }
 
     void showDashboardFragment() {
@@ -918,5 +986,9 @@ class FragmentHolder {
 
     void onLocationChanged(Location location) {
         dashboard.onLocationChanged(location);
+    }
+
+    public void onLocationLookupStarted() {
+        dashboard.onLocationLookupStarted();
     }
 }

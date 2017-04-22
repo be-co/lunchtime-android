@@ -680,6 +680,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.model.caching.ModelCache;
@@ -689,7 +690,6 @@ import com.tbaehr.lunchtime.model.web.ModelDownloader;
 import com.tbaehr.lunchtime.tracking.ITracking;
 import com.tbaehr.lunchtime.tracking.LunchtimeTracker;
 import com.tbaehr.lunchtime.utils.DateTime;
-import com.tbaehr.lunchtime.utils.LocationHelper;
 import com.tbaehr.lunchtime.utils.SharedPrefsHelper;
 
 import org.json.JSONException;
@@ -698,7 +698,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.tbaehr.lunchtime.tracking.ITracking.KEY_ERROR_REPORTING_ENABLED;
 import static com.tbaehr.lunchtime.tracking.ITracking.KEY_TRACKING_ENABLED;
@@ -738,9 +740,24 @@ public class ModelProvider {
 
     private static final int MINUTE = 60 * 1000;
 
+    private static final int[] RADIUS = new int[] { 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000 };
+
+    /**
+     * The number of offer sections that should be shown (if any offers are available)
+     */
+    private static final int MINIMUM_OFFER_SECTIONS = 3;
+
+    private static int selectedRadius = 0;
+
+    private static int strippedOffersSizeOld = 0;
+
+    private static boolean strippedOffersSizeChanged = true;
+
     private static ModelProvider instance;
 
     private static ITracking tracker;
+
+    private static Set<RestaurantOffers> allOffers = new HashSet<>();
 
     public static ModelProvider getInstance() {
         if (instance == null) {
@@ -759,10 +776,12 @@ public class ModelProvider {
 
     public void resetLastSync() {
         lastSync = -1;
+        selectedRadius = 0;
+        strippedOffersSizeOld = 0;
+        strippedOffersSizeChanged = true;
     }
 
     private void getNearbyAsync(@NonNull final NearbyChangeListener callback, boolean forceUpdate) {
-        final String locationId = LocationHelper.getSelectedLocation();
         NearbyRestaurants nearby = null;
         try {
             // try to reload if cached nearby has syntax errors
@@ -773,7 +792,7 @@ public class ModelProvider {
         long now = System.currentTimeMillis();
         if (nearby == null || lastSync + MINUTE < now || forceUpdate) {
             lastSync = now;
-            ModelDownloader.getInstance().downloadNearby(locationId, new LoadJobListener<String>() {
+            ModelDownloader.getInstance().downloadNearby(new LoadJobListener<String>() {
                 @Override
                 public void onDownloadStarted() {
                     callback.loadingStarted();
@@ -798,7 +817,7 @@ public class ModelProvider {
                         protected Void doInBackground(Void... voids) {
                             try {
                                 result = ModelParser.getInstance().parseNearbyRestaurants(nearbyJson);
-                                ModelCache.getInstance().putNearby(nearbyJson, locationId);
+                                ModelCache.getInstance().putNearby(nearbyJson);
                             } catch (JSONException e) {
                                 tracker.trackException(e);
                             }
@@ -846,8 +865,7 @@ public class ModelProvider {
     }
 
     private NearbyRestaurants getNearby() throws JSONException {
-        final String locationId = LocationHelper.getSelectedLocation();
-        String nearbyJson = ModelCache.getInstance().getNearby(locationId);
+        String nearbyJson = ModelCache.getInstance().getNearby();
         if (nearbyJson != null) {
             NearbyRestaurants nearbyRestaurants = ModelParser.getInstance().parseNearbyRestaurants(nearbyJson);
             return nearbyRestaurants;
@@ -858,8 +876,6 @@ public class ModelProvider {
     private int getAllOffersCounter = 0;
 
     public void getAllOffersAsync(@Nullable final NearbyOffersChangeListener callback, @Nullable final Location location, boolean forceUpdate) {
-        final List<RestaurantOffers> allOffers = new ArrayList<>();
-
         getNearbyAsync(new NearbyChangeListener() {
             @Override
             public void loadingStarted() {
@@ -870,6 +886,7 @@ public class ModelProvider {
             public void pickUp(NearbyRestaurants nearby) {
                 final Collection<String> restaurantKeys = nearby.getRestaurantKeys();
                 getAllOffersCounter = 0;
+                allOffers.clear();
                 for (String restaurantId : restaurantKeys) {
                     getRestaurantOffersAsync(restaurantId, location, new RestaurantOffersChangeListener() {
                         @Override
@@ -900,8 +917,7 @@ public class ModelProvider {
                         }
 
                         private void publishOffers() {
-                            Collections.sort(allOffers);
-                            callback.pickUp(allOffers);
+                            callback.pickUp(stripByDistance(allOffers));
                         }
                     });
                 }
@@ -924,6 +940,59 @@ public class ModelProvider {
                 }
             }
         }, forceUpdate);
+    }
+
+    public boolean canLoadMoreOffers() {
+        int tempSelectedRadius = selectedRadius;
+        if (!increaseMoreOffersCounter()) {
+            return false;
+        }
+        List<RestaurantOffers> strippedOffers = stripByDistance(allOffers);
+        if (strippedOffers.size() == strippedOffersSizeOld) {
+            strippedOffersSizeChanged = false;
+        }
+        selectedRadius = tempSelectedRadius;
+        return RADIUS.length - 2 > selectedRadius && strippedOffersSizeChanged;
+    }
+
+    private boolean increaseMoreOffersCounter() {
+        if (RADIUS.length - 2 > selectedRadius) {
+            selectedRadius++;
+            return true;
+        }
+        return false;
+    }
+
+    public List<RestaurantOffers> loadMoreOffers() throws RestaurantOffers.DistanceNotAvailableException {
+        increaseMoreOffersCounter();
+        List<RestaurantOffers> strippedOffers = stripByDistance(allOffers);
+        strippedOffersSizeOld = strippedOffers.size();
+        return strippedOffers;
+    }
+
+    private List<RestaurantOffers> stripByDistance(Set<RestaurantOffers> inputOffers) {
+        List<RestaurantOffers> output = new ArrayList<>();
+
+        for (RestaurantOffers offers : inputOffers) {
+            try {
+                float distance = offers.getDistanceInMeters();
+                if (distance > RADIUS[selectedRadius]) {
+                    continue;
+                }
+                output.add(offers);
+            } catch (RestaurantOffers.DistanceNotAvailableException e) {
+                Log.e("TimTim", "Distance for "+offers.getRestaurantId()+" is not available.");
+            }
+        }
+
+        if (output.size() < MINIMUM_OFFER_SECTIONS) {
+            if (increaseMoreOffersCounter()) {
+                return stripByDistance(inputOffers);
+            }
+        }
+
+        Collections.sort(output);
+        return output;
     }
 
     public void getRestaurantAsync(@NonNull final String restaurantId, @Nullable final RestaurantChangeListener callback) {

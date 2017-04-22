@@ -105,7 +105,7 @@
  * feature that (1) displays an appropriate copyright notice, and (2)
  * tells the user that there is no warranty for the work (except to the
  * extent that warranties are provided), that licensees may convey the
- * work under this License, and how to view a copy of this License.  If
+ * work under this License, and how to mView a copy of this License.  If
  * the interface presents a list of user commands or options, such as a
  * menu, a prominent item in the list meets this criterion.
  *
@@ -678,24 +678,35 @@ package com.tbaehr.lunchtime.controller;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.tbaehr.lunchtime.presenter.MasterPagePresenter;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
 import com.tbaehr.lunchtime.view.MasterPageViewContainer;
 
 public class MasterPageActivity extends BaseActivity<IMasterPageViewContainer, MasterPagePresenter> {
 
-    private IMasterPageViewContainer view;
+    private static final String TAG = "MasterPageActivity";
+
+    private IMasterPageViewContainer mView;
+
+    public MenuItem searchItem;
+
+    public MaterialSearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        view = new MasterPageViewContainer(this, getSupportFragmentManager());
+        mView = new MasterPageViewContainer(this, getSupportFragmentManager());
     }
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+        Log.v("TimTim2", "onPostCreate");
         getPresenter().onPostCreate(savedInstanceState);
     }
 
@@ -711,19 +722,34 @@ public class MasterPageActivity extends BaseActivity<IMasterPageViewContainer, M
 
     @Override
     public IMasterPageViewContainer getViewLayer() {
-        return view;
+        return mView;
     }
 
     @Override
     public void onBackPressed() {
-        if (!view.onBackPressed()) {
+        if (!getPresenter().onBackPressed()) {
             super.onBackPressed();
         }
     }
 
     @Override
+    public void onPresenterProvided(MasterPagePresenter presenter) {
+        super.onPresenterProvided(presenter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (getPresenter() != null) {
+            return getPresenter().onCreateOptionsMenu(menu);
+        } else {
+            Log.e(TAG, "Could not inflate menu");
+            return false;
+        }
+    }
+
+    @Override
     protected void onDestroy() {
-        view = null;
+        mView = null;
         super.onDestroy();
     }
 }

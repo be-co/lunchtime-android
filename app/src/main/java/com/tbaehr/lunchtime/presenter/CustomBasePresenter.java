@@ -677,6 +677,7 @@
 package com.tbaehr.lunchtime.presenter;
 
 import android.support.annotation.NonNull;
+import android.view.Menu;
 
 import com.propaneapps.tomorrow.presenter.BasePresenter;
 
@@ -695,6 +696,10 @@ public class CustomBasePresenter<V> extends BasePresenter<V> {
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,  @NonNull int[] grantResults) {
         //;
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return false;
     }
 
 }

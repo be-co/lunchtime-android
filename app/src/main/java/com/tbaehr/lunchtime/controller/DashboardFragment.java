@@ -685,9 +685,6 @@ import android.view.ViewGroup;
 
 import com.tbaehr.lunchtime.localization.LocationListener;
 import com.tbaehr.lunchtime.presenter.DashboardPresenter;
-import com.tbaehr.lunchtime.tracking.CustomDimension;
-import com.tbaehr.lunchtime.tracking.TrackingScreen;
-import com.tbaehr.lunchtime.utils.LocationHelper;
 import com.tbaehr.lunchtime.view.DashboardViewContainer;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
@@ -701,18 +698,14 @@ public class DashboardFragment extends BaseFragment<IDashboardViewContainer, Das
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        viewContainer = new DashboardViewContainer(getContext(), inflater, container);
+        final DashboardViewContainer.OnCheckLocationSettingsListener listener = new DashboardViewContainer.OnCheckLocationSettingsListener() {
+            @Override
+            public void onLocationSettingsClicked() {
+                ((BaseActivity) getActivity()).checkLocationSettings();
+            }
+        };
+        viewContainer = new DashboardViewContainer(getContext(), inflater, container, listener);
         return viewContainer.getRootView();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        CustomDimension location = new CustomDimension(
-                CustomDimension.CustomDimensionIndex.KEY_LOCATION,
-                LocationHelper.getSelectedLocation()
-        );
-        tracker.trackScreenView(TrackingScreen.DASHBOARD, location);
     }
 
     @Override
@@ -746,8 +739,8 @@ public class DashboardFragment extends BaseFragment<IDashboardViewContainer, Das
         getPresenter().onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    public void reloadOffers(boolean clearOffers) {
-        getPresenter().refreshOffers(clearOffers);
+    public void reloadOffers(boolean silent, boolean clearOffers) {
+        getPresenter().refreshOffers(silent, clearOffers);
     }
 
     @Override
@@ -755,6 +748,14 @@ public class DashboardFragment extends BaseFragment<IDashboardViewContainer, Das
         DashboardPresenter presenter = getPresenter();
         if (presenter != null) {
             presenter.onLocationChanged(location);
+        }
+    }
+
+    @Override
+    public void onLocationLookupStarted() {
+        DashboardPresenter presenter = getPresenter();
+        if (presenter != null) {
+            presenter.onLocationLookupStarted();
         }
     }
 }

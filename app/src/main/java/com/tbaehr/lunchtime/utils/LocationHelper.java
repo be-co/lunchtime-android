@@ -676,33 +676,84 @@
  */
 package com.tbaehr.lunchtime.utils;
 
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+
+import com.tbaehr.lunchtime.LunchtimeApplication;
 import com.tbaehr.lunchtime.model.ModelProvider;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by timo.baehr@gmail.com on 21.02.17.
  */
 public class LocationHelper {
 
-    private static final String KEY_SELECTED_LOCATION_INDEX = "selected location index";
-
-    private static int selectedLocationIndex = -1;
-
-    public static CharSequence[] getLocations() {
-        return new CharSequence[] {"Weiterstadt", "Darmstadt"};
+    public enum LocationMode {
+        CURRENT_LOCATION,
+        ADDRESS;
     }
 
-    public static int getSelectedLocationIndex() {
-        return selectedLocationIndex != -1 ? selectedLocationIndex : SharedPrefsHelper.getInt(KEY_SELECTED_LOCATION_INDEX, 0);
+    private static final String KEY_ADRESS = "entered address";
+
+    private static final String KEY_PINNED_LOCATION = "pinned location";
+
+    private static LocationMode mLocationMode = LocationMode.CURRENT_LOCATION;
+
+    private static String mAddressQualifier;
+
+    private static Location mPinnedLocation;
+
+    public static void setLocationMode(LocationMode locationMode) {
+        mLocationMode = locationMode;
     }
 
-    public static String getSelectedLocation() {
-        return (String) getLocations()[getSelectedLocationIndex()];
+    public static LocationMode getLocationMode() {
+        return mLocationMode;
     }
 
-    public static void setSelectedLocationIndex(int index) {
-        selectedLocationIndex = index;
+    public static Location getPinnedLocation() {
+        if (mPinnedLocation == null) {
+            mPinnedLocation = SharedPrefsHelper.getLocation(KEY_PINNED_LOCATION);
+        }
+        return mPinnedLocation;
+    }
+
+    public static String getPinnedLocationName() {
+        return mAddressQualifier;
+    }
+
+    public static void setPinnedLocation(String pinnedLocationName, Location pinnedLocation) {
         ModelProvider.getInstance().resetLastSync();
-        SharedPrefsHelper.putInt(KEY_SELECTED_LOCATION_INDEX, index);
+
+        mAddressQualifier = pinnedLocationName;
+        SharedPrefsHelper.putString(KEY_ADRESS, pinnedLocationName);
+
+        mPinnedLocation = pinnedLocation;
+        SharedPrefsHelper.putLocation(KEY_PINNED_LOCATION, pinnedLocation);
+    }
+
+    public static List<Address> getAddressFromPlace(String enteredAddress) throws IOException {
+        Geocoder coder = new Geocoder(LunchtimeApplication.getContext());
+        List<Address> foundPlacesTemp;
+
+        foundPlacesTemp = coder.getFromLocationName(enteredAddress, 5);
+        if (foundPlacesTemp == null || foundPlacesTemp.size() == 0) {
+            throw new IOException("Could not find a place for the entered address: "+enteredAddress);
+        }
+
+        List<Address> foundPlaces = new ArrayList<>();
+        for (Address address : foundPlacesTemp) {
+            String countryCode = address.getCountryCode();
+            if (countryCode != null && "DE".equals(countryCode)) {
+                foundPlaces.add(address);
+            }
+        }
+
+        return foundPlaces;
     }
 
 }

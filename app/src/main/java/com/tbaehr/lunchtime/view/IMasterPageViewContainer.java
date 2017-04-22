@@ -676,12 +676,12 @@
  */
 package com.tbaehr.lunchtime.view;
 
-import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.view.Menu;
 
+import com.miguelcatalan.materialsearchview.SuggestionItem;
 import com.tbaehr.lunchtime.localization.LocationListener;
 
 /**
@@ -689,11 +689,17 @@ import com.tbaehr.lunchtime.localization.LocationListener;
  */
 public interface IMasterPageViewContainer extends LocationListener {
 
+    public interface MaterialSearchViewListener {
+        boolean onQueryTextSubmit(String query);
+
+        void onQueryTextChange(String newText);
+    }
+
     void showToolbar(AppCompatActivity activity, NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener);
 
     void setToolbarTitle(String title);
 
-    void setOnTitleClickListener(View.OnClickListener onClickListener);
+    void setLocationModeIcon(boolean listeningOnLocation);
 
     void showDashboardFragment();
 
@@ -707,9 +713,15 @@ public interface IMasterPageViewContainer extends LocationListener {
 
     void syncDrawerToggleButton();
 
-    void openLocationPicker(CharSequence[] options, int checkedItemIndex, DialogInterface.OnClickListener onClickListener);
-
     void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults);
 
-    void reloadOffers(boolean clearOffers);
+    void reloadOffers(boolean silent, boolean clearOffers);
+
+    void inflateSearchView(MaterialSearchViewListener callback);
+
+    boolean inflateLocationModeIcon(Menu menu, boolean listeningOnLocation);
+
+    void setSearchViewSuggestions(SuggestionItem[] suggestions);
+
+    void setLocationModeIconVisibility(boolean visible);
 }

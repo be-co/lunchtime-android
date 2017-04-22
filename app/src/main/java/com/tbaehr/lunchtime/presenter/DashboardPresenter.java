@@ -694,10 +694,12 @@ import com.tbaehr.lunchtime.model.Offer;
 import com.tbaehr.lunchtime.model.RestaurantOffers;
 import com.tbaehr.lunchtime.tracking.ITracking;
 import com.tbaehr.lunchtime.utils.DateTime;
+import com.tbaehr.lunchtime.view.DashboardViewContainer;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -720,6 +722,8 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
     private Timer timer;
 
+    private Location lastKnownLocation;
+
     public DashboardPresenter(DashboardFragment fragment) {
         this.activity = (BaseActivity) fragment.getActivity();
         this.tracker = activity.getTracker();
@@ -737,9 +741,9 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         super.bindView(view);
         activity.requestLocationUpdates();
         if (cachedOffers == null || cachedOffers.size() == 0) {
-            getView().setProgressBarVisibility(true);
+            getView().showLoadingOffers();
         }
-        refreshOffers(false);
+        refreshOffers(true, false);
     }
 
     @Override
@@ -782,7 +786,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        refreshOffers(false);
+                        refreshOffers(true, false);
                     }
                 });
             }
@@ -804,7 +808,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
                 IDashboardViewContainer view = getView();
                 if (view != null) {
                     if (cachedOffers == null || cachedOffers.size() == 0) {
-                        getView().setProgressBarVisibility(true);
+                        view.showLoadingOffers();
                     }
                 }
             }
@@ -818,7 +822,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
             public void run() {
                 IDashboardViewContainer view = getView();
                 if (view != null) {
-                    view.setProgressBarVisibility(false);
+                    view.hideProgressBar();
                     getView().showNoOffersView(R.string.status_offer_sync_failed);
                 }
             }
@@ -871,9 +875,13 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
     @Override
     public void pickUp(List<RestaurantOffers> allOffers) {
-        Log.i("TimTim", "pickUp("+allOffers+")");
         IDashboardViewContainer view = getView();
         if (view == null) {
+            return;
+        }
+
+        if (allOffers.size() == 0) {
+            view.showNoOffersView(R.string.no_offers);
             return;
         }
 
@@ -892,12 +900,13 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         }
         Log.i("TimTim", "dataSet has changed");
 
-        view.setProgressBarVisibility(false);
+        view.hideProgressBar();
         view.clearOffers();
         restartTimeBasedRefresh(allOffers);
 
         boolean foundOffers = false;
 
+        Collections.reverse(allOffers);
         for (final RestaurantOffers nearbyRestaurantOffers : allOffers) {
             if (nearbyRestaurantOffers.isEmpty()) {
                 continue;
@@ -929,9 +938,40 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
                     onSliderItemClickListener
             );
         }
+        if (ModelProvider.getInstance().canLoadMoreOffers()) {
+            view.showLoadMoreButton(new DashboardViewContainer.OnLoadMoreClickListener() {
+                @Override
+                public void onLoadMoreClicked() {
+                    loadMoreOffers();
+                }
+            });
+        }
 
         if (!foundOffers) {
             showNoOfferView();
+        }
+    }
+
+    private void loadMoreOffers() {
+        ModelProvider provider = ModelProvider.getInstance();
+        IDashboardViewContainer view = getView();
+        if (view == null) {
+            return;
+        }
+        if (provider.canLoadMoreOffers()) {
+            List<RestaurantOffers> offers = null;
+            try {
+                offers = provider.loadMoreOffers();
+            } catch (RestaurantOffers.DistanceNotAvailableException e) {
+                if (view != null) {
+                    view.showLocationUnknown();
+                    return;
+                }
+            }
+            Log.v("TimTim", "Received "+offers.size()+" offer sections.");
+            pickUp(offers);
+        } else {
+            view.hideLoadMoreButton();
         }
     }
 
@@ -959,12 +999,20 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         activity.startActivity(openFetchOrderActivityIntent);
     }
 
-    public void refreshOffers(boolean forceUpdate) {
-        Location lastKnownLocation = activity.getLastKnownLocation();
+    public void refreshOffers(boolean silentRefresh, boolean forceUpdate) {
+        Log.v("TimTim", "DashboardPresenter.refreshOffers | "+(forceUpdate?"forced update":"")+(silentRefresh?", refresh silent":"")+")");
         IDashboardViewContainer view = getView();
-        if (forceUpdate && view != null) {
+
+        if (lastKnownLocation == null) {
+            if (view != null) {
+                view.showLocationUnknown();
+            }
+            return;
+        }
+
+        if (!silentRefresh && view != null) {
             view.clearOffers();
-            view.setProgressBarVisibility(true);
+            view.showLoadingOffers();
         }
         ModelProvider.getInstance().getAllOffersAsync(this, lastKnownLocation, forceUpdate);
     }
@@ -973,13 +1021,22 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_REQUEST_CODE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             cachedOffers = null;
-            refreshOffers(true);
+            refreshOffers(false, true);
         }
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.i("TimTim", "onLocationChanged(" + location + ")");
-        refreshOffers(false);
+        lastKnownLocation = location;
+        Log.i("TimTim", "DashboardPresenter.onLocationChanged(" + location + ")");
+        refreshOffers(true, false);
+    }
+
+    @Override
+    public void onLocationLookupStarted() {
+        IDashboardViewContainer view = getView();
+        if (view != null) {
+            view.showSearchingLocation();
+        }
     }
 }

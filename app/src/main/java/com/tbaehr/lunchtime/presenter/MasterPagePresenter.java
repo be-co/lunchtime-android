@@ -676,21 +676,29 @@
  */
 package com.tbaehr.lunchtime.presenter;
 
-import android.content.DialogInterface;
+import android.location.Address;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
-import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.Toast;
 
+import com.miguelcatalan.materialsearchview.SuggestionItem;
 import com.tbaehr.lunchtime.R;
+import com.tbaehr.lunchtime.controller.BaseActivity;
 import com.tbaehr.lunchtime.localization.LocationListener;
+import com.tbaehr.lunchtime.model.ModelProvider;
 import com.tbaehr.lunchtime.utils.LocationHelper;
 import com.tbaehr.lunchtime.view.IMasterPageViewContainer;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 
 import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_DASHBOARD_FRAGMENT;
 import static com.tbaehr.lunchtime.view.MasterPageViewContainer.TAG_HELP_FRAGMENT;
@@ -708,13 +716,17 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
 
     private final static boolean CLEAR_OFFERS = true;
 
+    private static final boolean NON_SILENT_REFRESH = false;
+
     private String toolbarTitle;
 
     private String activeFragment;
 
-    private AppCompatActivity activity;
+    private BaseActivity activity;
 
-    public MasterPagePresenter(AppCompatActivity activity) {
+    private HashMap<String, Location> offlineModeLocations;
+
+    public MasterPagePresenter(BaseActivity activity) {
         this.activity = activity;
     }
 
@@ -722,13 +734,53 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        fillOfflineModeLocationSuggestions();
+
         if (savedInstanceState == null) {
-            toolbarTitle = getDashboardTitle();
+            toolbarTitle = "";
             activeFragment = TAG_DASHBOARD_FRAGMENT;
         } else {
             toolbarTitle = savedInstanceState.getString(KEY_TOOLBAR_TITLE);
             activeFragment = savedInstanceState.getString(KEY_ACTIVE_FRAGMENT);
         }
+    }
+
+    private SuggestionItem[] getSuggestionItems() {
+        SuggestionItem[] suggestionItems = new SuggestionItem[offlineModeLocations.keySet().size()+1];
+        suggestionItems[0] = new SuggestionItem(true, R.drawable.ic_location_current_grey, activity.getString(R.string.searchview_current_location));
+        String[] offlineSuggestions = offlineModeLocations.keySet().toArray(new String[0]);
+        for (int i = 1; i < suggestionItems.length; i++) {
+            suggestionItems[i] = new SuggestionItem(false, R.drawable.ic_location_grey, offlineSuggestions[i-1]);
+        }
+        return suggestionItems;
+    }
+
+    private void fillOfflineModeLocationSuggestions() {
+        offlineModeLocations = new HashMap<>();
+
+        Location daStadtmitte = new Location("persistent");
+        daStadtmitte.setLatitude(49.872828d);
+        daStadtmitte.setLongitude(8.651212d);
+        daStadtmitte.setAccuracy(1);
+        offlineModeLocations.put("Darmstadt, Stadtmitte", daStadtmitte);
+
+        Location daT_OnlineAlle = new Location("persistent");
+        daT_OnlineAlle.setLatitude(49.864311d);
+        daT_OnlineAlle.setLongitude(8.626370d);
+        daT_OnlineAlle.setAccuracy(1);
+        offlineModeLocations.put("Darmstadt, T-Online-Allee", daT_OnlineAlle);
+
+        Location weiterstadtLoop5 = new Location("persistent");
+        weiterstadtLoop5.setLatitude(49.892242d);
+        weiterstadtLoop5.setLongitude(8.606656d);
+        weiterstadtLoop5.setAccuracy(1);
+        offlineModeLocations.put("Weiterstadt, Loop5", weiterstadtLoop5);
+
+        Location frankfurtPlatzDerEinheit = new Location("persistent");
+        frankfurtPlatzDerEinheit.setLatitude(50.111500d);
+        frankfurtPlatzDerEinheit.setLongitude(8.654205);
+        frankfurtPlatzDerEinheit.setAccuracy(1);
+        offlineModeLocations.put("Frankfurt, Platz der Einheit", frankfurtPlatzDerEinheit);
     }
 
     @Override
@@ -741,16 +793,103 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
             presentDashboard();
         } else if (activeFragment.equals(TAG_HELP_FRAGMENT)) {
             presentHelpPage();
+        } else if (activeFragment.equals(TAG_PREFERENCES_FRAGMENT)) {
+            presentPreferencesPage();
         }
+
+        IMasterPageViewContainer.MaterialSearchViewListener listener = new IMasterPageViewContainer.MaterialSearchViewListener() {
+            SuggestionItem[] suggestionItems = getSuggestionItems();
+
+            @Override
+            public boolean onQueryTextSubmit(final String query) {
+                final IMasterPageViewContainer view = getView();
+                if (getView() == null) {
+                    return false;
+                }
+
+                if (query.equals(suggestionItems[0].getText())) {
+                    toolbarTitle = "";
+                    view.setLocationModeIcon(true);
+                    if (LocationHelper.getLocationMode().equals(LocationHelper.LocationMode.ADDRESS)) {
+                        LocationHelper.setLocationMode(LocationHelper.LocationMode.CURRENT_LOCATION);
+                        ModelProvider.getInstance().resetLastSync();
+                        view.reloadOffers(NON_SILENT_REFRESH, CLEAR_OFFERS);
+                    }
+                    activity.requestLocationUpdates();
+                } else {
+                    toolbarTitle = query;
+                    view.setLocationModeIcon(false);
+                    LocationHelper.setLocationMode(LocationHelper.LocationMode.ADDRESS);
+                    activity.stopLocationUpdates();
+
+                    if (offlineModeLocations.containsKey(query)) {
+                        Location pinnedLocation = offlineModeLocations.get(query);
+                        LocationHelper.setPinnedLocation(query, pinnedLocation);
+                        onLocationChanged(pinnedLocation);
+                        view.reloadOffers(NON_SILENT_REFRESH, CLEAR_OFFERS);
+                    } else {
+                        view.onLocationLookupStarted();
+                        new AsyncTask<Void, Void, Address>() {
+                            @Override
+                            protected Address doInBackground(Void... params) {
+                                try {
+                                    List<Address> foundPlaces = LocationHelper.getAddressFromPlace(query);
+                                    if (foundPlaces.size() > 0) {
+                                        return foundPlaces.get(0);
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Address address) {
+                                super.onPostExecute(address);
+
+                                if (address != null) {
+                                    Location pinnedLocation = new Location("Geocoder");
+                                    pinnedLocation.setLatitude(address.getLatitude());
+                                    pinnedLocation.setLongitude(address.getLongitude());
+
+                                    String title = addressToString(address);
+                                    LocationHelper.setPinnedLocation(title, pinnedLocation);
+                                    view.setToolbarTitle(title);
+                                    onLocationChanged(pinnedLocation);
+                                    activity.stopLocationUpdates();
+                                } else {
+                                    Toast.makeText(activity, R.string.failed_to_resolve_place, Toast.LENGTH_LONG).show();
+                                    LocationHelper.setLocationMode(LocationHelper.LocationMode.CURRENT_LOCATION);
+                                    view.reloadOffers(NON_SILENT_REFRESH, CLEAR_OFFERS);
+                                    presentDashboard();
+                                }
+                            }
+                        }.execute();
+                    }
+                }
+
+                view.setToolbarTitle(toolbarTitle);
+                return false;
+            }
+
+            @Override
+            public void onQueryTextChange(final String newText) {
+                // ;
+            }
+        };
+        view.inflateSearchView(listener);
+        view.setSearchViewSuggestions(getSuggestionItems());
     }
 
-    @Override
-    public void unbindView() {
-        IMasterPageViewContainer view = getView();
-        if (view != null) {
-            view.setOnTitleClickListener(null);
+    private String addressToString(Address address) {
+        StringBuilder sb = new StringBuilder();
+        if (address.getLocality() != null) {
+            sb.append(address.getLocality());
         }
-        super.unbindView();
+        if (address.getAdminArea() != null) {
+            sb.append(", ").append(address.getAdminArea());
+        }
+        return sb.toString();
     }
 
     @Override
@@ -791,44 +930,43 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         activeFragment = TAG_DASHBOARD_FRAGMENT;
 
         final IMasterPageViewContainer view = getView();
-        toolbarTitle = getDashboardTitle();
-        view.setToolbarTitle(toolbarTitle);
-        view.setOnTitleClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View clickedView) {
-                view.openLocationPicker(LocationHelper.getLocations(), LocationHelper.getSelectedLocationIndex(), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int selectedItemIndex) {
-                        LocationHelper.setSelectedLocationIndex(selectedItemIndex);
-                        toolbarTitle = LocationHelper.getSelectedLocation();
-                        view.setToolbarTitle(toolbarTitle);
-                        view.reloadOffers(CLEAR_OFFERS);
-                        dialogInterface.dismiss();
-                    }
-                });
+        if (view != null) {
+            view.setLocationModeIconVisibility(true);
+            boolean modeCurrentLocation = LocationHelper.getLocationMode().equals(LocationHelper.LocationMode.CURRENT_LOCATION);
+            if (modeCurrentLocation) {
+                toolbarTitle = "";
+                view.setLocationModeIcon(true);
+            } else {
+                toolbarTitle = LocationHelper.getPinnedLocationName();
+                view.setLocationModeIcon(false);
             }
-        });
-        view.showDashboardFragment();
+            view.setToolbarTitle(toolbarTitle);
+            view.showDashboardFragment();
+        }
     }
 
     private void presentPreferencesPage() {
         activeFragment = TAG_PREFERENCES_FRAGMENT;
 
         IMasterPageViewContainer view = getView();
-        toolbarTitle = getString(R.string.nav_item_preferences);
-        view.setToolbarTitle(toolbarTitle);
-        view.setOnTitleClickListener(null);
-        view.showPreferencesFragment();
+        if (view != null) {
+            view.setLocationModeIconVisibility(false);
+            toolbarTitle = getString(R.string.nav_item_preferences);
+            view.setToolbarTitle(toolbarTitle);
+            view.showPreferencesFragment();
+        }
     }
 
     private void presentHelpPage() {
         activeFragment = TAG_HELP_FRAGMENT;
 
         IMasterPageViewContainer view = getView();
-        toolbarTitle = getString(R.string.nav_item_help);
-        view.setToolbarTitle(toolbarTitle);
-        view.setOnTitleClickListener(null);
-        view.showHelpFragment();
+        if (view != null) {
+            view.setLocationModeIconVisibility(false);
+            toolbarTitle = getString(R.string.nav_item_help);
+            view.setToolbarTitle(toolbarTitle);
+            view.showHelpFragment();
+        }
     }
 
     @Override
@@ -839,8 +977,14 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
         super.onDestroy();
     }
 
-    private String getDashboardTitle() {
-        return LocationHelper.getSelectedLocation();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (getView() != null) {
+            boolean modeCurrentLocation = LocationHelper.getLocationMode().equals(LocationHelper.LocationMode.CURRENT_LOCATION);
+            return getView().inflateLocationModeIcon(menu, modeCurrentLocation);
+        }
+
+        return false;
     }
 
     private String getString(@StringRes int resId) {
@@ -858,4 +1002,21 @@ public class MasterPagePresenter extends CustomBasePresenter<IMasterPageViewCont
             view.onLocationChanged(location);
         }
     }
+
+    @Override
+    public void onLocationLookupStarted() {
+        IMasterPageViewContainer view = getView();
+        if (view != null) {
+            view.onLocationLookupStarted();
+        }
+    }
+
+    public boolean onBackPressed() {
+        IMasterPageViewContainer view = getView();
+        if (view != null) {
+            return view.onBackPressed();
+        }
+        return false;
+    }
+
 }

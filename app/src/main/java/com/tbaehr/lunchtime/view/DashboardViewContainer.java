@@ -677,10 +677,16 @@
 package com.tbaehr.lunchtime.view;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.StringRes;
+import android.support.v7.view.ContextThemeWrapper;
+import android.text.method.LinkMovementMethod;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -698,6 +704,14 @@ import butterknife.ButterKnife;
  */
 public class DashboardViewContainer implements IDashboardViewContainer {
 
+    public interface OnLoadMoreClickListener {
+        void onLoadMoreClicked();
+    }
+
+    public interface OnCheckLocationSettingsListener {
+        void onLocationSettingsClicked();
+    }
+
     private Context context;
 
     private View rootView;
@@ -705,18 +719,29 @@ public class DashboardViewContainer implements IDashboardViewContainer {
     @BindView(R.id.no_offers)
     TextView noOffersView;
 
+    @BindView(R.id.progress_text)
+    TextView progressTextView;
+
+    @BindView(R.id.location_button)
+    Button checkLocationSettingsButton;
+
     @BindView(R.id.view_container)
     LinearLayout viewContainer;
 
     @BindView(R.id.progress_bar_loading)
     LinearLayout progressBarLoading;
 
+    private Button mLoadMoreButton;
+
+    private OnCheckLocationSettingsListener listener;
+
     private HashMap<String, HorizontalSliderView> sliderViewMap = new HashMap<>();
 
-    public DashboardViewContainer(Context context, LayoutInflater inflater, ViewGroup container) {
+    public DashboardViewContainer(Context context, LayoutInflater inflater, ViewGroup container, OnCheckLocationSettingsListener listener) {
         rootView = inflater.inflate(R.layout.content_dashboard, container, false);
         ButterKnife.bind(this, rootView);
         this.context = context;
+        this.listener = listener;
     }
 
     @Override
@@ -724,6 +749,38 @@ public class DashboardViewContainer implements IDashboardViewContainer {
         HorizontalSliderView sliderView = new HorizontalSliderView(context, sectionTitle, shortDescription, distance, offers, headerClickListener, sliderItemClickListener);
         viewContainer.addView(sliderView, 0);
         sliderViewMap.put(sectionId, sliderView);
+    }
+
+    @Override
+    public void showLoadMoreButton(final OnLoadMoreClickListener listener) {
+        int style;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            style = android.R.style.Widget_Material_Button_Borderless_Colored;
+        } else {
+            style = android.R.style.Widget_Button;
+        }
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.CENTER;
+        mLoadMoreButton = new Button(new ContextThemeWrapper(context, style), null, style);
+        mLoadMoreButton.setText(R.string.load_more);
+        mLoadMoreButton.setLayoutParams(params);
+
+        mLoadMoreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onLoadMoreClicked();
+            }
+        });
+
+        viewContainer.addView(mLoadMoreButton);
+    }
+
+    @Override
+    public void hideLoadMoreButton() {
+        viewContainer.removeView(mLoadMoreButton);
+        mLoadMoreButton = null;
     }
 
     @Override
@@ -741,14 +798,16 @@ public class DashboardViewContainer implements IDashboardViewContainer {
 
     @Override
     public void showNoOffersView(@StringRes int message) {
-        setProgressBarVisibility(false);
+        hideProgressBar();
         noOffersView.setText(message);
+        noOffersView.setMovementMethod (LinkMovementMethod.getInstance());
         noOffersView.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideNoOffersView() {
         noOffersView.setVisibility(View.GONE);
+        checkLocationSettingsButton.setVisibility(View.GONE);
     }
 
     @Override
@@ -762,18 +821,45 @@ public class DashboardViewContainer implements IDashboardViewContainer {
     }
 
     @Override
-    public void setProgressBarVisibility(boolean visible) {
-        if (visible) {
-            clearOffers();
-        }
-        progressBarLoading.setVisibility(visible ? View.VISIBLE : View.GONE);
+    public void hideProgressBar() {
+        progressBarLoading.setVisibility(View.GONE);
     }
 
     @Override
     public void clearOffers() {
+        Log.v("TimTim", "DashboardView.clearOffers");
         hideNoOffersView();
         viewContainer.removeAllViews();
         sliderViewMap.clear();
+    }
+
+    @Override
+    public void showLoadingOffers() {
+        progressBarLoading.setVisibility(View.VISIBLE);
+        clearOffers();
+        progressTextView.setText(R.string.status_loading);
+    }
+
+    @Override
+    public void showSearchingLocation() {
+        progressBarLoading.setVisibility(View.VISIBLE);
+        clearOffers();
+        progressTextView.setText(R.string.status_location_lookup);
+    }
+
+    @Override
+    public void showLocationUnknown() {
+        clearOffers();
+        hideProgressBar();
+
+        showNoOffersView(R.string.message_location_unknown);
+        checkLocationSettingsButton.setVisibility(View.VISIBLE);
+        checkLocationSettingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onLocationSettingsClicked();
+            }
+        });
     }
 
     @Override
@@ -785,4 +871,5 @@ public class DashboardViewContainer implements IDashboardViewContainer {
     public boolean isInitialized() {
         return viewContainer.getChildCount() > 0;
     }
+
 }

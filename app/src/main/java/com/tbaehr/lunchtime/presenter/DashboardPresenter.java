@@ -717,6 +717,8 @@ import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_
 public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContainer>
         implements ModelProvider.NearbyOffersChangeListener, LocationListener {
 
+    private static final String TAG = "Lunchtime";
+
     private static final boolean SILENT_REFRESH = true;
 
     private static final boolean ENFORCE_UPDATE = true;
@@ -897,19 +899,19 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         }
 
         if (!hasDataSetChanged(allOffers)) {
-            Log.i("TimTim", "dataSet has NOT changed");
             if (!view.hasOffers()) {
+                Log.i(TAG, "dataSet has NOT changed");
                 if (!areOffersAvailable(allOffers)) {
                     showNoOfferView();
                     return;
                 }
             } else if (!view.isProgressBarVisible()) {
-                Log.i("TimTim", "distance updated");
+                Log.i(TAG, "dataSet has NOT changed -> distance updated");
                 updateDistance(allOffers);
                 return;
             }
         }
-        Log.i("TimTim", "dataSet has changed");
+        Log.i(TAG, "dataSet has changed");
 
         view.hideProgressBar();
         view.clearOffers();
@@ -974,12 +976,10 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
             try {
                 offers = provider.loadMoreOffers();
             } catch (RestaurantOffers.DistanceNotAvailableException e) {
-                if (view != null) {
-                    view.showLocationUnknown();
-                    return;
-                }
+                view.showLocationUnknown();
+                return;
             }
-            Log.v("TimTim", "Received "+offers.size()+" offer sections.");
+            Log.v(TAG, "Received "+offers.size()+" offer sections.");
             pickUp(offers);
         } else {
             view.hideLoadMoreButton();
@@ -1011,7 +1011,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     }
 
     public void refreshOffers(boolean silentRefresh, boolean forceUpdate) {
-        Log.v("TimTim", "DashboardPresenter.refreshOffers | "+(forceUpdate?"forced update":"")+(silentRefresh?", refresh silent":"")+")");
+        Log.v(TAG, "DashboardPresenter.refreshOffers("+(silentRefresh?"SILENT":"!SILENT")+", "+(forceUpdate?"FORCE":"!FORCE")+")");
         IDashboardViewContainer view = getView();
 
         if (lastKnownLocation == null) {
@@ -1038,8 +1038,14 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
     @Override
     public void onLocationChanged(Location location) {
+        if (lastKnownLocation != null &&
+                lastKnownLocation.getLongitude() == location.getLongitude() &&
+                lastKnownLocation.getLatitude() == location.getLatitude()) {
+            return;
+        }
+
         lastKnownLocation = location;
-        Log.i("TimTim", "DashboardPresenter.onLocationChanged(" + location + ")");
+        Log.i(TAG, "DashboardPresenter.onLocationChanged(" + location + ")");
         refreshOffers(SILENT_REFRESH, !ENFORCE_UPDATE);
     }
 

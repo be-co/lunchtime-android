@@ -703,6 +703,8 @@ import butterknife.ButterKnife;
  * Created by timo.baehr@gmail.com on 31.12.16.
  */
 public class DashboardViewContainer implements IDashboardViewContainer {
+    
+    private static final String TAG = "Lunchtime";
 
     public interface OnLoadMoreClickListener {
         void onLoadMoreClicked();
@@ -827,7 +829,7 @@ public class DashboardViewContainer implements IDashboardViewContainer {
 
     @Override
     public void clearOffers() {
-        Log.v("TimTim", "DashboardView.clearOffers");
+        Log.v(TAG, "DashboardView.clearOffers");
         hideNoOffersView();
         viewContainer.removeAllViews();
         sliderViewMap.clear();

@@ -900,18 +900,18 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
         if (!hasDataSetChanged(allOffers)) {
             if (!view.hasOffers()) {
-                Log.i(TAG, "dataSet has NOT changed");
+                Log.i(TAG, "DashboardPresenter: dataSet has NOT changed");
                 if (!areOffersAvailable(allOffers)) {
                     showNoOfferView();
                     return;
                 }
             } else if (!view.isProgressBarVisible()) {
-                Log.i(TAG, "dataSet has NOT changed -> distance updated");
+                Log.i(TAG, "DashboardPresenter: dataSet has NOT changed -> distance updated");
                 updateDistance(allOffers);
                 return;
             }
         }
-        Log.i(TAG, "dataSet has changed");
+        Log.i(TAG, "DashboardPresenter: dataSet has changed");
 
         view.hideProgressBar();
         view.clearOffers();

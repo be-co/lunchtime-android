@@ -698,6 +698,7 @@ import com.tbaehr.lunchtime.view.DashboardViewContainer;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -730,8 +731,6 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
     private SparseArray<RestaurantOffers> cachedOffers;
 
-    private List<RestaurantOffers> mOffers;
-
     public DashboardPresenter(DashboardFragment fragment) {
         this.activity = (BaseActivity) fragment.getActivity();
         this.tracker = activity.getTracker();
@@ -741,8 +740,8 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     public void onDestroy() {
         activity = null;
         timer = null;
-        cachedOffers = null;
-        mOffers = null;
+        //cachedOffers = null;
+        //mOffers = null;
         lastKnownLocation = null;
         tracker = null;
         super.onDestroy();
@@ -752,9 +751,13 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     public void bindView(IDashboardViewContainer view) {
         super.bindView(view);
         activity.requestLocationUpdates();
-        if (mOffers != null) {
-            pickUp(mOffers);
-        } else if (cachedOffers == null || cachedOffers.size() == 0) {
+        if (cachedOffers != null) {
+            List<RestaurantOffers> offers = new ArrayList<>();
+            for (int i = 0; i < cachedOffers.size(); i++) {
+                offers.add(cachedOffers.get(i));
+            }
+            pickUp(offers);
+        } else {
             getView().showLoadingOffers();
             refreshOffers(SILENT_REFRESH, !ENFORCE_UPDATE);
         }
@@ -765,10 +768,6 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         stopTimeBasedRefresh();
         activity.stopLocationUpdates();
         super.unbindView();
-    }
-
-    public void onDestroyFragment() {
-        cachedOffers = null;
     }
 
     private void restartTimeBasedRefresh(Collection<RestaurantOffers> restaurantOffersList) {
@@ -887,8 +886,6 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
     @Override
     public void pickUp(List<RestaurantOffers> allOffers) {
-        mOffers = allOffers;
-
         IDashboardViewContainer view = getView();
         if (view == null) {
             return;
@@ -1035,7 +1032,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_REQUEST_CODE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             cachedOffers = null;
-            refreshOffers(false, true);
+            refreshOffers(!SILENT_REFRESH, ENFORCE_UPDATE);
         }
     }
 
@@ -1043,7 +1040,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     public void onLocationChanged(Location location) {
         lastKnownLocation = location;
         Log.i("TimTim", "DashboardPresenter.onLocationChanged(" + location + ")");
-        refreshOffers(true, false);
+        refreshOffers(SILENT_REFRESH, !ENFORCE_UPDATE);
     }
 
     @Override

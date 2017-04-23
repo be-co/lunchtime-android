@@ -676,20 +676,95 @@
  */
 package com.tbaehr.lunchtime.localization;
 
+import android.content.Context;
 import android.location.Location;
 
+import com.miguelcatalan.materialsearchview.SuggestionItem;
+import com.tbaehr.lunchtime.LunchtimeApplication;
+import com.tbaehr.lunchtime.R;
+
+import java.util.HashMap;
+
 /**
- * Created by timo.baehr@gmail.com on 30.03.2017.
+ * Created by timo.baehr@gmail.com on 23.04.2017.
  */
-public interface LocationListener {
+public class LocationSuggestions {
 
-    /**
-     * Called when the location has changed.
-     *
-     * @param location The new location, as a Location object.
-     */
-    void onLocationChanged(Location location);
+    private static LocationSuggestions instance;
 
-    void onLocationLookupStarted();
+    public static LocationSuggestions getInstance() {
+        if (instance == null) {
+            instance = new LocationSuggestions();
+        }
+        return instance;
+    }
 
+    private Context mContext;
+
+    private HashMap<String, Location> offlineModeLocations;
+
+    private LocationSuggestions() {
+        offlineModeLocations = createSuggestionsMap();
+        mContext = LunchtimeApplication.getContext();
+    }
+
+    public boolean isLocationAvailableFor(String query) {
+        return offlineModeLocations.containsKey(query);
+    }
+
+    public Location getLocationFor(String query) {
+        return offlineModeLocations.get(query);
+    }
+
+    public SuggestionItem[] getSuggestions() {
+        SuggestionItem[] suggestionItems = new SuggestionItem[offlineModeLocations.keySet().size()+1];
+        suggestionItems[0] = new SuggestionItem(true, R.drawable.ic_location_current_grey, mContext.getString(R.string.searchview_current_location));
+        String[] offlineSuggestions = offlineModeLocations.keySet().toArray(new String[0]);
+        for (int i = 1; i < suggestionItems.length; i++) {
+            suggestionItems[i] = new SuggestionItem(false, R.drawable.ic_location_grey, offlineSuggestions[i-1]);
+        }
+        return suggestionItems;
+    }
+
+    private HashMap<String, Location> createSuggestionsMap() {
+        HashMap<String, Location> offlineModeLocations = new HashMap<>();
+
+        Location daStadtmitte = new Location("persistent");
+        daStadtmitte.setLatitude(49.872828d);
+        daStadtmitte.setLongitude(8.651212d);
+        daStadtmitte.setAccuracy(1);
+        offlineModeLocations.put("Darmstadt, Luisenplatz", daStadtmitte);
+
+        Location daHbf = new Location("persistent");
+        daHbf.setLatitude(49.872597d);
+        daHbf.setLongitude(8.629321d);
+        daHbf.setAccuracy(1);
+        offlineModeLocations.put("Darmstadt, Hauptbahnhof", daHbf);
+
+        Location daT_OnlineAlle = new Location("persistent");
+        daT_OnlineAlle.setLatitude(49.864311d);
+        daT_OnlineAlle.setLongitude(8.626370d);
+        daT_OnlineAlle.setAccuracy(1);
+        offlineModeLocations.put("Darmstadt, T-Online-Allee", daT_OnlineAlle);
+
+        Location weiterstadtLoop5 = new Location("persistent");
+        weiterstadtLoop5.setLatitude(49.892242d);
+        weiterstadtLoop5.setLongitude(8.606656d);
+        weiterstadtLoop5.setAccuracy(1);
+        offlineModeLocations.put("Weiterstadt, Loop5", weiterstadtLoop5);
+
+        Location frankfurtPlatzDerEinheit = new Location("persistent");
+        frankfurtPlatzDerEinheit.setLatitude(50.111500d);
+        frankfurtPlatzDerEinheit.setLongitude(8.654205d);
+        frankfurtPlatzDerEinheit.setAccuracy(1);
+        offlineModeLocations.put("Frankfurt, Platz der Einheit", frankfurtPlatzDerEinheit);
+
+        Location frankfurtHbf = new Location("persistent");
+        frankfurtHbf.setLatitude(50.106529d);
+        frankfurtHbf.setLongitude(8.662162d);
+        frankfurtHbf.setAccuracy(1);
+        offlineModeLocations.put("Frankfurt, Hauptbahnhof", frankfurtHbf);
+
+        return offlineModeLocations;
+    }
 }

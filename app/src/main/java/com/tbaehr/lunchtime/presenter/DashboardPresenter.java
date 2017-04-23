@@ -716,6 +716,10 @@ import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_
 public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContainer>
         implements ModelProvider.NearbyOffersChangeListener, LocationListener {
 
+    private static final boolean SILENT_REFRESH = true;
+
+    private static final boolean ENFORCE_UPDATE = true;
+
     private BaseActivity activity;
 
     private ITracking tracker;
@@ -723,6 +727,10 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     private Timer timer;
 
     private Location lastKnownLocation;
+
+    private SparseArray<RestaurantOffers> cachedOffers;
+
+    private List<RestaurantOffers> mOffers;
 
     public DashboardPresenter(DashboardFragment fragment) {
         this.activity = (BaseActivity) fragment.getActivity();
@@ -733,6 +741,10 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     public void onDestroy() {
         activity = null;
         timer = null;
+        cachedOffers = null;
+        mOffers = null;
+        lastKnownLocation = null;
+        tracker = null;
         super.onDestroy();
     }
 
@@ -740,10 +752,12 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     public void bindView(IDashboardViewContainer view) {
         super.bindView(view);
         activity.requestLocationUpdates();
-        if (cachedOffers == null || cachedOffers.size() == 0) {
+        if (mOffers != null) {
+            pickUp(mOffers);
+        } else if (cachedOffers == null || cachedOffers.size() == 0) {
             getView().showLoadingOffers();
+            refreshOffers(SILENT_REFRESH, !ENFORCE_UPDATE);
         }
-        refreshOffers(true, false);
     }
 
     @Override
@@ -829,8 +843,6 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         });
     }
 
-    private SparseArray<RestaurantOffers> cachedOffers;
-
     private boolean hasDataSetChanged(List<RestaurantOffers> allOffers) {
         boolean dataSetChanged = false;
         if (cachedOffers == null || cachedOffers.size() != allOffers.size()) {
@@ -875,6 +887,8 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
 
     @Override
     public void pickUp(List<RestaurantOffers> allOffers) {
+        mOffers = allOffers;
+
         IDashboardViewContainer view = getView();
         if (view == null) {
             return;

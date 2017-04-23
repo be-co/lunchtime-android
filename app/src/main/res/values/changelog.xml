@@ -1,6 +1,8 @@
 <resources>
     <string name="changelog_header">Changelog</string>
-    <string name="changelog"><b>2017.04.22 Alpha (v22)</b>
+    <string name="changelog"><b>2017.04.29 Alpha (v23)</b>
+        \n•  Keep offers at rotation
+        \n\n<b>2017.04.22 Alpha (v22)</b>
         \n•  Removed the feature to enter fix places inside search view
         \n•  Load more offers disappears if no further offers are available
         \n\n<b>2017.04.17 Alpha (v21)</b>

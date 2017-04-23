@@ -1,7 +1,9 @@
 <resources>
     <string name="changelog_header">Versionshistorie</string>
     <string name="changelog">
-        <b>2017.04.22 Alpha (v22)</b>
+        <b>2017.04.29 Alpha (v23)</b>
+        \n•  Angebote werden bei Rotation nicht neu geladen
+        \n\n<b>2017.04.22 Alpha (v22)</b>
         \n•  Eingabe fixer Ausgangsorte entfernt
         \n•  Weitere Angebote laden wird ausgeblendet falls keine weiteren Angebote im Umkraus von 5km zu finden sind
         \n\n<b>2017.04.17 Alpha (v21)</b>

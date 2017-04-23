@@ -698,6 +698,7 @@ import com.tbaehr.lunchtime.view.DashboardViewContainer;
 import com.tbaehr.lunchtime.view.HorizontalSliderView;
 import com.tbaehr.lunchtime.view.IDashboardViewContainer;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -716,6 +717,12 @@ import static com.tbaehr.lunchtime.controller.DetailPageActivity.KEY_RESTAURANT_
 public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContainer>
         implements ModelProvider.NearbyOffersChangeListener, LocationListener {
 
+    private static final String TAG = "Lunchtime";
+
+    private static final boolean SILENT_REFRESH = true;
+
+    private static final boolean ENFORCE_UPDATE = true;
+
     private BaseActivity activity;
 
     private ITracking tracker;
@@ -723,6 +730,8 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     private Timer timer;
 
     private Location lastKnownLocation;
+
+    private SparseArray<RestaurantOffers> cachedOffers;
 
     public DashboardPresenter(DashboardFragment fragment) {
         this.activity = (BaseActivity) fragment.getActivity();
@@ -733,6 +742,10 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     public void onDestroy() {
         activity = null;
         timer = null;
+        //cachedOffers = null;
+        //mOffers = null;
+        lastKnownLocation = null;
+        tracker = null;
         super.onDestroy();
     }
 
@@ -740,10 +753,16 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     public void bindView(IDashboardViewContainer view) {
         super.bindView(view);
         activity.requestLocationUpdates();
-        if (cachedOffers == null || cachedOffers.size() == 0) {
+        if (cachedOffers != null) {
+            List<RestaurantOffers> offers = new ArrayList<>();
+            for (int i = 0; i < cachedOffers.size(); i++) {
+                offers.add(cachedOffers.get(i));
+            }
+            pickUp(offers);
+        } else {
             getView().showLoadingOffers();
+            refreshOffers(SILENT_REFRESH, !ENFORCE_UPDATE);
         }
-        refreshOffers(true, false);
     }
 
     @Override
@@ -751,10 +770,6 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         stopTimeBasedRefresh();
         activity.stopLocationUpdates();
         super.unbindView();
-    }
-
-    public void onDestroyFragment() {
-        cachedOffers = null;
     }
 
     private void restartTimeBasedRefresh(Collection<RestaurantOffers> restaurantOffersList) {
@@ -829,8 +844,6 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         });
     }
 
-    private SparseArray<RestaurantOffers> cachedOffers;
-
     private boolean hasDataSetChanged(List<RestaurantOffers> allOffers) {
         boolean dataSetChanged = false;
         if (cachedOffers == null || cachedOffers.size() != allOffers.size()) {
@@ -886,19 +899,19 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
         }
 
         if (!hasDataSetChanged(allOffers)) {
-            Log.i("TimTim", "dataSet has NOT changed");
             if (!view.hasOffers()) {
+                Log.i(TAG, "DashboardPresenter: dataSet has NOT changed");
                 if (!areOffersAvailable(allOffers)) {
                     showNoOfferView();
                     return;
                 }
             } else if (!view.isProgressBarVisible()) {
-                Log.i("TimTim", "distance updated");
+                Log.i(TAG, "DashboardPresenter: dataSet has NOT changed -> distance updated");
                 updateDistance(allOffers);
                 return;
             }
         }
-        Log.i("TimTim", "dataSet has changed");
+        Log.i(TAG, "DashboardPresenter: dataSet has changed");
 
         view.hideProgressBar();
         view.clearOffers();
@@ -963,12 +976,10 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
             try {
                 offers = provider.loadMoreOffers();
             } catch (RestaurantOffers.DistanceNotAvailableException e) {
-                if (view != null) {
-                    view.showLocationUnknown();
-                    return;
-                }
+                view.showLocationUnknown();
+                return;
             }
-            Log.v("TimTim", "Received "+offers.size()+" offer sections.");
+            Log.v(TAG, "Received "+offers.size()+" offer sections.");
             pickUp(offers);
         } else {
             view.hideLoadMoreButton();
@@ -1000,7 +1011,7 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     }
 
     public void refreshOffers(boolean silentRefresh, boolean forceUpdate) {
-        Log.v("TimTim", "DashboardPresenter.refreshOffers | "+(forceUpdate?"forced update":"")+(silentRefresh?", refresh silent":"")+")");
+        Log.v(TAG, "DashboardPresenter.refreshOffers("+(silentRefresh?"SILENT":"!SILENT")+", "+(forceUpdate?"FORCE":"!FORCE")+")");
         IDashboardViewContainer view = getView();
 
         if (lastKnownLocation == null) {
@@ -1021,15 +1032,21 @@ public class DashboardPresenter extends CustomBasePresenter<IDashboardViewContai
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_REQUEST_CODE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             cachedOffers = null;
-            refreshOffers(false, true);
+            refreshOffers(!SILENT_REFRESH, ENFORCE_UPDATE);
         }
     }
 
     @Override
     public void onLocationChanged(Location location) {
+        if (lastKnownLocation != null &&
+                lastKnownLocation.getLongitude() == location.getLongitude() &&
+                lastKnownLocation.getLatitude() == location.getLatitude()) {
+            return;
+        }
+
         lastKnownLocation = location;
-        Log.i("TimTim", "DashboardPresenter.onLocationChanged(" + location + ")");
-        refreshOffers(true, false);
+        Log.i(TAG, "DashboardPresenter.onLocationChanged(" + location + ")");
+        refreshOffers(SILENT_REFRESH, !ENFORCE_UPDATE);
     }
 
     @Override

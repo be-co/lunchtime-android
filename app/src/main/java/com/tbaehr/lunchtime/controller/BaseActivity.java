@@ -726,7 +726,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
         LocationListener,
         ResultCallback<LocationSettingsResult> {
 
-    private static final String TAG = "Lunchtime.BaseActivity";
+    private static final String TAG = "Lunchtime";
 
     /**
      * Constant used in the location settings dialog.
@@ -940,7 +940,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
     }
 
     private void tellPresenterLocationChanged() {
-        Log.v("TimTim", "tellPresenterLocationChanged()");
+        Log.v(TAG, "BaseActivity.tellPresenterLocationChanged()");
         CustomBasePresenter presenter = getPresenter();
         if (presenter != null && presenter instanceof com.tbaehr.lunchtime.localization.LocationListener) {
             ((com.tbaehr.lunchtime.localization.LocationListener) presenter).onLocationChanged(mCurrentLocation);
@@ -1018,7 +1018,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     @Override
     public void onResult(LocationSettingsResult locationSettingsResult) {
-        Log.v("TimTim", "onResult");
         final Status status = locationSettingsResult.getStatus();
         switch (status.getStatusCode()) {
             case LocationSettingsStatusCodes.SUCCESS:
@@ -1106,7 +1105,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.v("TimTim", "onActivityResult("+requestCode+", "+requestCode+", "+data+")");
         switch (requestCode) {
             // Check for the integer request code originally supplied to startResolutionForResult()
             case REQUEST_CHECK_SETTINGS:
@@ -1128,7 +1126,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * Requests location updates from the FusedLocationApi.
      */
     protected void startLocationUpdates() {
-        Log.v("TimTim", "startLocationUpdates()");
+        Log.v(TAG, "BaseActivity.startLocationUpdates()");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             alertDialogRequestingLocationPermission();
@@ -1151,6 +1149,7 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      * Removes location updates from the FusedLocationApi.
      */
     public void stopLocationUpdates() {
+        Log.v(TAG, "BaseActivity.stopLocationUpdates()");
         // It is a good practice to remove location requests when the activity is in a paused or
         // stopped state. Doing so helps battery performance and is especially
         // recommended in applications that request frequent location updates.
@@ -1197,7 +1196,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     @Override
     public void onConnected(Bundle connectionHint) {
-        Log.v("TimTim", "onConnected("+connectionHint+")");
         if (!mRequestingLocationUpdates) {
             return;
         }
@@ -1230,7 +1228,6 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
      */
     @Override
     public void onLocationChanged(Location location) {
-        Log.v("TimTim", "onLocationChanged("+location+")");
         mCurrentLocation = location;
         SharedPrefsHelper.putLocation(KEY_LOCATION, mCurrentLocation);
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
@@ -1239,13 +1236,11 @@ public abstract class BaseActivity<V, P extends CustomBasePresenter<V>> extends 
 
     @Override
     public void onConnectionSuspended(int cause) {
-        Log.v("TimTim", "onConnectionSuspended("+cause+")");
         // ;
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        Log.v("TimTim", "onConnectionSuspended("+result+")");
         // ;
     }
 }

@@ -945,6 +945,8 @@ public class ModelProvider {
     }
 
     public boolean canLoadMoreOffers() {
+        boolean canLoadMore;
+
         int tempSelectedRadius = selectedRadius;
         if (!increaseMoreOffersCounter()) {
             return false;
@@ -952,13 +954,17 @@ public class ModelProvider {
         List<RestaurantOffers> strippedOffers = stripByDistance(allOffers);
         if (strippedOffers.size() == strippedOffersSizeOld) {
             strippedOffersSizeChanged = false;
+            canLoadMore = canLoadMoreOffers();
+        } else {
+            strippedOffersSizeChanged = true;
+            canLoadMore = selectedRadius < RADIUS.length - 1;
         }
         selectedRadius = tempSelectedRadius;
-        return RADIUS.length - 2 > selectedRadius && strippedOffersSizeChanged;
+        return canLoadMore && strippedOffersSizeChanged;
     }
 
     private boolean increaseMoreOffersCounter() {
-        if (RADIUS.length - 2 > selectedRadius) {
+        if (selectedRadius < RADIUS.length - 1) {
             selectedRadius++;
             return true;
         }
